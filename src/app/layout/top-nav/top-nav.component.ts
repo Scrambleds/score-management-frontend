@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
-import { LanguageService } from '../../core/services/language.service';
 import { TranslationService } from '../../core/services/translation.service';
 import { UserService } from '../../services/sharedService/userService/userService.service';
 
@@ -24,28 +23,24 @@ export class TopNavComponent implements OnInit {
   role: string = '';
 
   constructor(
-    private languageService: LanguageService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private translationService: TranslationService,
-    private UserService:UserService,
+    private UserService: UserService
   ) {}
 
   ngOnInit(): void {
-    console.log("My nav")
-      this.UserService.userInfo$.subscribe((userInfo) => {
-        if (userInfo) {
-          this.prefix = userInfo.prefix_description_th;
-          this.firstname = userInfo.firstname;
-          this.lastname = userInfo.lastname;
-          this.teacher_code = userInfo.teacher_code;
-          this.role = userInfo.role_description_th;
-        }
-      });
+    console.log('My nav');
+    this.UserService.userInfo$.subscribe((userInfo) => {
+      if (userInfo) {
+        this.prefix = userInfo.prefix_description_th;
+        this.firstname = userInfo.firstname;
+        this.lastname = userInfo.lastname;
+        this.teacher_code = userInfo.teacher_code;
+        this.role = userInfo.role_description_th;
+      }
+    });
 
-    // this.currentLang = this.languageService.getCurrentLanguage();
-    // console.log('current @ top nav', this.currentLang);
-    // this.languageService.setLanguage(this.currentLang);
     if (typeof window !== 'undefined') {
       const savedLang = localStorage.getItem(`language`) || 'th';
       this.currentLang = savedLang;

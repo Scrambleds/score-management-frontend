@@ -16,7 +16,12 @@
       ></i>
       {{ buttonName }}
     </label>
-    <input id="uploadfile" type="file" class="d-none" />
+    <input
+      id="uploadfile"
+      type="file"
+      class="d-none"
+      (change)="onFileSelected($event)"
+    />
   </div>
 </div>
 
@@ -25,7 +30,9 @@
     <!-- header -->
     <div class="row gx-0 w-100">
       <div class="w-100 mb-2">
-        <div class="fw-bold text-start">ตารางคะแนน</div>
+        <div class="fw-bold text-start">
+          {{ "uploadscore_tableName" | translate }}
+        </div>
       </div>
       <div class="col-12 col-md-8 mb-2">
         <form
@@ -43,7 +50,7 @@
                   overflow: hidden;
                   text-overflow: ellipsis;
                 "
-                >รหัสนิสิต/ชื่อนิสิต/อีเมล</label
+                >{{ "uploadscore_searchStudent" | translate }}</label
               >
               <div
                 class="input-group-autocomplete mw-100"
@@ -63,18 +70,22 @@
               </div>
             </div>
             <div class="col-12 col-md-3">
-              <label for="subjectNo" class="fw-bold mb-2">รหัสสาขา</label>
+              <label for="subjectNo" class="fw-bold mb-2">{{
+                "uploadscore_searchMajor" | translate
+              }}</label>
               <ng-select
                 id="majorCode"
                 class="w-100"
                 formControlName="majorCode"
-                [items]="majorCodeOptions"
-                bindLabel="label"
-                bindValue="value"
+                [items]="majorList"
+                bindValue="byte_code"
                 [placeholder]="'placeholder_select' | translate"
                 [clearable]="true"
                 (change)="onSelectChange($event, 'majorCode')"
               >
+                <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                  {{ item | translateDropdown }}
+                </ng-template>
               </ng-select>
             </div>
             <div
@@ -86,7 +97,7 @@
                   class="bi bi-search"
                   style="font-size: var(--icon-size); color: var(--white-color)"
                 ></i>
-                ค้นหา
+                {{ "uploadscore_searchButton" | translate }}
               </button>
             </div>
           </div>
@@ -106,7 +117,7 @@
               class="bi bi-floppy-fill"
               style="font-size: var(--icon-size); color: var(--white-color)"
             ></i>
-            บันทึกข้อมูล
+            {{ "uploadscore_saveData" | translate }}
           </button>
           <button
             class="btn btn-secondary"
@@ -117,7 +128,7 @@
               class="bi bi-trash-fill"
               style="font-size: var(--icon-size); color: var(--white-color)"
             ></i>
-            ลบข้อมูล
+            {{ "uploadscore_deleteData" | translate }}
           </button>
         </div>
       </div>
@@ -130,6 +141,7 @@
       [rowData]="rowData"
       [columnDefs]="columnDefs"
       [defaultColDef]="defaultColDef"
+      (gridReady)="onGridReady($event)"
     >
     </ag-grid-angular>
   </div>

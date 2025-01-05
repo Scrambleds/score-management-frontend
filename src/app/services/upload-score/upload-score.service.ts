@@ -74,4 +74,15 @@ export class UploadScoreService {
       tap((_) => console.log('uploadScore done!!'))
     );
   }
+
+  masterData(reference: string): Observable<any[]> {
+    const url = `${environment.apiUrl}/api/MasterData/SystemParam`;
+    const params = new HttpParams().set('reference', reference);
+    return this.http
+      .get<Record<string, string>>(url, { params, ...this.httpOptions })
+      .pipe(
+        map((response: any) => response),
+        tap((_) => console.log(`get masterdata : ${reference} done!!`))
+      );
+  }
 }

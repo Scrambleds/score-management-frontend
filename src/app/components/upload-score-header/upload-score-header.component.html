@@ -79,13 +79,15 @@
           <ng-select
             name="academicYearCode"
             formControlName="academicYearCode"
-            [items]="academicYearCodeOptions"
-            bindLabel="label"
-            bindValue="value"
+            [items]="academicYearList"
+            bindValue="byte_code"
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             (change)="onSelectChange($event, 'academicYearCode')"
           >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown }}
+            </ng-template>
           </ng-select>
           <div
             *ngIf="
@@ -106,13 +108,15 @@
           <ng-select
             name="semesterCode"
             formControlName="semesterCode"
-            [items]="semesterCodeOptions"
-            bindLabel="label"
-            bindValue="value"
+            [items]="semesterList"
+            bindValue="byte_code"
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             (change)="onSelectChange($event, 'semesterCode')"
           >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown }}
+            </ng-template>
           </ng-select>
           <div
             *ngIf="
@@ -133,13 +137,15 @@
           <ng-select
             name="sectionCode"
             formControlName="sectionCode"
-            [items]="sectionCodeOptions"
-            bindLabel="label"
-            bindValue="value"
+            [items]="sectionList"
+            bindValue="byte_code"
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             (change)="onSelectChange($event, 'sectionCode')"
           >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown }}
+            </ng-template>
           </ng-select>
           <div
             *ngIf="

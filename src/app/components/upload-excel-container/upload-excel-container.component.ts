@@ -3,6 +3,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -17,6 +18,20 @@ import { UploadScoreHeaderComponent } from '../upload-score-header/upload-score-
 import Swal from 'sweetalert2';
 import { UploadScoreService } from '../../services/upload-score/upload-score.service';
 import { UserService } from '../../services/sharedService/userService/userService.service';
+import { SelectBoxService } from '../../services/select-box/select-box.service';
+import { TranslationService } from '../../core/services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import {
+  ClientSideRowModelModule,
+  ColDef,
+  ColGroupDef,
+  GridApi,
+  GridOptions,
+  GridReadyEvent,
+  ModuleRegistry,
+  createGrid,
+} from 'ag-grid-community';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-upload-excel-container',
@@ -25,7 +40,7 @@ import { UserService } from '../../services/sharedService/userService/userServic
   templateUrl: './upload-excel-container.component.html',
   styleUrl: './upload-excel-container.component.css',
 })
-export class UploadExcelContainerComponent {
+export class UploadExcelContainerComponent implements OnInit {
   @Input() titleName: string = 'No title'; // รับค่าจาก Parent
   @Input() buttonName: string = 'No title'; // รับค่าจาก Parent
 
@@ -34,12 +49,15 @@ export class UploadExcelContainerComponent {
   @Output() isUploaded = new EventEmitter<boolean>(); // ส่งค่ากลับไปยัง Parent
 
   //view child
-  // @ViewChild('subjectDetailForm', { read: FormGroupDirective })
-  // subjectDetailFormRef?: FormGroupDirective;
-  // @ViewChild(SubjectDetailComponent)
-  // subjectDetailComponent: SubjectDetailComponent;
   @ViewChild(UploadScoreHeaderComponent, { static: false })
   subjectDetailComponent?: UploadScoreHeaderComponent;
+
+  //pipe
+  private translatePipe: TranslatePipe;
+
+  //lang
+  currentLanguage!: string;
+  private translationSubscription!: Subscription;
 
   @Output() submitRequest = new EventEmitter<void>();
   @Output() sendDataToApi = new EventEmitter<any>(); // Emit final data to send to API
@@ -50,6 +68,12 @@ export class UploadExcelContainerComponent {
   columnDefs: any[] = []; // คำนิยามของคอลัมน์
   originalData: any[] = []; // สำหรับใช้กรองข้อมูล
   isFileUploaded = false; // flag ตรวจสอบการอัปโหลดไฟล์
+
+  //masterData
+  majorList: any[] = [];
+
+  gridApi!: GridApi<any>;
+
   filteredSubjects = [
     {
       subjectCode: '01418442-60',
@@ -90,7 +114,7 @@ export class UploadExcelContainerComponent {
     'ชื่อ-นามสกุล',
     'รหัสสาขา',
     'อีเมล',
-    'คะแนนเก็บ',
+    'คะแนนระหว่างเรียน',
     'คะแนนกลางภาค',
     'คะแนนปลายภาค',
   ]; // ฟีลด์ที่ต้องการ
@@ -98,13 +122,47 @@ export class UploadExcelContainerComponent {
   constructor(
     private fb: FormBuilder,
     private uploadScoreService: UploadScoreService,
-    private userService: UserService
+    private userService: UserService,
+    private selectBoxService: SelectBoxService,
+    private translationService: TranslationService
   ) {
     this.form = this.fb.group({
       // subjectNo: [''],
       // subjectName: [''],
       search: [{ value: '', disabled: false }],
       majorCode: [{ value: null, disabled: false }],
+    });
+    this.loadMajor();
+    this.translatePipe = new TranslatePipe(this.translationService);
+  }
+
+  ngOnInit(): void {
+    // this.detectLanguageChange();
+    this.translationService.getTranslations().subscribe(() => {
+      this.refreshHeaderNames(); // รีเฟรชชื่อคอลัมน์เมื่อเปลี่ยนภาษา
+    });
+    // this.langSubscription = this.languageService
+    //   .getCurrentLanguageObservable()
+    //   .subscribe((lang) => {
+    //     this.currentLanguage = lang;
+    //     console.log('Current Language:', lang);
+    //     this.refreshHeaderNames(); // อัปเดต UI
+    //   });
+    // if (typeof window !== 'undefined') {
+    //   let currentLanguage = localStorage.getItem('language') || 'en';
+    //   const newLanguage = localStorage.getItem('language');
+    //   if (newLanguage && newLanguage !== currentLanguage) {
+    //     currentLanguage = newLanguage;
+    //     this.refreshHeaderNames();
+    //   }
+    // }
+  }
+
+  //MasterData
+  loadMajor() {
+    this.selectBoxService.getSystemParamMajor().subscribe((resp) => {
+      console.log(resp);
+      this.majorList = resp;
     });
   }
 
@@ -116,49 +174,223 @@ export class UploadExcelContainerComponent {
   // เมื่อไฟล์ถูกวางลง
   onDrop(event: DragEvent) {
     event.preventDefault();
-
     const file = event.dataTransfer?.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-
-        // อ่านข้อมูลจาก Sheet แรก
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-
-        // แปลง Sheet เป็น JSON
-        const jsonData = XLSX.utils.sheet_to_json(sheet);
-        // ตรวจสอบฟีลด์
-        if (this.validateFields(jsonData)) {
-          // เพิ่มฟีลด์คะแนนรวม
-          const modifiedData = this.processData(jsonData);
-
-          // โหลดข้อมูลลงใน ag-Grid
-          this.loadGridData(modifiedData);
-          this.isFileUploaded = true; // ตั้งค่า flag เมื่อไฟล์อัปโหลดแล้ว
-          this.isUploaded.emit(true); // แจ้ง Parent ว่าไฟล์ถูกอัปโหลดสำเร็จ
-        } else {
-          alert('ไฟล์ไม่ถูกต้อง กรุณาอัปโหลดไฟล์ที่มีฟีลด์ครบถ้วน');
-        }
-      };
-
-      reader.readAsArrayBuffer(file);
+      this.processFile(file);
     }
   }
 
+  // เมื่อเลือกไฟล์จาก input
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.processFile(file);
+    }
+  }
+
+  // ฟังก์ชันที่ใช้ในการประมวลผลไฟล์ทั้งจากการลากวางและการเลือกไฟล์
+  processFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+
+      // อ่านข้อมูลจาก Sheet แรก
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+
+      // ใช้ header: 1 เพื่อให้แถวแรกเป็น header
+      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      console.log(jsonData); // ตรวจสอบข้อมูลที่ได้
+
+      // ตรวจสอบข้อมูลด้วย validateData
+      if (this.validateData(jsonData)) {
+        // เปลี่ยน jsonData จากอาร์เรย์ 2 มิติให้เป็นอาร์เรย์ของอ็อบเจ็กต์
+        const mappedData = this.mapJsonData(jsonData);
+
+        // ถ้าไม่มีข้อผิดพลาด
+        // ทำการประมวลผลข้อมูล
+        const modifiedData = this.processData(mappedData);
+        this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
+        this.isFileUploaded = true; // ตั้งค่า flag เมื่อไฟล์อัปโหลดแล้ว
+        this.isUploaded.emit(true); // แจ้ง Parent ว่าไฟล์ถูกอัปโหลดสำเร็จ
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+
+  // ฟังก์ชันสำหรับ mapping jsonData ให้สามารถใช้โค้ดเดิมได้
+  mapJsonData(data: any[]): any[] {
+    const headers = data[0]; // ใช้แถวแรกเป็น header
+    const rows = data.slice(1); // ใช้แถวที่เหลือเป็นข้อมูลจริง
+
+    return rows.map((row) => {
+      // สร้างอ็อบเจ็กต์โดยจับคู่ชื่อฟิลด์จาก headers กับข้อมูลในแถว
+      const rowData: any = {};
+
+      headers.forEach((header: string, index: number) => {
+        rowData[header] = row[index]; // ค่าของแต่ละคอลัมน์
+      });
+
+      // คืนค่าข้อมูลในรูปแบบที่ต้องการ
+      return {
+        ลำดับ: rowData['ลำดับ'] || '',
+        รหัสนิสิต: rowData['รหัสนิสิต'] || '',
+        คำนำหน้า: rowData['คำนำหน้า'] || '',
+        'ชื่อ-นามสกุล': rowData['ชื่อ-นามสกุล'] || '',
+        รหัสสาขา: rowData['รหัสสาขา'] || '',
+        อีเมล: rowData['อีเมล'] || '',
+        คะแนนระหว่างเรียน: rowData['คะแนนระหว่างเรียน'] || 0,
+        คะแนนกลางภาค: rowData['คะแนนกลางภาค'] || 0,
+        คะแนนปลายภาค: rowData['คะแนนปลายภาค'] || 0,
+      };
+    });
+  }
+
+  validateData(jsonData: any[]): boolean {
+    const headers = jsonData[0] || []; // แถวแรกของไฟล์ใช้เป็น header (field names)
+    const dataRows = jsonData.slice(1); // ข้อมูลหลัง header
+    let errorMessages: string[] = [];
+
+    // ตรวจสอบ headers ว่ามีฟีลด์ที่ต้องการครบหรือไม่
+    const missingFields = this.requiredFields.filter(
+      (field) => !headers.includes(field)
+    );
+
+    if (missingFields.length > 0) {
+      errorMessages.push(
+        `ฟีลด์ที่ขาดหายไปใน header: ${missingFields.join(', ')}`
+      );
+    }
+
+    // ตรวจสอบกรณีไม่มีข้อมูลใน dataRows
+    if (dataRows.length === 0) {
+      errorMessages.push('ไม่มีข้อมูลในไฟล์ กรุณาอัปโหลดไฟล์ที่มีข้อมูล');
+    } else {
+      // ตรวจสอบว่าฟีลด์ในแต่ละแถวไม่มีค่าว่าง
+      for (let rowIndex = 0; rowIndex < dataRows.length; rowIndex++) {
+        const row = dataRows[rowIndex];
+
+        // ตรวจสอบฟีลด์ในแต่ละแถว
+        this.requiredFields.forEach((field, fieldIndex) => {
+          const fieldValue = row[fieldIndex]; // ใช้ index ในการจับคู่ค่าจากแต่ละแถว
+          if (fieldValue == null || fieldValue === '') {
+            errorMessages.push(
+              `ฟีลด์ "${field}" ในแถวที่ ${rowIndex + 1} เป็นค่าว่าง`
+            );
+          }
+        });
+      }
+    }
+
+    // หากมี error เก็บทั้งหมดไว้ใน swal
+    if (errorMessages.length > 0) {
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        // text: errorMessages.join('\n'), // แสดงข้อความ error ทั้งหมดใน swal
+        html: errorMessages.join('<br>'), // ใช้ <br> แทน \n เพื่อแสดงผลในบรรทัดใหม่
+        icon: 'error',
+        confirmButtonColor: 'var(--secondary-color)',
+        confirmButtonText: 'ปิด',
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  validateHeaders(headers: any): boolean {
+    const missingFields = this.requiredFields.filter(
+      (field) => !headers.includes(field)
+    );
+
+    if (missingFields.length > 0) {
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: `ฟีลด์ที่ขาดหายไป: ${missingFields.join(', ')}`,
+        icon: 'error',
+        confirmButtonColor: 'var(--secondary-color)',
+        confirmButtonText: 'ปิด',
+      });
+      return false;
+    }
+    return true;
+  }
+
   validateFields(data: any[]): boolean {
-    if (data.length === 0) return false;
-    const fileFields = Object.keys(data[0]); // ชื่อฟีลด์จากไฟล์ Excel
-    return this.requiredFields.every((field) => fileFields.includes(field));
+    const dataRows = data;
+    const fileFields = Object.keys(data[0] || {}); // ชื่อฟีลด์จากไฟล์ Excel (เผื่อกรณีไฟล์ไม่มีข้อมูล)
+
+    // ตรวจสอบว่าไฟล์มีฟีลด์ครบตามที่กำหนด
+    const missingFields = this.requiredFields.filter(
+      (field) => !fileFields.includes(field)
+    );
+
+    // ตรวจสอบกรณีฟีลด์ไม่ครบและไม่มีข้อมูลใน row
+    if (missingFields.length > 0 && dataRows.length === 0) {
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: `ฟีลด์ที่ขาดหายไป: ${missingFields.join(
+          ', '
+        )} และไม่มีข้อมูลในไฟล์`,
+        icon: 'error',
+        confirmButtonColor: 'var(--secondary-color)',
+        confirmButtonText: 'ปิด',
+      });
+      return false;
+    }
+
+    // ตรวจสอบกรณีฟีลด์ไม่ครบ
+    if (missingFields.length > 0) {
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: `ฟีลด์ที่ขาดหายไป: ${missingFields.join(', ')}`,
+        icon: 'error',
+        confirmButtonColor: 'var(--secondary-color)',
+        confirmButtonText: 'ปิด',
+      });
+      return false;
+    }
+
+    // ตรวจสอบกรณีไม่มี row data
+    if (dataRows.length === 0) {
+      Swal.fire({
+        title: 'เกิดข้อผิดพลาด',
+        text: 'ข้อมูลไม่พบ กรุณาอัปโหลดไฟล์ที่มีข้อมูล',
+        icon: 'error',
+        confirmButtonColor: 'var(--secondary-color)',
+        confirmButtonText: 'ปิด',
+      });
+      return false;
+    }
+
+    // ตรวจสอบทุกแถวว่าไม่มีฟีลด์ที่เป็นค่าว่าง
+    for (const row of dataRows) {
+      for (const field of this.requiredFields) {
+        if (!row[field] || row[field] === '') {
+          Swal.fire({
+            title: 'เกิดข้อผิดพลาด',
+            text: `ฟีลด์ "${field}" ในแถวที่ ${
+              dataRows.indexOf(row) + 1
+            } เป็นค่าว่าง`,
+            icon: 'error',
+            confirmButtonColor: 'var(--secondary-color)',
+            confirmButtonText: 'ปิด',
+          });
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   processData(data: any[]): any[] {
     return data.map((row) => {
       const [firstName, lastName] = (row['ชื่อ-นามสกุล'] || '').split(' '); // แยกชื่อและนามสกุล
       const totalScore =
-        (row['คะแนนเก็บ'] || 0) +
+        (row['คะแนนระหว่างเรียน'] || 0) +
         (row['คะแนนกลางภาค'] || 0) +
         (row['คะแนนปลายภาค'] || 0); // คำนวณคะแนนรวม
 
@@ -171,7 +403,7 @@ export class UploadExcelContainerComponent {
         นามสกุล: lastName || '',
         รหัสสาขา: row['รหัสสาขา'],
         อีเมล: row['อีเมล'],
-        คะแนนเก็บ: row['คะแนนเก็บ'] || 0,
+        คะแนนระหว่างเรียน: row['คะแนนระหว่างเรียน'] || 0,
         คะแนนกลางภาค: row['คะแนนกลางภาค'] || 0,
         คะแนนปลายภาค: row['คะแนนปลายภาค'] || 0,
         คะแนนรวม: totalScore,
@@ -179,75 +411,114 @@ export class UploadExcelContainerComponent {
     });
   }
 
+  onGridReady(params: GridReadyEvent<any>) {
+    this.gridApi = params.api;
+  }
+
+  generateColumnDefs(data: any[]) {
+    if (data.length === 0) {
+      return [];
+    }
+
+    return Object.keys(data[0]).map((key) => {
+      let customWidth = 100;
+      let flexValue = 1;
+      let cellClass = '';
+      let fieldNameKey = '';
+
+      switch (key) {
+        case 'ลำดับ':
+          customWidth = 71;
+          flexValue = 0.8;
+          fieldNameKey = 'uploadscore_tableFieldSeatNo';
+          break;
+        case 'รหัสนิสิต':
+          customWidth = 113;
+          flexValue = 1.5;
+          fieldNameKey = 'uploadscore_tableFieldStudentId';
+          break;
+        case 'คำนำหน้า':
+          customWidth = 88;
+          flexValue = 1.2;
+          fieldNameKey = 'uploadscore_tableFieldPrefix';
+          break;
+        case 'ชื่อ':
+          customWidth = 161;
+          flexValue = 1.8;
+          fieldNameKey = 'uploadscore_tableFieldFirstName';
+          break;
+        case 'นามสกุล':
+          customWidth = 161;
+          flexValue = 1.8;
+          fieldNameKey = 'uploadscore_tableFieldLastName';
+          break;
+        case 'รหัสสาขา':
+          customWidth = 90;
+          flexValue = 1.2;
+          fieldNameKey = 'uploadscore_tableFieldMajor';
+          break;
+        case 'อีเมล':
+          customWidth = 210;
+          flexValue = 2;
+          fieldNameKey = 'uploadscore_tableFieldEmail';
+          break;
+        case 'คะแนนระหว่างเรียน':
+          customWidth = 125;
+          flexValue = 1.4;
+          cellClass = 'text-end';
+          fieldNameKey = 'uploadscore_tableFieldAccScore';
+          break;
+        case 'คะแนนกลางภาค':
+          customWidth = 134;
+          flexValue = 1.5;
+          cellClass = 'text-end';
+          fieldNameKey = 'uploadscore_tableFieldMidScore';
+          break;
+        case 'คะแนนปลายภาค':
+          customWidth = 134;
+          flexValue = 1.5;
+          cellClass = 'text-end';
+          fieldNameKey = 'uploadscore_tableFieldFinScore';
+          break;
+        case 'คะแนนรวม':
+          customWidth = 126.6;
+          flexValue = 1.3;
+          cellClass = 'text-end';
+          fieldNameKey = 'uploadscore_tableFieldTotalScore';
+          break;
+        default:
+          customWidth = 160;
+          fieldNameKey = key;
+      }
+
+      const translatedHeader =
+        this.translationService.getTranslation(fieldNameKey);
+
+      return {
+        field: key,
+        headerName: translatedHeader || key,
+        flex: flexValue,
+        minWidth: customWidth,
+        cellClass: cellClass,
+      };
+    });
+  }
+
+  // ฟังก์ชันสำหรับโหลดข้อมูลใน grid
   loadGridData(data: any[]) {
     if (data.length > 0) {
       console.log(data);
-      // สร้างคอลัมน์จาก key ใน JSON
-      this.columnDefs = Object.keys(data[0]).map((key) => {
-        let customWidth = 100; // กำหนดความกว้างเริ่มต้น
-        let flexValue = 1; // ค่าเริ่มต้นของ flex
-        let cellClass = ''; // ตัวแปรสำหรับการกำหนดคลาส CSS
-        switch (key) {
-          case 'ลำดับ':
-            customWidth = 71;
-            flexValue = 0.8; // ความยืดหยุ่นเล็กกว่า
-            break;
-          case 'รหัสนิสิต':
-            customWidth = 113;
-            flexValue = 1.5; // ขยายความกว้าง
-            break;
-          case 'คำนำหน้า':
-            customWidth = 88;
-            flexValue = 1.2; // ขนาดปานกลาง
-            break;
-          case 'ชื่อ':
-          case 'นามสกุล':
-            customWidth = 161;
-            flexValue = 1.8; // ขนาดปานกลาง
-            break;
-          case 'รหัสสาขา':
-            customWidth = 90;
-            flexValue = 1.2; // ขนาดปานกลาง
-            break;
-          case 'อีเมล':
-            customWidth = 210;
-            flexValue = 2; // ความกว้างมากที่สุด
-            break;
-          case 'คะแนนเก็บ':
-            customWidth = 125;
-            flexValue = 1.4; // ค่า flex เท่ากัน
-            cellClass = 'text-end'; // เพิ่มคลาสสำหรับการจัดข้อความ
-            break;
-          case 'คะแนนกลางภาค':
-            customWidth = 134;
-            flexValue = 1.5; // ค่า flex เท่ากัน
-            cellClass = 'text-end'; // เพิ่มคลาสสำหรับการจัดข้อความ
-            break;
-          case 'คะแนนปลายภาค':
-            customWidth = 134;
-            flexValue = 1.5; // ค่า flex เท่ากัน
-            cellClass = 'text-end'; // เพิ่มคลาสสำหรับการจัดข้อความ
-            break;
-          case 'คะแนนรวม':
-            customWidth = 126.6;
-            flexValue = 1.3; // ค่า flex เท่ากัน
-            cellClass = 'text-end'; // เพิ่มคลาสสำหรับการจัดข้อความ
-            break;
-          default:
-            customWidth = 160; // ความกว้างเริ่มต้น
-        }
-        return {
-          field: key,
-          headerName: key.charAt(0).toUpperCase() + key.slice(1),
-          flex: flexValue, // ใช้ flex แทน width
-          minWidth: customWidth, // กำหนดความกว้างขั้นต่ำ
-          // width: customWidth, // กำหนดความกว้าง
-          cellClass: cellClass, // เพิ่มคลาส
-        };
-      });
       this.rowData = data;
       this.originalData = data;
+      this.columnDefs = this.generateColumnDefs(data);
       console.log(this.rowData);
+    }
+  }
+
+  // ฟังก์ชันสำหรับรีเฟรชชื่อคอลัมน์เมื่อเปลี่ยนภาษา
+  refreshHeaderNames() {
+    if (this.originalData && this.originalData.length > 0) {
+      this.columnDefs = this.generateColumnDefs(this.originalData);
     }
   }
 
@@ -274,6 +545,7 @@ export class UploadExcelContainerComponent {
       const matchesSearch = formValues.search
         ? row['รหัสนิสิต']?.toString().includes(formValues.search) || // แปลงเป็น string
           row['ชื่อ']?.includes(formValues.search) ||
+          row['นามสกุล']?.includes(formValues.search) ||
           row['อีเมล']?.includes(formValues.search)
         : true;
 
@@ -322,7 +594,7 @@ export class UploadExcelContainerComponent {
         lastname: item['นามสกุล'],
         major_code: item['รหัสสาขา'],
         email: item['อีเมล'],
-        accumulated_score: item['คะแนนเก็บ'],
+        accumulated_score: item['คะแนนระหว่างเรียน'],
         midterm_score: item['คะแนนกลางภาค'],
         final_score: item['คะแนนปลายภาค'],
         total_score: item['คะแนนรวม'],

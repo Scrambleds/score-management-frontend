@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
-
 export class SelectBoxService {
   private Url = `${environment.apiUrl}/api/MasterData/SystemParam`;
 
@@ -26,5 +25,33 @@ export class SelectBoxService {
     const params = new HttpParams().append('reference', Status);
 
     return this.http.get<any>(this.Url, { params });
+  }
+  getSystemParamSection(): Observable<any> {
+    const params = new HttpParams().set('reference', 'section');
+    return this.http.get<Record<string, string>>(this.Url, { params }).pipe(
+      map((response: any) => response.objectResponse),
+      tap((_) => console.log(`get masterdata : section done!!`))
+    );
+  }
+  getSystemParamAcademicYear(): Observable<any> {
+    const params = new HttpParams().set('reference', 'acedemic_year');
+    return this.http.get<Record<string, string>>(this.Url, { params }).pipe(
+      map((response: any) => response.objectResponse),
+      tap((_) => console.log(`get masterdata : acedemic_year done!!`))
+    );
+  }
+  getSystemParamSemester(): Observable<any> {
+    const params = new HttpParams().set('reference', 'semester');
+    return this.http.get<Record<string, string>>(this.Url, { params }).pipe(
+      map((response: any) => response.objectResponse),
+      tap((_) => console.log(`get masterdata : semester done!!`))
+    );
+  }
+  getSystemParamMajor(): Observable<any> {
+    const params = new HttpParams().set('reference', 'major_code');
+    return this.http.get<Record<string, string>>(this.Url, { params }).pipe(
+      map((response: any) => response.objectResponse),
+      tap((_) => console.log(`get masterdata : major_code done!!`))
+    );
   }
 }

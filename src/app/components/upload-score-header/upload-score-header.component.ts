@@ -12,6 +12,7 @@ import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { UploadScoreService } from '../../services/upload-score/upload-score.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import Swal from 'sweetalert2';
+import { SelectBoxService } from '../../services/select-box/select-box.service';
 
 @Component({
   selector: 'app-upload-score-header',
@@ -47,30 +48,15 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
   isSemesterDisabled: boolean = true;
   isSectionCodeDisabled: boolean = true;
 
-  academicYearCodeOptions = [
-    { value: null, label: 'กรุณาเลือก' },
-    { value: '2022', label: '2565' },
-    { value: '2023', label: '2566' },
-    { value: '2024', label: '2567' },
-    { value: '2025', label: '2568' },
-  ];
-  semesterCodeOptions = [
-    { value: null, label: 'กรุณาเลือก' },
-    { value: '1', label: 'ภาคต้น' },
-    { value: '2', label: 'ภาคปลาย' },
-    { value: '3', label: 'ภาคฤดูร้อน' },
-  ];
-  sectionCodeOptions = [
-    { value: null, label: 'กรุณาเลือก' },
-    { value: '800', label: '800' },
-    { value: '801', label: '801' },
-    { value: '870', label: '870' },
-    { value: '880', label: '880' },
-  ];
+  //masterData
+  sectionList: any[] = [];
+  semesterList: any[] = [];
+  academicYearList: any[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private uploadScoreService: UploadScoreService
+    private uploadScoreService: UploadScoreService,
+    private selectBoxService: SelectBoxService
   ) {
     this.form = this.fb.group({
       subjectCode: [
@@ -88,14 +74,9 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    // this.form
-    //   .get('subjectCode')!
-    //   .valueChanges.pipe(debounceTime(300), distinctUntilChanged())
-    //   .subscribe((value) => {
-    //     if (value.trim() !== '') {
-    //       this.searchSubject(value);
-    //     }
-    //   });
+    this.loadSection();
+    this.loadSemester();
+    this.loadAcademicYear();
 
     console.log('oninit');
     console.log(this.form.get('subjectCode')?.value); // ดูค่าว่ามีการอัปเดต
@@ -138,6 +119,28 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
         this.form.get('semesterCode')?.disable();
         this.form.get('sectionCode')?.disable();
       }
+    });
+  }
+
+  //load MasterData
+  loadSection(): void {
+    this.selectBoxService.getSystemParamSection().subscribe((resp) => {
+      console.log(resp);
+      this.sectionList = resp;
+    });
+  }
+
+  loadSemester(): void {
+    this.selectBoxService.getSystemParamSemester().subscribe((resp) => {
+      console.log(resp);
+      this.semesterList = resp;
+    });
+  }
+
+  loadAcademicYear(): void {
+    this.selectBoxService.getSystemParamAcademicYear().subscribe((resp) => {
+      console.log(resp);
+      this.academicYearList = resp;
     });
   }
 
