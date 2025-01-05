@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +29,12 @@ export class UploadScoreService {
   ];
 
   private apiUrl = 'https://example.com/api/subjects'; // Replace with your API endpoint
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'content-type': 'application/json;charset=UTF-8',
+    }),
+    responseType: 'json' as 'json',
+  };
 
   constructor(private http: HttpClient) {}
 
@@ -58,5 +65,13 @@ export class UploadScoreService {
         subject.subjectName.toLowerCase().includes(term.toLowerCase())
     );
     return of(filteredSubjects);
+  }
+
+  uploadScore(payload: any): Observable<any> {
+    const url = `${environment.apiUrl}/api/StudentScore/UploadScore`;
+    return this.http.post<any>(url, payload, { ...this.httpOptions }).pipe(
+      map((response: any) => response),
+      tap((_) => console.log('uploadScore done!!'))
+    );
   }
 }

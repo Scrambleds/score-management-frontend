@@ -75,7 +75,7 @@ export class ScoreAnnouncementService {
     );
   }
 
-  getScoreAnnouncementByCondition(data:any): Observable<any> {
+  getScoreAnnouncementByCondition(data: any): Observable<any> {
     const url = `${environment.apiUrl}/api/ScoreAnnoucement/GetScoreAnnoucementByCondition`;
     return this.http.post(url, data);
   }

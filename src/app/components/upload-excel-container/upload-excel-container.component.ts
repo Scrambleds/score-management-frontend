@@ -15,6 +15,8 @@ import {
 } from '@angular/forms';
 import { UploadScoreHeaderComponent } from '../upload-score-header/upload-score-header.component';
 import Swal from 'sweetalert2';
+import { UploadScoreService } from '../../services/upload-score/upload-score.service';
+import { UserService } from '../../services/sharedService/userService/userService.service';
 
 @Component({
   selector: 'app-upload-excel-container',
@@ -93,7 +95,11 @@ export class UploadExcelContainerComponent {
     'คะแนนปลายภาค',
   ]; // ฟีลด์ที่ต้องการ
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private uploadScoreService: UploadScoreService,
+    private userService: UserService
+  ) {
     this.form = this.fb.group({
       // subjectNo: [''],
       // subjectName: [''],
@@ -305,13 +311,78 @@ export class UploadExcelContainerComponent {
   // 11. call service for send to API
   sendToApi(formData: any) {
     //list student score from Excel
-    const additionalData = { data: this.rowData }; // Add extra object data
+
+    // Mapping rowData to match the ScoreStudent model
+    const studentScoreData = {
+      data: this.rowData.map((item) => ({
+        seat_no: item['ลำดับ']?.toString(),
+        student_id: item['รหัสนิสิต']?.toString(),
+        prefix: item['คำนำหน้า'],
+        firstname: item['ชื่อ'],
+        lastname: item['นามสกุล'],
+        major_code: item['รหัสสาขา'],
+        email: item['อีเมล'],
+        accumulated_score: item['คะแนนเก็บ'],
+        midterm_score: item['คะแนนกลางภาค'],
+        final_score: item['คะแนนปลายภาค'],
+        total_score: item['คะแนนรวม'],
+      })),
+    };
+    const subjectData = {
+      subject: {
+        subject_id: formData.subjectCode,
+        subject_name: formData.subjectName,
+        academic_year: formData.academicYearCode,
+        semester: formData.semesterCode,
+        section: formData.sectionCode,
+        teacher: ['6430250440', 'S2042'],
+      },
+    };
     console.log(this.rowData);
     // add payload : subjectDetail and list student score
-    const payload = { ...formData, ...additionalData }; // Merge formData with additionalData
+    const payload = {
+      ...studentScoreData,
+      ...subjectData,
+      username: this.userService.username,
+    }; // Merge formData with additionalData
     console.log('Final Payload to API:', payload);
-
-    // this.sendDataToApi.emit(payload);
+    this.uploadScoreService.uploadScore(payload).subscribe(
+      (response) => {
+        console.log('Success', response);
+        if (response.isSuccess) {
+          Swal.fire({
+            title: 'บันทึกคะแนนนิสิตสำเร็จ',
+            icon: 'success',
+            confirmButtonColor: 'var(--primary-color)',
+            confirmButtonText: 'ตกลง',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // หากคลิก "ตกลง"
+              console.log('success : ', response.messageDesc);
+            }
+          });
+        } else {
+          Swal.fire({
+            title: 'เกิดข้อผิดพลาด',
+            text: response.message.messageDescription,
+            icon: 'error',
+            confirmButtonColor: 'var(--secondary-color)',
+            confirmButtonText: 'ปิด',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // หากคลิก "ตกลง"
+              console.log('error : ', response.messageDesc);
+            }
+          });
+        }
+      },
+      (error) => {
+        console.log('Error', error);
+      },
+      () => {
+        console.log('Complete');
+      }
+    );
   }
 
   // ลบข้อมูลใน ag-Grid

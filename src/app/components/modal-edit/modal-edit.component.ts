@@ -1,11 +1,26 @@
-import { Component, EventEmitter, HostListener, Input, Output,  AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { passwordStrengthValidator } from '../validators/password-strength.validator';
 import Swal from 'sweetalert2';
 import { Modal } from 'bootstrap';
-import { UserEditService } from '../../services/edit-user/edit-user.service'
+import { UserEditService } from '../../services/edit-user/edit-user.service';
 import { SelectBoxService } from '../../services/select-box/select-box.service';
-import { UserService } from '../../services/sharedService/userService/userService.service'
+import { UserService } from '../../services/sharedService/userService/userService.service';
 import { UserManageService } from '../../services/user-manage/user-manage.service';
 import { Router } from '@angular/router';
 import { TranslationService } from '../../core/services/translation.service';
@@ -14,7 +29,7 @@ import { TranslationService } from '../../core/services/translation.service';
   selector: 'app-modal-edit',
   standalone: false,
   templateUrl: './modal-edit.component.html',
-  styleUrls: ['./modal-edit.component.css']
+  styleUrls: ['./modal-edit.component.css'],
 })
 export class ModalEditComponent {
   @Input() show = false; // ควบคุมการแสดงผลของ modal
@@ -32,20 +47,28 @@ export class ModalEditComponent {
   form: FormGroup;
   @ViewChild('modalElement') modalElement: ElementRef | undefined;
   modalInstance: Modal | undefined;
-  isDisabled = true; 
+  isDisabled = true;
   submitted = false;
-  
-  constructor(private fb: FormBuilder, 
-    private userEditService: UserEditService
-    , private SelectBoxService: SelectBoxService
-    , private UserService: UserService
-    , private UserManageService: UserManageService
-    , private Router: Router
-    , private translate: TranslationService) {
+
+  constructor(
+    private fb: FormBuilder,
+    private userEditService: UserEditService,
+    private SelectBoxService: SelectBoxService,
+    private UserService: UserService,
+    private UserManageService: UserManageService,
+    private Router: Router,
+    private translate: TranslationService
+  ) {
     this.form = this.fb.group({
       row_id: [null],
-      teacher_code: [{value: null , disabled: this.isDisabled}, Validators.required],
-      email: [{value: null, disabled: this.isDisabled}, [Validators.required, Validators.email]],
+      teacher_code: [
+        { value: null, disabled: this.isDisabled },
+        Validators.required,
+      ],
+      email: [
+        { value: null, disabled: this.isDisabled },
+        [Validators.required, Validators.email],
+      ],
       role: [null, Validators.required],
       prefix: [null, Validators.required],
       firstname: [null, Validators.required],
@@ -68,10 +91,10 @@ export class ModalEditComponent {
     const password = control.get('password')?.value;
     const confirmPassword = control.get('confirm_password')?.value;
 
-    if (!password || password.length < 8){
+    if (!password || password.length < 8) {
       return null;
     }
-  
+
     if (password && confirmPassword && password !== confirmPassword) {
       return { passwordMismatch: true }; // ส่งข้อผิดพลาดเมื่อรหัสผ่านไม่ตรงกัน
     }
@@ -105,9 +128,9 @@ export class ModalEditComponent {
     if (this.modalInstance) {
       this.modalInstance.hide();
     }
-    this.hide.emit(); 
-    this.form.reset(); 
-    this.removeConditionalFields(); 
+    this.hide.emit();
+    this.form.reset();
+    this.removeConditionalFields();
   }
 
   ngOnChanges() {
@@ -131,7 +154,7 @@ export class ModalEditComponent {
     }
   }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     this.unlockScroll();
   }
 
@@ -156,8 +179,7 @@ export class ModalEditComponent {
   }
 
   ngOnInit() {
-
-    if(this.show){
+    if (this.show) {
       this.lockScroll();
     }
 
@@ -165,7 +187,7 @@ export class ModalEditComponent {
     this.form.get('password')?.valueChanges.subscribe(() => {
       this.form.get('confirm_password')?.updateValueAndValidity();
     });
-  
+
     // ฟังการเปลี่ยนแปลงของ confirm_password
     this.form.get('confirm_password')?.valueChanges.subscribe(() => {
       this.form.get('confirm_password')?.updateValueAndValidity();
@@ -174,11 +196,16 @@ export class ModalEditComponent {
 
   private addConditionalFields() {
     if (!this.form.contains('confirm_password')) {
-      this.form.addControl('confirm_password', this.fb.control(null, Validators.required));
+      this.form.addControl(
+        'confirm_password',
+        this.fb.control(null, Validators.required)
+      );
     }
-    this.form.get('confirm_password')?.setValidators([Validators.required, this.matchPasswords]);
-    this.form.get('confirm_password')?.updateValueAndValidity(); 
-    this.form.updateValueAndValidity(); 
+    this.form
+      .get('confirm_password')
+      ?.setValidators([Validators.required, this.matchPasswords]);
+    this.form.get('confirm_password')?.updateValueAndValidity();
+    this.form.updateValueAndValidity();
   }
 
   private removeConditionalFields() {
@@ -197,18 +224,21 @@ export class ModalEditComponent {
     this.unlockScroll();
 
     setTimeout(() => {
-    this.form.reset();
-    this.removeConditionalFields();
-  }, 800);
+      this.form.reset();
+      this.removeConditionalFields();
+    }, 800);
   }
 
   onSubmit() {
     this.submitted = true;
     this.form.markAllAsTouched();
     this.form.updateValueAndValidity();
-  
-    if (this.form.valid && ((!this.form.value.password && !this.form.value.confirm_password) || (this.form.value.password === this.form.value.confirm_password))) {
 
+    if (
+      this.form.valid &&
+      ((!this.form.value.password && !this.form.value.confirm_password) ||
+        this.form.value.password === this.form.value.confirm_password)
+    ) {
       const UserInfo = this.UserService.username;
 
       const Success_title = this.translate.getTranslation('sweet_alert_success');
@@ -261,14 +291,14 @@ export class ModalEditComponent {
         this.removeConditionalFields();
       });
     } else {
-      console.log("ฟอร์มไม่ถูกต้อง ข้อผิดพลาด: ", this.form.errors);
+      console.log('ฟอร์มไม่ถูกต้อง ข้อผิดพลาด: ', this.form.errors);
     }
   }
-  
+
   onBlurConfirmPassword() {
     const confirmPasswordControl = this.form.get('confirm_password');
-    confirmPasswordControl?.updateValueAndValidity(); 
-    confirmPasswordControl?.markAsTouched(); 
+    confirmPasswordControl?.updateValueAndValidity();
+    confirmPasswordControl?.markAsTouched();
   }
 
   @HostListener('document:keydown.escape', ['$event'])

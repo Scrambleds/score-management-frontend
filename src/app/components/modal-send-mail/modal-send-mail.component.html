@@ -52,7 +52,6 @@
             autocomplete="off"
           />
         </div>
-
         <!-- Variable Selection -->
         <div class="mb-2">
           <label for="variableSelect" class="form-label me-2"
@@ -61,8 +60,6 @@
           <div class="d-flex align-items-center">
             <ng-select
               [items]="placeholderList"
-              bindLabel="desc_th"
-              bindValue="placeholder_key"
               [(ngModel)]="selectedVariable"
               placeholder="กรุณาเลือก"
               [searchable]="true"
@@ -70,8 +67,16 @@
               [dropdownPosition]="'auto'"
               class="custom-ng-select"
               style="width: 35%"
+              bindValue="placeholder_key"
             >
+              <!-- ใช้ ng-label-tmp เพื่อแสดง label เมื่อมีการเลือก item -->
+              <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                {{
+                  item | translateDropdown : { th: "desc_th", en: "desc_en" }
+                }}
+              </ng-template>
             </ng-select>
+
             <button
               type="button"
               class="btn btn-primary ms-2"
