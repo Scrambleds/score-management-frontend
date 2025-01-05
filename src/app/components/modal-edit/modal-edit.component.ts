@@ -241,64 +241,55 @@ export class ModalEditComponent {
     ) {
       const UserInfo = this.UserService.username;
 
-      const Success_title = this.translate.getTranslation(
-        'sweet_alert_success'
-      );
+      const Success_title = this.translate.getTranslation('sweet_alert_success');
       const Success_text = this.translate.getTranslation('sweet_alert_edit');
+      const Submit_Button = this.translate.getTranslation('add_user_ok');
 
       const userData = this.form.getRawValue();
       userData.update_by = UserInfo;
-      console.log('ฟอร์มถูกต้อง ข้อมูลที่ส่ง: ', userData);
-      this.userEditService.editUser(userData).subscribe(
-        (response: any) => {
-          console.log('Response from API:', response);
-          this.submit.emit(this.form.getRawValue());
+      console.log("ฟอร์มถูกต้อง ข้อมูลที่ส่ง: ", userData);
+      this.userEditService.editUser(userData).subscribe((response: any) => {
+        console.log("Response from API:", response);
+        this.submit.emit(this.form.getRawValue()); 
+  
+        Swal.fire({
+          // title: 'สำเร็จ',
+          // text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+          title: Success_title,
+          text: Success_text,
+          icon: 'success',
+          confirmButtonText: Submit_Button,
+          confirmButtonColor: '#007bff'
+        }).then(() => {
+          // เมื่อกด "ตกลง" ใน Swal, ปิด modal
+          if (this.modalInstance) {
+            this.modalInstance.hide();
+          }
+        // window.location.reload();
+        this.Router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+          this.Router.navigate([this.Router.url]);
+        });
+      });
+      
+        this.form.reset();
+        this.removeConditionalFields();
+        
+      }, (error: any) => {
 
-          Swal.fire({
-            // title: 'สำเร็จ',
-            // text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
-            title: Success_title,
-            text: Success_text,
-            icon: 'success',
-            confirmButtonText: 'ตกลง',
-            confirmButtonColor: '#007bff',
-          }).then(() => {
-            // เมื่อกด "ตกลง" ใน Swal, ปิด modal
-            if (this.modalInstance) {
-              this.modalInstance.hide();
-            }
-
-            // window.location.reload();
-            this.Router.navigateByUrl('/', { skipLocationChange: true }).then(
-              () => {
-                this.Router.navigate([this.Router.url]);
-              }
-            );
-          });
-
-          this.form.reset();
-          this.removeConditionalFields();
-        },
-        (error: any) => {
-          const Fail_title = this.translate.getTranslation(
-            'sweet_alert_fail_title'
-          );
-          const Fail_text = this.translate.getTranslation(
-            'sweet_alert_fail_text'
-          );
-          Swal.fire({
-            // title: 'เกิดข้อผิดพลาด',
-            // text: 'การอัปเดตข้อมูลผู้ใช้ล้มเหลว',
-            title: Fail_title,
-            text: Fail_text,
-            icon: 'error',
-            confirmButtonText: 'ตกลง',
-            confirmButtonColor: '#ff0000',
-          });
-          this.form.reset();
-          this.removeConditionalFields();
-        }
-      );
+        const Fail_title = this.translate.getTranslation('sweet_alert_fail_title');
+        const Fail_text = this.translate.getTranslation('sweet_alert_fail_text');
+        Swal.fire({
+          // title: 'เกิดข้อผิดพลาด',
+          // text: 'การอัปเดตข้อมูลผู้ใช้ล้มเหลว',
+          title: Fail_title,
+          text: Fail_text,
+          icon: 'error',
+          confirmButtonText: Submit_Button,
+          confirmButtonColor: '#ff0000',
+        });
+        this.form.reset();
+        this.removeConditionalFields();
+      });
     } else {
       console.log('ฟอร์มไม่ถูกต้อง ข้อผิดพลาด: ', this.form.errors);
     }

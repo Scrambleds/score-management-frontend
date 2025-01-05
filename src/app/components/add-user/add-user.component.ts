@@ -558,16 +558,23 @@ export class AddUserComponent implements OnInit {
         create_by: UserInfo,
       };
     });
+
+    const Success_title = this.translate.getTranslation('sweet_alert_success');
+    const Success_text = this.translate.getTranslation('sweet_alert_edit');
+    const Submit_Button = this.translate.getTranslation('add_user_ok');
+    const Fail_title = this.translate.getTranslation('sweet_alert_fail_title');
+    const Fail_text = this.translate.getTranslation('sweet_alert_fail_text');
+    const email_duplicated = this.translate.getTranslation('email_duplicated');
     
     // ส่งข้อมูลไปยัง API
     this.addUserService.insertUser(dataToSend).subscribe(
       (response) => {
         Swal.fire({
-          title: currentLang === 'th' ? 'บันทึกข้อมูลสำเร็จ' : 'Data Saved Successfully',
-          text: currentLang === 'th' ? 'ข้อมูลถูกบันทึกเรียบร้อยแล้ว' : 'Data has been saved successfully',
+          title: Success_title,
+          text: Success_text,
           icon: 'success',
           confirmButtonColor: '#0d6efd',
-          confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
+          confirmButtonText: Submit_Button,
         }).then(() => {
           this.router.navigate(['/UserManagement']);
         });
@@ -584,26 +591,26 @@ export class AddUserComponent implements OnInit {
               .join('<br>');
             
             Swal.fire({
-              title: currentLang === 'th' ? 'เกิดข้อผิดพลาด' : 'An error occurred',
-              html: `${currentLang === 'th' ? 'พบอีเมลที่ซ้ำกัน:' : 'Duplicate emails found:'}<br>${errorMessage}`,
+              title: Fail_title,
+              html: `${email_duplicated}<br>${errorMessage}`,
               icon: 'error',
               confirmButtonColor: '#0d6efd',
-              confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
+              confirmButtonText: Submit_Button,
             });
             return;
           }
         }
   
         Swal.fire({
-          title: currentLang === 'th' ? 'เกิดข้อผิดพลาด' : 'An error occurred',
-          text: currentLang === 'th' ? 'ไม่สามารถบันทึกข้อมูลได้ โปรดลองอีกครั้ง' : 'Unable to save data, please try again',
+          title: Fail_title,
+          text: Fail_text,
           icon: 'error',
-          confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
+          confirmButtonText: Submit_Button,
           confirmButtonColor: '#0d6efd',
         });
       }
     );
-  }  
+  }
   
   onDelete() {
     const title =  this.translate.getTranslation('add_user_question_1');
@@ -637,62 +644,6 @@ export class AddUserComponent implements OnInit {
       }
     });
   }
-
-//   validateFields(data: any[]): boolean {
-//     if (!data || data.length === 0 || !data[0]) {
-//       const Failed_title = this.translate.getTranslation('add_user_failed_title');
-//       const Failed_text = this.translate.getTranslation('add_user_failed_text');
-//       const submit = this.translate.getTranslation('add_user_ok');
-  
-//       Swal.fire({
-//         title: Failed_title,
-//         html: `${Failed_text}`,
-//         icon: 'error',
-//         confirmButtonText: submit,
-//         confirmButtonColor: '#0d6efd',
-//       });
-//       return false;
-//     }
-  
-//     const Ok_button = this.translate.getTranslation('add_user_ok');
-//     const Invalid_header = this.translate.getTranslation('add_user_invalid_header');
-//     const Validate_excel = this.translate.getTranslation('add_user_validate_excel');
-  
-//     const requiredFields = [
-//       'อีเมล',
-//       'รหัสอาจารย์',
-//       'คำนำหน้า',
-//       'ชื่อ',
-//       'นามสกุล',
-//       'หน้าที่',
-//     ];
-  
-//     // ตรวจสอบชื่อคอลัมน์จากแถวแรก
-//     const fileFields = Object.keys(data[0]).map(field => field.trim());
-  
-//     // ตรวจสอบคอลัมน์ที่ขาดหายไป
-//     const missingFields = requiredFields.filter(
-//       (field) => !fileFields.some(f => f.trim() === field.trim())
-//     );
-  
-//     // หากมีคอลัมน์ที่หายไป ให้แจ้งเตือน
-//     if (missingFields.length > 0) {
-//       Swal.fire({
-//         title: Invalid_header,
-//         html: `${Validate_excel}:<br>${missingFields.join('<br>')}`,
-//         icon: 'warning',
-//         confirmButtonText: Ok_button,
-//         confirmButtonColor: '#0d6efd',
-//       });
-//       console.log("Col on file: ", fileFields); // แสดงคอลัมน์ที่ได้รับจากไฟล์
-//       console.log("Data on col first row: ", Object.keys(data[0])); // ดูคอลัมน์ที่ได้จากข้อมูลแถวแรก
-//       return false;
-//     }
-  
-//     // ถ้าทุกคอลัมน์ที่ต้องการมีครบ สามารถอัปโหลดได้
-//     return true;
-//   }
-// }  
 
 validateFields(data: any[]): boolean {
   if (!data || data.length === 0 || !data[0]) {
