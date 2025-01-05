@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { SearchMasterdataServiceTsComponent } from '../../components/search-masterdata.service.ts/search-masterdata.service.ts.component'
 
 @Component({
   selector: 'app-search-master-data',
@@ -11,21 +12,19 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 export class SearchMasterDataComponent {
   searchForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
-
+  constructor(private fb: FormBuilder, private searchService: SearchMasterdataServiceTsComponent) {
     this.searchForm = this.fb.group({
-      searchInput: [''] 
+      searchInput: ['']
     });
   }
 
   onSubmit(): void {
-    const searchValue = this.searchForm.value.searchInput;
-    console.log('Search submitted with value:', searchValue);
-
+    const searchValue = this.searchForm.value.searchInput.trim();
+    this.searchService.setSearchTerm(searchValue); // ส่งค่าค้นหาไปยัง Service
   }
 
   onReset(): void {
-    this.searchForm.reset(); 
-    console.log('Form reset');
+    this.searchForm.reset();
+    this.searchService.setSearchTerm(''); // ล้างค่าค้นหา
   }
 }

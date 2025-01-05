@@ -1,69 +1,156 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-modal-masterdata-add',
-//   standalone: false,
-  
-//   templateUrl: './modal-masterdata-add.component.html',
-//   styleUrl: './modal-masterdata-add.component.css'
-// })
-// export class ModalMasterdataAddComponent {
-
-// }
-
-
-import { Component, EventEmitter, HostListener, Input, Output,  AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { passwordStrengthValidator } from '../validators/password-strength.validator';
-import Swal from 'sweetalert2';
+import { Component, EventEmitter, HostListener, Input, Output, AfterViewInit, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MasterDataService } from '../../services/master-data/master-data.service'
 import { Modal } from 'bootstrap';
-import { UserEditService } from '../../services/edit-user/edit-user.service'
-import { SelectBoxService } from '../../services/select-box/select-box.service';
-import { UserService } from '../../services/sharedService/userService/userService.service'
-import { UserManageService } from '../../services/user-manage/user-manage.service';
-import { Router } from '@angular/router';
+import { UserService } from '../../services/sharedService/userService/userService.service';
+import Swal from 'sweetalert2';
 import { TranslationService } from '../../core/services/translation.service';
+
 
 @Component({
   selector: 'app-modal-masterdata-add',
   standalone: false,
-  
   templateUrl: './modal-masterdata-add.component.html',
-  styleUrl: './modal-masterdata-add.component.css'
+  styleUrls: ['./modal-masterdata-add.component.css']
 })
-export class ModalMasterdataAddComponent implements AfterViewInit {
-  @ViewChild('modalElementAdd') modalElement: ElementRef | undefined;
+export class ModalMasterdataAddComponent implements AfterViewInit, OnChanges {
+  form!: FormGroup;
+  @ViewChild('modalElement') modalElement: ElementRef | undefined;
   @Output() showChange = new EventEmitter<boolean>();
   modalInstance: Modal | undefined;
   @Input() show = false;
+  @Input() byteReference: string | null = null;
+  @Input() byteCode: string | null = null;
+  @Input() byteDescTH: string | null = null;
+  @Input() byteDescEN: string | null = null;
+  // @Input() activeStatus: string | null = null;
+  @Input() statusData: Array<{ id: string; title: string }> = [];
+  @Output() addMasterData = new EventEmitter<any>();
+
+  constructor(private fb: FormBuilder, private MasterDataService: MasterDataService, private UserService: UserService, private translate: TranslationService) {}
+
+  ngOnInit() {
+    this.form = this.fb.group({
+      byte_reference: [{ value: this.byteReference, disabled: true }, Validators.required],
+      byte_code:  [{ value: this.byteCode, disabled: true }, Validators.required],
+      byte_desc_th: [this.byteDescTH, Validators.required],
+      byte_desc_en: [this.byteDescEN, Validators.required],
+      // active_status: [this.activeStatus, Validators.required],
+    });
+  }
 
   ngAfterViewInit() {
-    // สร้าง instance ของ modal
-    this.modalInstance = new Modal(this.modalElement?.nativeElement);
+    if (this.modalElement) {
+      this.modalInstance = new Modal(this.modalElement.nativeElement);
 
-    // เปิด modal ถ้า show เป็น true
-    if (this.show) {
-      this.modalInstance.show();
+      // ฟัง event ตอน modal ถูกซ่อน
+      this.modalElement.nativeElement.addEventListener('hidden.bs.modal', () => {
+        this.show = false;
+        this.modalInstance = new Modal(this.modalElement!.nativeElement); // สร้าง instance ใหม่
+        this.showChange.emit(false);
+      });
     }
   }
 
-  @HostListener('hidden.bs.modal')
-  onModalHidden() {
-    this.showChange.emit(false); // แจ้ง parent ว่า modal ถูกปิดแล้ว
-  }
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.form) {
+      if (changes['byteReference'] && this.byteReference !== undefined) {
+        this.form.get('byte_reference')?.setValue(this.byteReference);
+      }
+      if (changes['byteCode'] && this.byteCode !== undefined) {
+        this.form.get('byte_code')?.setValue(this.byteCode);
+      }
+    }  
 
-  ngOnChanges() {
-    // เปิดหรือปิด modal ตามค่า show
-    if (this.show) {
-      this.modalInstance?.show();
-    } else {
-      this.modalInstance?.hide();
-    }
+    if (changes['show'] && !changes['show'].firstChange) {
+      if (this.show) {
+        if (!this.modalInstance && this.modalElement) {
+          this.modalInstance = new Modal(this.modalElement.nativeElement);
+        }
+        this.modalInstance?.show();
+      } else {
+        this.modalInstance?.hide();
+      }
+    }    
   }
 
   closeModal() {
     this.show = false;
     this.modalInstance?.hide();
-    this.showChange.emit(false); // แจ้ง parent component
+    this.form.reset();
+
+    this.form.get('byte_reference')?.setValue(this.byteReference);
+    this.form.get('byte_code')?.setValue(this.byteCode);
+    this.showChange.emit(false);
+  }
+
+  onBackdropClick(event: MouseEvent) {
+    if (event.target === this.modalElement?.nativeElement) {
+      this.closeModal();
+    }
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapePress(event: KeyboardEvent) {
+    if (this.show) {
+      this.closeModal();
+    }
+  }
+
+
+  onSave() {
+    const currentLang = localStorage.getItem('language') || 'en';
+  
+    this.form.markAllAsTouched();
+  
+    if (this.form.invalid) {
+      return;
+    }
+  
+    const Success_title = this.translate.getTranslation('sweet_alert_success');
+    const Success_text = this.translate.getTranslation('sweet_alert_edit');
+    const Submit_Button = this.translate.getTranslation('add_user_ok');
+    const Fail_title = this.translate.getTranslation('sweet_alert_fail_title');
+    const Fail_text = this.translate.getTranslation('sweet_alert_fail_text');
+    const description_duplicated = this.translate.getTranslation('description_duplicated');
+
+    const UserAdd = this.UserService.username;
+    const formData = this.form.getRawValue();
+    formData.create_by = UserAdd;
+  
+    this.MasterDataService.insertSystemParam(formData).subscribe({
+      next: (response) => {
+        console.log("Response: ", response)
+        if (response.isSuccess && response.message != 'Duplicate description found.') {
+          Swal.fire({
+            icon: 'success',
+            title: Success_title,
+            text: Success_text,
+            confirmButtonText: Submit_Button,
+            confirmButtonColor: '#007bff',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.reload();  // รีเฟรชหน้า
+            }
+          });
+    
+          this.closeModal();
+        }
+      },
+      error: (error) => {
+        console.error('Error occurred:', error);
+        // ตรวจสอบหากมีข้อความ error ที่เกี่ยวข้อง
+        if (error.message != 'Duplicate description found.') 
+        {
+          Swal.fire({
+            icon: 'error',
+            title: Fail_title,
+            text: description_duplicated,
+            confirmButtonText: Submit_Button,
+            confirmButtonColor: '#007bff',
+          });
+        }
+      }
+    });
   }
 }

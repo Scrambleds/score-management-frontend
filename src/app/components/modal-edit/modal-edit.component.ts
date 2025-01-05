@@ -212,7 +212,8 @@ export class ModalEditComponent {
       const UserInfo = this.UserService.username;
 
       const Success_title = this.translate.getTranslation('sweet_alert_success');
-      const Success_text = this.translate.getTranslation('sweet_alert_edit')
+      const Success_text = this.translate.getTranslation('sweet_alert_edit');
+      const Submit_Button = this.translate.getTranslation('add_user_ok');
 
       const userData = this.form.getRawValue();
       userData.update_by = UserInfo;
@@ -227,7 +228,7 @@ export class ModalEditComponent {
           title: Success_title,
           text: Success_text,
           icon: 'success',
-          confirmButtonText: 'ตกลง',
+          confirmButtonText: Submit_Button,
           confirmButtonColor: '#007bff'
         }).then(() => {
           // เมื่อกด "ตกลง" ใน Swal, ปิด modal
@@ -253,7 +254,7 @@ export class ModalEditComponent {
           title: Fail_title,
           text: Fail_text,
           icon: 'error',
-          confirmButtonText: 'ตกลง',
+          confirmButtonText: Submit_Button,
           confirmButtonColor: '#ff0000',
         });
         this.form.reset();

@@ -7,25 +7,24 @@
           <!-- Input -->
           <div class="col-12 col-md-6 col-lg-3">
             <label for="search_input" class="form-label fw-bold text-truncate ps-2">
-              ค้นหาข้อมูลอ้างอิง
+              {{ "add_masterdata_search" | translate }}
             </label>
             <input
               type="text"
               id="search_input"
               formControlName="searchInput"
               class="form-control"
-              placeholder="กรุณากรอก"
-            />
+              [placeholder]="'placeholder_text' | translate" />
           </div>
           <!-- Buttons -->
           <div class="col-12 col-md d-flex align-items-end gap-2">
             <button type="submit" class="btn btn-primary custom-btn">
               <i class="bi bi-search"></i>
-              ค้นหา
+              {{ "uploadscore_searchButton" | translate }}
             </button>
             <button type="button" class="btn btn-secondary custom-btn" (click)="onReset()">
               <i class="bi bi-arrow-repeat"></i>
-              รีเซ็ต
+              {{ "user_manage_reset" | translate }}
             </button>
           </div>
         </div>
