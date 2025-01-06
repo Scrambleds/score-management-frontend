@@ -64,12 +64,11 @@ export class ModalMasterdataEditComponent implements AfterViewInit, OnChanges {
     if (this.modalElement) {
       this.modalInstance = new Modal(this.modalElement.nativeElement);
 
-      // ฟัง event ตอน modal ถูกซ่อน
       this.modalElement.nativeElement.addEventListener(
         'hidden.bs.modal',
         () => {
           this.show = false;
-          this.modalInstance = new Modal(this.modalElement!.nativeElement); // สร้าง instance ใหม่
+          this.modalInstance = new Modal(this.modalElement!.nativeElement);
           this.showChange.emit(false);
         }
       );
@@ -124,7 +123,7 @@ export class ModalMasterdataEditComponent implements AfterViewInit, OnChanges {
     const description_duplicated = this.translate.getTranslation('description_duplicated');
     
     const UserEdit = this.UserService.username;
-    const formData = this.form.getRawValue(); // ดึงค่าทั้งหมดรวมถึง disabled fields
+    const formData = this.form.getRawValue();
     formData.update_by = UserEdit;
 
     this.MasterDataService.updateSystemParam(formData).subscribe({

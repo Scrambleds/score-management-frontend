@@ -37,16 +37,17 @@ export class masterDataService{
     getStatusData(): any[]{
         return this.statusData;
     }
-      // เพิ่ม Observable สำหรับติดตามการเปลี่ยนแปลงข้อมูล
-  getRoleDataObservable() {
-    return this.roleDataSubject.asObservable();
-  }
 
-  getPrefixDataObservable() {
-    return this.prefixDataSubject.asObservable();
-  }
+    // เพิ่ม Observable สำหรับติดตามการเปลี่ยนแปลงข้อมูล
+    getRoleDataObservable() {
+      return this.roleDataSubject.asObservable();
+    }
 
-  getStatusDataObservable() {
-    return this.statusDataSubject.asObservable();
+    getPrefixDataObservable() {
+      return this.prefixDataSubject.asObservable();
+    }
+
+    getStatusDataObservable() {
+      return this.statusDataSubject.asObservable();
+    }
   }
-}

@@ -36,7 +36,7 @@ interface MasterData {
   styleUrl: './master-data.component.css'
 })
 export class MasterDataComponents implements OnInit {
-  form!: FormGroup;
+  // form!: FormGroup;
   selectedDetail: any;
   @Input() options: any[] = [];
   openCollapse: number | null = null;
@@ -69,7 +69,7 @@ export class MasterDataComponents implements OnInit {
               private SelectBoxService: SelectBoxService, private searchService: SearchMasterdataServiceTsComponent) {}
   
   ngOnInit(): void {
-
+    // this.form = this.fb.group({});
     this.getMasterData();
 
     this.searchSubscription = this.searchService.searchTerm$.subscribe(term => {
@@ -186,10 +186,10 @@ export class MasterDataComponents implements OnInit {
   //   this.showModal = show;
   // }
 
-  onSubmit(): void {
-    const values = this.form.value;
-    console.log('Form Submitted', values);
-  }
+  // onSubmit(): void {
+  //   const values = this.form.value;
+  //   console.log('Form Submitted', values);
+  // }
 
   onAddModalChange = (show: boolean) => {
     this.showAddModal = show;
