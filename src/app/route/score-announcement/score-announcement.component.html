@@ -1,6 +1,6 @@
 
 <app-modal-send-mail></app-modal-send-mail>
 <div class="route-container">
-  <search-form-score-announcemen (searchSubmit)="onSearchSubmit($event)"/>
+  <search-form-score-announcemen (searchSubmit)="onSearchSubmit($event)" (resetForm)="onReset()"/>
   <table-score-announcemen [gridData]="gridData"/>
 </div>

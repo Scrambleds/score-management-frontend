@@ -13,6 +13,7 @@ export class ContantService {
     }),
     responseType: 'json' as 'json',
   };
+  valueChanges: any;
 
   constructor(private http: HttpClient) {}
 
@@ -30,6 +31,12 @@ export class ContantService {
         return [];
       })
     );
+  }
+
+
+  getDataByCondition(req:any ,data: any): Observable<any> {
+    const url = `${environment.apiUrl}/${req}`;
+    return this.http.post(url, data);
   }
   
 }

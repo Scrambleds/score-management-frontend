@@ -17,7 +17,7 @@
           <!-- 1. click save data -->
           <button
             type="button"
-            class="btn btn-primary "
+            class="btn btn-primary"
             data-bs-toggle="modal"
             data-bs-target="#announceScoreModal"
           >
@@ -39,8 +39,12 @@
       [columnDefs]="columnDefs"
       [defaultColDef]="defaultColDef"
       rowSelection="multiple"
+      [pagination]="pagination"
+      [paginationPageSize]="paginationPageSize"
       [rowMultiSelectWithClick]="true"
-      [overlayNoRowsTemplate]="'<span>' + ('no_row_show' | translate) + '</span>'"
+      [overlayNoRowsTemplate]="
+        '<span>' + ('no_row_show' | translate) + '</span>'
+      "
     >
     </ag-grid-angular>
   </div>
