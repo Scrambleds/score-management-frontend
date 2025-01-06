@@ -1,34 +1,56 @@
 <div class="custom-card">
   <div class="card-body">
     <div class="fw-bold">รายละเอียด</div>
-    <div class="text-danger">*กรุณากรอกรหัสวิชา และ ชื่อวิชา</div>
+    <div class="text-danger">
+      *กรุณากรอกรหัสวิชา และ ชื่อวิชา เพื่อแสดงข้อมูลในตาราง
+    </div>
     <!-- parent will submit this form instead -->
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-100">
-      <div class="row">
+      <div class="d-flex justify-content-center gap-3">
         <!-- Subject Code -->
-        <div class="col-6 col-sm-5 col-md-2">
-          <label for="subjectCode" class="fw-bold mb-2">{{
-            "subject_code" | translate
-          }}</label>
+        <div class="col-6 col-sm-5 col-md-2 col-lg-3">
+          <label for="subjectCode" class="fw-bold mb-2"
+            >{{ "subject_code" | translate }} /
+            {{ "subject_name" | translate }}</label
+          >
           <div class="input-group-autocomplete mb-2">
-            <app-autocomplete
-              #subjectCode
-              id="subjectCode"
-              [name]="'subjectCode'"
-              formControlName="subjectCode"
-              [placeholder]="'placeholder_text' | translate"
-              [suggestions]="filteredSubjects"
-              [displayKey]="'subjectCode'"
-              [displayFormat]="customFormat"
-              [widthAuto]="true"
-              (search)="searchCode($event)"
-              (select)="selectCode($event)"
-              [value]="form.get('subjectCode')?.value"
-            ></app-autocomplete>
+            <div class="input-group-autocomplete mb-2">
+              <input
+                #subjectCode
+                id="subjectSearch"
+                class="form-control"
+                formControlName="subjectSearch"
+                [placeholder]="'placeholder_text' | translate"
+                (focus)="showSuggestions = true"
+                (blur)="hideSuggestions()"
+                (input)="showAutocomplete()"
+              />
+              <ul *ngIf="showSuggestions && filteredSuggestions.length > 0">
+                <li
+                  *ngFor="let suggestion of filteredSuggestions"
+                  (mousedown)="selectSubject(suggestion)"
+                >
+                  {{ suggestion.subject_id }} {{ suggestion.subject_name }}
+                </li>
+              </ul>
+              <!-- แสดงข้อความเมื่อไม่มีข้อมูล -->
+              <ng-template #noData>
+                <p *ngIf="isSearching">ไม่พบข้อมูล</p>
+              </ng-template>
 
-            <ng-template #customFormat let-item>
-              {{ item.subjectCode }} - {{ item.subjectName }}
-            </ng-template>
+              <!-- แสดงข้อความเมื่อไม่มีข้อมูล -->
+              <ng-template #noData>
+                <p *ngIf="isSearching">ไม่พบข้อมูล</p>
+              </ng-template>
+
+              <!-- แสดงชื่อวิชาที่เลือก -->
+              <div *ngIf="selectedSubject">
+                <p>
+                  คุณเลือก: {{ selectedSubject.subject_id
+                  }}{{ selectedSubject.subject_name }}
+                </p>
+              </div>
+            </div>
           </div>
           <div
             *ngIf="
@@ -42,39 +64,67 @@
         </div>
 
         <!-- Subject Name -->
-        <div class="col-6 col-sm-7 col-md-4 col-lg-3">
-          <label for="subjectName" class="fw-bold mb-2">{{
-            "subject_name" | translate
+        <div class="col-6 col-sm-4 col-md-2 col-lg-2">
+          <label for="academic_year" class="fw-bold mb-2">{{
+            "academic_year" | translate
           }}</label>
-          <app-autocomplete
-            id="subjectName"
-            [name]="'subjectName'"
-            formControlName="subjectName"
-            [placeholder]="'placeholder_text' | translate"
-            [suggestions]="filteredSubjects"
-            [displayKey]="'subjectName'"
-            [displayFormat]="customFormat"
-            [readonly]="isSubjectNameReadonly"
-            [value]="form.get('subjectName')!.value"
-          ></app-autocomplete>
-
-          <ng-template #customFormat let-item>
-            {{ item.subjectCode }} - {{ item.subjectName }}
-          </ng-template>
+          <ng-select
+            name="academic_year"
+            formControlName="academic_year"
+            bindLabel="label"
+            bindValue="value"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [items]="academic_yearLovItem"
+          >
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('semesterCode')?.touched &&
+              form.get('semesterCode')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
         </div>
-
+        <div class="col-6 col-sm-4 col-md-2 col-lg-2">
+          <label for="semester" class="fw-bold mb-2">{{
+            "semester" | translate
+          }}</label>
+          <ng-select
+            name="semester"
+            formControlName="semester"
+            bindLabel="label"
+            bindValue="value"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [items]="semesterLovItem"
+          >
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('semesterCode')?.touched &&
+              form.get('semesterCode')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center gap-3">
         <div class="col-6 col-sm-4 col-md-2 col-lg-3">
-          <label for="fullName" class="fw-bold mb-2"
+          <label for="studentSearch" class="fw-bold mb-2"
             >{{ "student_name" | translate }} /
             {{ "student_id" | translate }}</label
           >
-          <app-autocomplete
-            id="fullName"
-            [name]="'fullName'"
-            formControlName="fullName"
+          <input
+            id="studentSearch"
+            class="form-control"
+            formControlName="studentSearch"
             [placeholder]="'placeholder_text' | translate"
-            [displayKey]="'fullName'"
-          ></app-autocomplete>
+          />
           <div
             *ngIf="
               form.get('academicYearCode')?.touched &&
@@ -85,8 +135,31 @@
             {{ "alert_enterData" | translate }}
           </div>
         </div>
-
-        <div class="col-6 col-sm-4 col-md-2">
+        <div class="col-6 col-sm-4 col-md-2 col-lg-2">
+          <label for="section" class="fw-bold mb-2">{{
+            "section" | translate
+          }}</label>
+          <ng-select
+            name="section"
+            formControlName="section"
+            bindLabel="label"
+            bindValue="value"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [items]="sectionLovItem"
+          >
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('semesterCode')?.touched &&
+              form.get('semesterCode')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-2 col-lg-2">
           <label for="sendStatus" class="fw-bold mb-2">{{
             "send_status" | translate
           }}</label>
@@ -110,11 +183,18 @@
             {{ "alert_enterData" | translate }}
           </div>
         </div>
-        <div class="col-12 col-md align-items-end">
-          <button type="submit" class="btn btn-primary custom-btn">
-            <i class="bi bi-search"></i> ค้นหา
-          </button>
-        </div>
+      </div>
+      <div class="d-flex justify-content-center gap-2">
+        <button type="submit" class="btn btn-primary custom-btn">
+          <i class="bi bi-search"></i> ค้นหา
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary custom-btn"
+          (click)="onReset()"
+        >
+          <i class="bi bi-arrow-repeat"></i> รีเซ็ต
+        </button>
       </div>
     </form>
   </div>

@@ -27,6 +27,8 @@ import { ScoreAnnouncementService } from '../../../services/score-announcement/s
 export class TableScoreAnnouncementComponent {
   @Input() gridData: any[] = [];
   selectedRows: any[] = [];
+  pagination = true;
+  paginationPageSize = 100;
   columnDefs = [
     {
       headerName: '',
@@ -35,7 +37,11 @@ export class TableScoreAnnouncementComponent {
       headerStyle: { textAlign: 'center' },
       flex: 0.5,
     },
-    { headerName: 'ลำดับ', field: 'row_id', flex: 0.7 },
+    {
+      headerName: 'ลำดับ',
+      valueGetter: (params: any) => params.node.rowIndex + 1,
+      flex: 0.7,
+    },
     {
       headerName: 'รหัสนิสิต',
       field: 'student_id',
@@ -48,7 +54,7 @@ export class TableScoreAnnouncementComponent {
       headerStyle: { textAlign: 'center' },
       flex: 2,
       valueGetter: (params: any) =>
-        `${params.data.prefix_th} ${params.data.firstname} ${params.data.lastname}`,
+        `${params.data.prefix_desc_th} ${params.data.firstname} ${params.data.lastname}`,
     },
     { headerName: 'รหัสสาขา', field: 'major_code', flex: 1 },
     {
@@ -85,7 +91,7 @@ export class TableScoreAnnouncementComponent {
         params.data.midterm_score +
         params.data.final_score,
     },
-    { headerName: 'สถานะ', field: 'send_status_desc_th', flex: 1 },
+    { headerName: 'สถานะ', field: 'send_status_code_desc_th', flex: 1 },
     {
       headerName: 'ส่งคะแนน',
       flex: 0.7,

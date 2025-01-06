@@ -58,12 +58,16 @@ export class ScoreAnnouncementComponent {
       semesterCode: [''],
     });
   }
-
+  onReset() {
+    // ทำการรีเซ็ตข้อมูลทั้งหมด
+    this.gridData = []; // หรือรีเซ็ตค่าตามที่ต้องการ
+  }
   ngOnInit() {
   }
   updateGridData(newData: any[]): void {
     this.gridData = newData;
   }
+  
   onSearchSubmit(requestData: any) {
     this.scoreService.getScoreAnnouncementByCondition(requestData).subscribe(
       (response) => {
