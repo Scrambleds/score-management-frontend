@@ -1,39 +1,35 @@
 <div class="custom-card">
   <div class="card-body">
-    <div class="fw-bold">รายละเอียด</div>
-    <div class="text-danger">
-      *กรุณากรอกรหัสวิชา และ ชื่อวิชา เพื่อแสดงข้อมูลในตาราง
-    </div>
+    <div class="fw-bold">{{ "uploadscore_details" | translate }}</div>
+
     <!-- parent will submit this form instead -->
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-100">
-      <div class="d-flex justify-content-center gap-3">
+      <div class="d-flex justify-content-center gap-2 gap-xl-3 align-items-end mbsm-2">
         <!-- Subject Code -->
-        <div class="col-6 col-sm-5 col-md-2 col-lg-3">
-          <label for="subjectSearch" class="fw-bold d-flex flex-wrap mb-2"
+        <div class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+          <label for="subjectSearch" class="fw-bold d-flex flex-wrap mb-2 flex-wrap"
             >{{ "subject_code" | translate }} /
-            {{ "subject_name" | translate }}<p class="text-danger mb-0 ms-1"> * </p></label
+            {{ "subject_name" | translate }} <p class="text-danger mb-0 ms-1"> * </p></label
           >
-          <div class="input-group-autocomplete mb-2">
-            <div class="input-group-autocomplete mb-2">
-              <input
-                #subjectCode
-                id="subjectSearch"
-                class="form-control"
-                formControlName="subjectSearch"
-                [placeholder]="'placeholder_text' | translate"
-                (focus)="showSuggestions = true"
-                (blur)="hideSuggestions()"
-                (input)="showAutocomplete()"
-              />
-              <ul *ngIf="showSuggestions && filteredSuggestions.length > 0">
-                <li
-                  *ngFor="let suggestion of filteredSuggestions"
-                  (mousedown)="selectSubject(suggestion)"
-                >
-                  {{ suggestion.subject_id }} {{ suggestion.subject_name }}
-                </li>
-              </ul>
-            </div>
+          <div class="input-group-autocomplete">
+            <input
+              #subjectCode
+              id="subjectSearch"
+              class="form-control"
+              formControlName="subjectSearch"
+              [placeholder]="'placeholder_text' | translate"
+              (focus)="showSuggestions = true"
+              (blur)="hideSuggestions()"
+              (input)="showAutocomplete()"
+            />
+            <ul *ngIf="showSuggestions && filteredSuggestions.length > 0">
+              <li
+                *ngFor="let suggestion of filteredSuggestions"
+                (mousedown)="selectSubject(suggestion)"
+              >
+                {{ suggestion.subject_id }} {{ suggestion.subject_name }}
+              </li>
+            </ul>
           </div>
           <div
             *ngIf="
@@ -47,17 +43,17 @@
         </div>
 
         <!-- Subject Name -->
-        <div class="col-6 col-sm-4 col-md-2 col-lg-2">
+        <div class="col-12 col-sm-12 col-md-2 col-lg col-xl col-xxl-1">
           <label for="academic_year" class="fw-bold mb-2">{{
             "academic_year" | translate
-          }}</label>
+          }}  </label>
           <ng-select
             name="academic_year"
             formControlName="academic_year"
             bindLabel="label"
             bindValue="value"
             [placeholder]="'placeholder_select' | translate"
-            [clearable]="true"
+            [clearable]="true"  
             [items]="academic_yearLovItem"
           >
           </ng-select>
@@ -71,7 +67,7 @@
             {{ "alert_enterData" | translate }}
           </div>
         </div>
-        <div class="col-6 col-sm-4 col-md-2 col-lg-2">
+        <div class="col-12 col-sm-12 col-md-2 col-lg col-xl col-xxl-1">
           <label for="semester" class="fw-bold mb-2">{{
             "semester" | translate
           }}</label>
@@ -95,9 +91,8 @@
             {{ "alert_enterData" | translate }}
           </div>
         </div>
-      </div>
-      <div class="d-flex justify-content-center gap-3">
-        <div class="col-6 col-sm-4 col-md-2 col-lg-3">
+        <div class="d-none d-md-block d-lg-none d-xl-none d-xxl-none col-md-2"></div>
+        <div class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
           <label for="studentSearch" class="fw-bold mb-2"
             >{{ "student_name" | translate }} /
             {{ "student_id" | translate }}</label
@@ -118,7 +113,7 @@
             {{ "alert_enterData" | translate }}
           </div>
         </div>
-        <div class="col-6 col-sm-4 col-md-2 col-lg-2">
+        <div class="col-12 col-sm-12 col-lg-2 col-md-2 col-xl-1 col-xxl-1">
           <label for="section" class="fw-bold mb-2">{{
             "section" | translate
           }}</label>
@@ -142,42 +137,18 @@
             {{ "alert_enterData" | translate }}
           </div>
         </div>
-        <div class="col-6 col-sm-4 col-md-2 col-lg-2">
-          <label for="sendStatus" class="fw-bold mb-2">{{
-            "send_status" | translate
-          }}</label>
-          <ng-select
-            name="sendStatus"
-            formControlName="sendStatus"
-            bindLabel="label"
-            bindValue="value"
-            [placeholder]="'placeholder_select' | translate"
-            [clearable]="true"
-            [items]="statuses"
+        <div class="col-12 col-sm-12 col-md-4 col-lg col-xl-2 col-xxl text-center text-xl-start mx-sm-1">
+          <button type="submit" class="btn btn-primary custom-btn">
+            <i class="bi bi-search"></i> {{"user_manage_search"|translate}}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary custom-btn"
+            (click)="onReset()"
           >
-          </ng-select>
-          <div
-            *ngIf="
-              form.get('semesterCode')?.touched &&
-              form.get('semesterCode')?.invalid
-            "
-            class="text-danger ps-2"
-          >
-            {{ "alert_enterData" | translate }}
-          </div>
+            <i class="bi bi-arrow-repeat"></i> {{"user_manage_reset"|translate}}
+          </button>
         </div>
-      </div>
-      <div class="d-flex justify-content-center gap-2">
-        <button type="submit" class="btn btn-primary custom-btn">
-          <i class="bi bi-search"></i> ค้นหา
-        </button>
-        <button
-          type="button"
-          class="btn btn-secondary custom-btn"
-          (click)="onReset()"
-        >
-          <i class="bi bi-arrow-repeat"></i> รีเซ็ต
-        </button>
       </div>
     </form>
   </div>

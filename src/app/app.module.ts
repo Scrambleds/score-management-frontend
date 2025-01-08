@@ -60,6 +60,8 @@ import { ModalMasterdataAddComponent } from './components/modal-masterdata-add/m
 import { SearchFormScoreAnnouncementComponent } from './components/score-announcement/search-form/search-form-search-form-score-announcemen.component';
 import { TableScoreAnnouncementComponent } from './components/score-announcement/table-score-announcemen/table-score-announcemen.component';
 import { SearchMasterDataComponent } from './components/search-master-data/search-master-data.component';
+import { TableScoreSearchComponent } from './components/score-search/table-score-search/table-score-search.component';
+import { SearchFormScoreComponent } from './components/score-search/search-form/search-form-score.component';
 
 @NgModule({
   declarations: [
@@ -94,6 +96,8 @@ import { SearchMasterDataComponent } from './components/search-master-data/searc
     SearchFormScoreAnnouncementComponent,
     TableScoreAnnouncementComponent,
     SearchMasterDataComponent,
+    SearchFormScoreComponent,
+    TableScoreSearchComponent
   ],
   imports: [
     BrowserModule,

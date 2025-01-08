@@ -1,41 +1,32 @@
 import {
   Component,
   ElementRef,
-  AfterViewInit,
   Input,
   OnInit,
   Output,
   ViewChild,
   EventEmitter,
 } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 // import { UploadScoreService } from '../../services/upload-score/upload-score.service';
-import {
-  debounceTime,
-  switchMap,
-  map,
-  distinctUntilChanged,
-  first,
-  tap,
-} from 'rxjs/operators';
-import Swal from 'sweetalert2';
-import { ScoreAnnouncementService } from '../../../services/score-announcement/score-announcement.service';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { ContantService } from '../../../shared/service/contants-service.service';
 import { Observable, of } from 'rxjs';
 
 @Component({
-  selector: 'search-form-score-announcemen',
+  selector: 'search-form-score',
   standalone: false,
-  templateUrl: './search-form-score-announcemen.component.html',
-  styleUrls: ['./search-form-score-announcemen.component.css'],
+  templateUrl: './search-form-score.component.html',
+  styleUrls: ['./search-form-score.component.css'],
 })
-export class SearchFormScoreAnnouncementComponent implements OnInit {
+export class SearchFormScoreComponent implements OnInit {
   @Input() titleName: string = 'No title';
   @Input() buttonName: string = 'No title';
   form!: FormGroup;
   gridData: any[] = [];
   @Output() searchSubmit = new EventEmitter<any>();
   @Output() resetForm = new EventEmitter<void>();
+  @Output() formSubmitted = new EventEmitter<FormGroup>(); // Emit form data when submitted
   @ViewChild('subjectCode', { read: ElementRef }) subjectCodeRef?: ElementRef;
   @ViewChild('subjectDetailForm', { static: false })
   subjectDetailForm?: FormGroup;
@@ -83,19 +74,11 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     return found ? found.label : null; // Return label or null if not found
   }
 
-  // getValueLov(value: string, lookupArray: Array<{ label: string; value: string }>): string {
-  //   const found = lookupArray.find(item => item.label === value);
-  //   return found ? found.label : '';
-  // }
-
   onReset() {
     this.form.reset();
     this.resetForm.emit();
   }
-  // onBlur(): void {
-  //   // เมื่อผู้ใช้เลิกโฟกัสช่อง input
-  //   this.showSuggestions = false;  // ซ่อนรายการแนะนำ
-  // }
+
   ngOnInit(): void {
     this.contantLovService
       .getLovContant('GetLovSendStatus')
@@ -166,9 +149,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       this.showSuggestions = false;
     }, 200); // เพิ่มดีเลย์เพื่อป้องกันการคลิกหาย
   }
-  ngAfterViewInit() {}
 
-  loadStatuses(): void {}
   showAutocomplete() {
     this.form
       .get('subjectSearch')
@@ -198,9 +179,9 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
           const parsedUserInfo = JSON.parse(userInfo);
           if (parsedUserInfo.role == 1) {
             teacher_code = '';
-            role = parsedUserInfo.role;
+            role= parsedUserInfo.role;
           } else {
-            teacher_code = parsedUserInfo.teacher_code;
+            role= parsedUserInfo.role;
             teacher_code = parsedUserInfo.teacher_code;
           }
         } catch (error) {
@@ -214,25 +195,19 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
 
       const requestData = {
         teacher_code,
-        role,
         subjectSearch: this.form.value.subjectSearch ?? '',
         studentSearch: this.form.value.studentSearch ?? '',
-        // semester: this.getSectionLabelOrNull(
-        //   this.form.value.semester,
-        //   this.semesterLovItem
-        // ),
         semester: this.form.value.semester ?? null,
         section: this.getLabelForValue(
           this.form.value.section,
           this.sectionLovItem
         ),
-        // semester: this.form.value.semester ?? null,
         academic_year: this.getLabelForValue(
           this.form.value.academic_year,
           this.academic_yearLovItem
         ),
         send_status_code: this.form.value.sendStatus ?? '',
-        // send_status_code: this.getValueLov(this.form.value.send_status_code, this.statuses),
+        role
       };
 
       this.searchSubmit.emit(requestData); // ส่ง requestData ไปยัง API
@@ -241,31 +216,4 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     }
   }
 
-  searchCode(term: string) {
-    console.log('search code');
-  }
-
-  selectCode(item: any) {
-    if (item && item.subjectCode) {
-      console.log('================selectCode=======================');
-      console.log(item);
-      this.form
-        .get('subjectName')!
-        .setValue(item.subjectName, { emitEvent: false });
-      this.form
-        .get('subjectCode')!
-        .setValue(item.subjectCode, { emitEvent: false });
-      this.selectedSubjectCode = item.subjectCode;
-      this.isSubjectNameReadonly = true;
-      // this.filteredSubjects = [];
-    }
-  }
-
-  searchSubject(term: string) {
-    console.log('search subject');
-  }
-
-  onUlClick(event: Event): void {
-    console.log('UL clicked:', event);
-  }
 }

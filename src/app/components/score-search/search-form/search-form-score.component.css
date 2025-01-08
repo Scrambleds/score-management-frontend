@@ -49,9 +49,8 @@
 ng-select {
   width: 100%;
 }
-
-app-autocomplete {
-  width: 100%;
+.d-flex {
+  flex-wrap: wrap;
 }
 
 .custom-btn {
@@ -61,10 +60,34 @@ app-autocomplete {
   margin-left: 0.5rem;
 }
 
-@media (min-width: 1600px) {
+/* @media (min-width: 1600px) {
   .custom-btn {
     margin-top: 1rem;
   }
+} */
+@media (max-width: 1366px) {
+  .custom-btn {
+    width: fit-content;
+    font-size: 16px;
+  }
+}
+@media (max-width: 1200px) {
+  .custom-btn {
+    width: 100px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .custom-btn {
+    width: 90px;
+    font-size: 14px;
+    height: 35px; 
+  }
+}
+
+@media (max-width: 480px) {
+
 }
 
 .test {
