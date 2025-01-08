@@ -75,8 +75,35 @@ export class SearchFormScoreComponent implements OnInit {
   }
 
   onReset() {
+    let teacher_code: string | null = null;
+    let role: string | null = null;
     this.form.reset();
-    this.resetForm.emit();
+    const userInfo = localStorage.getItem('userInfo');
+    const parsedUserInfo = JSON.parse(userInfo!);
+    if (parsedUserInfo.role == 1) {
+      teacher_code = '';
+      role = parsedUserInfo.role;
+    } else {
+      role = parsedUserInfo.role;
+      teacher_code = parsedUserInfo.teacher_code;
+    }
+    const requestData = {
+      teacher_code,
+      subjectSearch: this.form.value.subjectSearch ?? '',
+      studentSearch: this.form.value.studentSearch ?? '',
+      semester: this.form.value.semester ?? null,
+      section: this.getLabelForValue(
+        this.form.value.section,
+        this.sectionLovItem
+      ),
+      academic_year: this.getLabelForValue(
+        this.form.value.academic_year,
+        this.academic_yearLovItem
+      ),
+      send_status_code: this.form.value.sendStatus ?? '',
+      role,
+    };
+    this.searchSubmit.emit(requestData); // ส่ง requestData ไปยัง API
   }
 
   ngOnInit(): void {
@@ -179,9 +206,9 @@ export class SearchFormScoreComponent implements OnInit {
           const parsedUserInfo = JSON.parse(userInfo);
           if (parsedUserInfo.role == 1) {
             teacher_code = '';
-            role= parsedUserInfo.role;
+            role = parsedUserInfo.role;
           } else {
-            role= parsedUserInfo.role;
+            role = parsedUserInfo.role;
             teacher_code = parsedUserInfo.teacher_code;
           }
         } catch (error) {
@@ -207,7 +234,7 @@ export class SearchFormScoreComponent implements OnInit {
           this.academic_yearLovItem
         ),
         send_status_code: this.form.value.sendStatus ?? '',
-        role
+        role,
       };
 
       this.searchSubmit.emit(requestData); // ส่ง requestData ไปยัง API
@@ -215,5 +242,4 @@ export class SearchFormScoreComponent implements OnInit {
       this.form.markAllAsTouched();
     }
   }
-
 }

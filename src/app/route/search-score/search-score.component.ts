@@ -19,6 +19,7 @@ export class SearchScoreComponent {
     section: null,
     academic_year: null,
     send_status_code: '',
+    role: null,
   };
 
   constructor(private scoreService: SearchScoreService) {}
@@ -28,9 +29,20 @@ export class SearchScoreComponent {
   }
 
   loadInitialData(): void {
+    const userInfo = localStorage.getItem('userInfo');
+    const parsedUserInfo = JSON.parse(userInfo!);
+    if (parsedUserInfo.role == 1) {
+      this.payload.role = parsedUserInfo.role;
+    } else {
+      this.payload.role = parsedUserInfo.role;
+      this.payload.teacher_code = parsedUserInfo.teacher_code;
+    }
+    
     this.scoreService.getScoreAnnouncementByCondition(this.payload).subscribe(
       (response) => {
-        this.gridData = response.objectResponse?.length ? response.objectResponse : [];
+        this.gridData = response.objectResponse?.length
+          ? response.objectResponse
+          : [];
         console.log('Initial data loaded:', this.gridData);
       },
       (error) => {
@@ -42,7 +54,9 @@ export class SearchScoreComponent {
   onSearchSubmit(requestData: any): void {
     this.scoreService.getScoreAnnouncementByCondition(requestData).subscribe(
       (response) => {
-        this.gridData = response.objectResponse?.length ? response.objectResponse : [];
+        this.gridData = response.objectResponse?.length
+          ? response.objectResponse
+          : [];
         console.log('Data received:', this.gridData);
       },
       (error) => {
@@ -52,7 +66,6 @@ export class SearchScoreComponent {
   }
 
   onResetForm(): void {
-
     this.onSearchSubmit(this.payload);
   }
 }

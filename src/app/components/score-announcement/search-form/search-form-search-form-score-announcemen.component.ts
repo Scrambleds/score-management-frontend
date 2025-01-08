@@ -90,7 +90,20 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
 
   onReset() {
     this.form.reset();
-    this.resetForm.emit();
+    let teacher_code: string | null = null;
+    let role: string | null = null;
+    const userInfo = localStorage.getItem('userInfo');
+    const parsedUserInfo = JSON.parse(userInfo!);
+    if (parsedUserInfo.role == 1) {
+      teacher_code = '';
+      role = parsedUserInfo.role;
+    } else {
+      role = parsedUserInfo.role;
+
+      teacher_code = parsedUserInfo.teacher_code;
+    }
+    const requestData = { role, teacher_code };
+    this.searchSubmit.emit(requestData); // ส่ง requestData ไปยัง API
   }
   // onBlur(): void {
   //   // เมื่อผู้ใช้เลิกโฟกัสช่อง input
@@ -200,7 +213,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
             teacher_code = '';
             role = parsedUserInfo.role;
           } else {
-            teacher_code = parsedUserInfo.teacher_code;
+            role = parsedUserInfo.role;
             teacher_code = parsedUserInfo.teacher_code;
           }
         } catch (error) {
