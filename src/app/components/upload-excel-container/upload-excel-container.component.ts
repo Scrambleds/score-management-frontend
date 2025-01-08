@@ -74,32 +74,8 @@ export class UploadExcelContainerComponent implements OnInit {
 
   gridApi!: GridApi<any>;
 
-  filteredSubjects = [
-    {
-      subjectCode: '01418442-60',
-      subjectName: 'Web Technology and Web Services',
-    },
-    { subjectCode: '01418499-65', subjectName: 'Computer Science Project' },
-    {
-      subjectCode: '01418221-60',
-      subjectName: 'Fundamentals of Database Systems',
-    },
-    {
-      subjectCode: '01418222-60',
-      subjectName: 'Internet Application for Commerce',
-    },
-    {
-      subjectCode: '01418233-60',
-      subjectName: 'Assembly Language and Computer Architecture',
-    },
-  ];
-  majorCodeOptions = [
-    { value: null, label: 'กรุณาเลือก' },
-    { value: 'S05', label: 'S05' },
-    { value: 'S06', label: 'S06' },
-    { value: 'S09', label: 'S09' },
-    { value: 'S10', label: 'S11' },
-  ];
+  //for get form state
+  @Input() isButtonDisabled = true;
 
   defaultColDef = {
     sortable: true,
@@ -252,6 +228,16 @@ export class UploadExcelContainerComponent implements OnInit {
     const headers = jsonData[0] || []; // แถวแรกของไฟล์ใช้เป็น header (field names)
     const dataRows = jsonData.slice(1); // ข้อมูลหลัง header
     let errorMessages: string[] = [];
+    const fail_title = this.translationService.getTranslation(
+      'sweet_alert_fail_title'
+    );
+    const btnCloselTitle = this.translationService.getTranslation('btn_close');
+    const noDataText = this.translationService.getTranslation(
+      'uploadscore_error_noData'
+    );
+    const missingFieldText = this.translationService.getTranslation(
+      'uploadscore_error_missingField'
+    );
 
     // ตรวจสอบ headers ว่ามีฟีลด์ที่ต้องการครบหรือไม่
     const missingFields = this.requiredFields.filter(
@@ -259,14 +245,12 @@ export class UploadExcelContainerComponent implements OnInit {
     );
 
     if (missingFields.length > 0) {
-      errorMessages.push(
-        `ฟีลด์ที่ขาดหายไปใน header: ${missingFields.join(', ')}`
-      );
+      errorMessages.push(`${missingFieldText} ${missingFields.join(', ')}`); //`ฟีลด์ที่ขาดหายไปใน header: ${missingFields.join(', ')}`
     }
 
     // ตรวจสอบกรณีไม่มีข้อมูลใน dataRows
     if (dataRows.length === 0) {
-      errorMessages.push('ไม่มีข้อมูลในไฟล์ กรุณาอัปโหลดไฟล์ที่มีข้อมูล');
+      errorMessages.push(noDataText); //'ไม่มีข้อมูลในไฟล์ กรุณาอัปโหลดไฟล์ที่มีข้อมูล'
     } else {
       // ตรวจสอบว่าฟีลด์ในแต่ละแถวไม่มีค่าว่าง
       for (let rowIndex = 0; rowIndex < dataRows.length; rowIndex++) {
@@ -276,9 +260,12 @@ export class UploadExcelContainerComponent implements OnInit {
         this.requiredFields.forEach((field, fieldIndex) => {
           const fieldValue = row[fieldIndex]; // ใช้ index ในการจับคู่ค่าจากแต่ละแถว
           if (fieldValue == null || fieldValue === '') {
-            errorMessages.push(
-              `ฟีลด์ "${field}" ในแถวที่ ${rowIndex + 1} เป็นค่าว่าง`
+            const missingValueText = this.translationService.getTranslation(
+              //value "ฟีลด์ "{field}" ในแถวที่ {rowIndex} เป็นค่าว่าง"
+              'uploadscore_error_missingValue',
+              { field: field, rowIndex: (rowIndex + 1).toString() } // แทนค่าใน {} ด้วย field และ rowIndex
             );
+            errorMessages.push(`${missingValueText}`); //`ฟีลด์ "${field}" ในแถวที่ ${rowIndex + 1} เป็นค่าว่าง`
           }
         });
       }
@@ -287,100 +274,14 @@ export class UploadExcelContainerComponent implements OnInit {
     // หากมี error เก็บทั้งหมดไว้ใน swal
     if (errorMessages.length > 0) {
       Swal.fire({
-        title: 'เกิดข้อผิดพลาด',
+        title: fail_title,
         // text: errorMessages.join('\n'), // แสดงข้อความ error ทั้งหมดใน swal
         html: errorMessages.join('<br>'), // ใช้ <br> แทน \n เพื่อแสดงผลในบรรทัดใหม่
         icon: 'error',
         confirmButtonColor: 'var(--secondary-color)',
-        confirmButtonText: 'ปิด',
+        confirmButtonText: btnCloselTitle,
       });
       return false;
-    }
-
-    return true;
-  }
-
-  validateHeaders(headers: any): boolean {
-    const missingFields = this.requiredFields.filter(
-      (field) => !headers.includes(field)
-    );
-
-    if (missingFields.length > 0) {
-      Swal.fire({
-        title: 'เกิดข้อผิดพลาด',
-        text: `ฟีลด์ที่ขาดหายไป: ${missingFields.join(', ')}`,
-        icon: 'error',
-        confirmButtonColor: 'var(--secondary-color)',
-        confirmButtonText: 'ปิด',
-      });
-      return false;
-    }
-    return true;
-  }
-
-  validateFields(data: any[]): boolean {
-    const dataRows = data;
-    const fileFields = Object.keys(data[0] || {}); // ชื่อฟีลด์จากไฟล์ Excel (เผื่อกรณีไฟล์ไม่มีข้อมูล)
-
-    // ตรวจสอบว่าไฟล์มีฟีลด์ครบตามที่กำหนด
-    const missingFields = this.requiredFields.filter(
-      (field) => !fileFields.includes(field)
-    );
-
-    // ตรวจสอบกรณีฟีลด์ไม่ครบและไม่มีข้อมูลใน row
-    if (missingFields.length > 0 && dataRows.length === 0) {
-      Swal.fire({
-        title: 'เกิดข้อผิดพลาด',
-        text: `ฟีลด์ที่ขาดหายไป: ${missingFields.join(
-          ', '
-        )} และไม่มีข้อมูลในไฟล์`,
-        icon: 'error',
-        confirmButtonColor: 'var(--secondary-color)',
-        confirmButtonText: 'ปิด',
-      });
-      return false;
-    }
-
-    // ตรวจสอบกรณีฟีลด์ไม่ครบ
-    if (missingFields.length > 0) {
-      Swal.fire({
-        title: 'เกิดข้อผิดพลาด',
-        text: `ฟีลด์ที่ขาดหายไป: ${missingFields.join(', ')}`,
-        icon: 'error',
-        confirmButtonColor: 'var(--secondary-color)',
-        confirmButtonText: 'ปิด',
-      });
-      return false;
-    }
-
-    // ตรวจสอบกรณีไม่มี row data
-    if (dataRows.length === 0) {
-      Swal.fire({
-        title: 'เกิดข้อผิดพลาด',
-        text: 'ข้อมูลไม่พบ กรุณาอัปโหลดไฟล์ที่มีข้อมูล',
-        icon: 'error',
-        confirmButtonColor: 'var(--secondary-color)',
-        confirmButtonText: 'ปิด',
-      });
-      return false;
-    }
-
-    // ตรวจสอบทุกแถวว่าไม่มีฟีลด์ที่เป็นค่าว่าง
-    for (const row of dataRows) {
-      for (const field of this.requiredFields) {
-        if (!row[field] || row[field] === '') {
-          Swal.fire({
-            title: 'เกิดข้อผิดพลาด',
-            text: `ฟีลด์ "${field}" ในแถวที่ ${
-              dataRows.indexOf(row) + 1
-            } เป็นค่าว่าง`,
-            icon: 'error',
-            confirmButtonColor: 'var(--secondary-color)',
-            confirmButtonText: 'ปิด',
-          });
-          return false;
-        }
-      }
     }
 
     return true;
@@ -582,6 +483,14 @@ export class UploadExcelContainerComponent implements OnInit {
 
   // 11. call service for send to API
   sendToApi(formData: any) {
+    const successTitle = this.translationService.getTranslation(
+      'uploadscore_swalSave_title'
+    );
+    const failTitle = this.translationService.getTranslation(
+      'sweet_alert_fail_title'
+    );
+    const okBtnText = this.translationService.getTranslation('btn_ok');
+    const closeBtnText = this.translationService.getTranslation('btn_close');
     //list student score from Excel
 
     // Mapping rowData to match the ScoreStudent model
@@ -623,10 +532,10 @@ export class UploadExcelContainerComponent implements OnInit {
         console.log('Success', response);
         if (response.isSuccess) {
           Swal.fire({
-            title: 'บันทึกคะแนนนิสิตสำเร็จ',
+            title: successTitle,
             icon: 'success',
             confirmButtonColor: 'var(--primary-color)',
-            confirmButtonText: 'ตกลง',
+            confirmButtonText: okBtnText,
           }).then((result) => {
             if (result.isConfirmed) {
               // หากคลิก "ตกลง"
@@ -635,11 +544,11 @@ export class UploadExcelContainerComponent implements OnInit {
           });
         } else {
           Swal.fire({
-            title: 'เกิดข้อผิดพลาด',
+            title: failTitle,
             text: response.message.messageDescription,
             icon: 'error',
             confirmButtonColor: 'var(--secondary-color)',
-            confirmButtonText: 'ปิด',
+            confirmButtonText: closeBtnText,
           }).then((result) => {
             if (result.isConfirmed) {
               // หากคลิก "ตกลง"
@@ -659,15 +568,24 @@ export class UploadExcelContainerComponent implements OnInit {
 
   // ลบข้อมูลใน ag-Grid
   onDelete() {
+    const deleteTitle = this.translationService.getTranslation(
+      'uploadscore_swalDelete_title'
+    );
+    const deleteText = this.translationService.getTranslation(
+      'uploadscore_swalDelete_text'
+    );
+    const deleteBtnText = this.translationService.getTranslation('btn_delete');
+    const cancelBtnText = this.translationService.getTranslation('btn_cancel');
+
     Swal.fire({
-      title: 'ต้องการลบข้อมูลใช่หรือไม่',
-      text: 'หลังจากลบข้อมูลแล้วจะไม่สามารถกลับมาแก้ไขได้',
+      title: deleteTitle,
+      text: deleteText,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: 'var(--danger-color)',
-      confirmButtonText: 'ลบ',
+      confirmButtonText: deleteBtnText,
       cancelButtonColor: 'var(--secondary-color)',
-      cancelButtonText: 'ยกเลิก',
+      cancelButtonText: cancelBtnText,
     }).then((result) => {
       if (result.isConfirmed) {
         // หากคลิก "ตกลง"

@@ -8,27 +8,6 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class UploadScoreService {
-  private mockSubjects = [
-    {
-      subjectCode: '01418442-60',
-      subjectName: 'Web Technology and Web Services',
-    },
-    { subjectCode: '01418499-65', subjectName: 'Computer Science Project' },
-    {
-      subjectCode: '01418221-60',
-      subjectName: 'Fundamentals of Database Systems',
-    },
-    {
-      subjectCode: '01418222-60',
-      subjectName: 'Internet Application for Commerce',
-    },
-    {
-      subjectCode: '01418233-60',
-      subjectName: 'Assembly Language and Computer Architecture',
-    },
-  ];
-
-  private apiUrl = 'https://example.com/api/subjects'; // Replace with your API endpoint
   private httpOptions = {
     headers: new HttpHeaders({
       'content-type': 'application/json;charset=UTF-8',
@@ -38,11 +17,6 @@ export class UploadScoreService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Search subjects by term.
-   * @param term The search term entered by the user.
-   * @returns Observable of filtered subjects.
-   */
   searchSubjects(
     term: string
   ): Observable<{ subjectCode: string; subjectName: string }[]> {
@@ -51,20 +25,21 @@ export class UploadScoreService {
       return of([]);
     }
 
-    // Uncomment the following code if using backend API:
-    /*
-    return this.http
-      .get<{ subjectCode: string; subjectName: string }[]>(`${this.apiUrl}?search=${term}`)
-      .pipe(map((data) => data || []));
-    */
-
-    // Using mock data for demo purposes:
-    const filteredSubjects = this.mockSubjects.filter(
-      (subject) =>
-        subject.subjectCode.toLowerCase().includes(term.toLowerCase()) ||
-        subject.subjectName.toLowerCase().includes(term.toLowerCase())
+    return this.getSubject().pipe(
+      map((subjects) =>
+        subjects.filter(
+          (subject) =>
+            subject.subjectCode.toLowerCase().includes(term.toLowerCase()) ||
+            subject.subjectName.toLowerCase().includes(term.toLowerCase())
+        )
+      ),
+      tap((filteredSubjects) =>
+        console.log(
+          `Filtered subjects based on term "${term}"`,
+          filteredSubjects
+        )
+      )
     );
-    return of(filteredSubjects);
   }
 
   uploadScore(payload: any): Observable<any> {
@@ -75,14 +50,16 @@ export class UploadScoreService {
     );
   }
 
-  masterData(reference: string): Observable<any[]> {
-    const url = `${environment.apiUrl}/api/MasterData/SystemParam`;
-    const params = new HttpParams().set('reference', reference);
-    return this.http
-      .get<Record<string, string>>(url, { params, ...this.httpOptions })
-      .pipe(
-        map((response: any) => response),
-        tap((_) => console.log(`get masterdata : ${reference} done!!`))
-      );
+  getSubject(): Observable<{ subjectCode: string; subjectName: string }[]> {
+    const url = `${environment.apiUrl}/api/MasterData/Subject`;
+    return this.http.get<any>(url, this.httpOptions).pipe(
+      map((response: any) => {
+        return response.objectResponse.map((subject: any) => ({
+          subjectCode: subject.subject_id,
+          subjectName: subject.subject_name,
+        }));
+      }),
+      tap((_) => console.log(`get masterdata done!!`))
+    );
   }
 }

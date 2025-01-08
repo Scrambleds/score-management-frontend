@@ -13,6 +13,7 @@ import { UploadScoreService } from '../../services/upload-score/upload-score.ser
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 import { SelectBoxService } from '../../services/select-box/select-box.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-upload-score-header',
@@ -53,6 +54,9 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
   semesterList: any[] = [];
   academicYearList: any[] = [];
 
+  //for send state to parent
+  @Output() formStatusChange = new EventEmitter<boolean>();
+
   constructor(
     private fb: FormBuilder,
     private uploadScoreService: UploadScoreService,
@@ -70,6 +74,11 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
       academicYearCode: [{ value: null, disabled: true }, Validators.required],
       semesterCode: [{ value: null, disabled: true }, Validators.required],
       sectionCode: [{ value: null, disabled: true }, Validators.required],
+    });
+
+    // ตรวจจับการเปลี่ยนแปลงของฟอร์ม
+    this.form.statusChanges.subscribe((status) => {
+      this.formStatusChange.emit(this.form.valid); // ส่ง true ถ้าฟอร์ม valid
     });
   }
 
@@ -280,13 +289,13 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
       const formData = this.form.getRawValue();
       //send formData to parent with event emitter
       this.formSubmitted.emit(formData);
-      Swal.fire({
-        title: 'สำเร็จ',
-        text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
-        icon: 'success',
-        confirmButtonText: 'ตกลง',
-        confirmButtonColor: 'var(--primary-color)',
-      });
+      // Swal.fire({
+      //   title: 'สำเร็จ',
+      //   text: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+      //   icon: 'success',
+      //   confirmButtonText: 'ตกลง',
+      //   confirmButtonColor: 'var(--primary-color)',
+      // });
 
       // this.form.reset();
     } else {

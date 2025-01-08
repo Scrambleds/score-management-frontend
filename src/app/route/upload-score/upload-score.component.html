@@ -4,6 +4,7 @@
     #scoreHeader
     [isUploaded]="isFileUploaded"
     (formSubmitted)="handleFormSubmitted($event)"
+    (formStatusChange)="onFormStatusChange($event)"
   ></app-upload-score-header>
   <!-- 4. call fn: handleSubmitRequest()-->
   <app-upload-excel-container
@@ -12,5 +13,6 @@
     [buttonName]="'uploadscore_uploadExcelFile' | translate"
     (isUploaded)="handleUploadEvent($event)"
     (submitRequest)="handleSubmitRequest()"
+    [isButtonDisabled]="isButtonDisabled"
   ></app-upload-excel-container>
 </div>
