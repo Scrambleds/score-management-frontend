@@ -30,60 +30,11 @@
           ></i>
         </button>
         <ul
-          class="dropdown-menu dropdown-menu-end"
+          class="notify-container dropdown-menu"
           aria-labelledby="notificationDropdown"
+          id="notificationList"
         >
           <li><h6 class="dropdown-header">Notifications</h6></li>
-          <li>
-            <a class="dropdown-item" href="#">
-              <div style="font-size: 14px">
-                <span style="font-weight: 600">01418222-60 </span>
-                <span
-                  >ส่งทั้งหมด 10 รายการ
-                  <span class="text-success">สำเร็จ 8 รายการ </span
-                  ><span class="text-danger">ไม่สำเร็จ 2 รายการ</span></span
-                >
-              </div>
-
-              <div style="font-size: 12px; color: grey">2 นาทีที่แล้ว</div>
-            </a>
-          </li>
-          <li><hr class="dropdown-divider" /></li>
-          <li>
-            <a class="dropdown-item" href="#">
-              <div style="font-size: 14px">
-                <span style="font-weight: 600">01418221-60 </span>
-                <span
-                  >ส่งทั้งหมด 50 รายการ
-                  <span class="text-success">สำเร็จ 45 รายการ </span
-                  ><span class="text-danger">ไม่สำเร็จ 5 รายการ</span></span
-                >
-              </div>
-
-              <div style="font-size: 12px; color: grey">15 นาทีที่แล้ว</div>
-            </a>
-          </li>
-          <li><hr class="dropdown-divider" /></li>
-          <li>
-            <a class="dropdown-item" href="#">
-              <div style="font-size: 14px">
-                <span style="font-weight: 600"> 01418442-60 </span>
-                <span
-                  >ส่งทั้งหมด 30 รายการ
-                  <span class="text-success">สำเร็จ 18 รายการ </span
-                  ><span class="text-danger">ไม่สำเร็จ 12 รายการ</span></span
-                >
-              </div>
-
-              <div style="font-size: 12px; color: grey">1 ชั่วโมงที่แล้ว</div>
-            </a>
-          </li>
-          <!-- <li><hr class="dropdown-divider" /></li>
-          <li>
-            <a class="dropdown-item text-center" href="#"
-              >See all notifications</a
-            >
-          </li> -->
         </ul>
       </div>
       <!-- switch language -->
@@ -159,9 +110,11 @@
             </div>
             <div class="col-8 d-flex flex-column text-end">
               <!-- <div style="font-size: 12px">ดร.ฉัตรชัย เกษมทวีโชค</div> -->
-              <div style="font-size: 12px">{{ prefix }} {{ firstname }} {{ lastname }}</div>
+              <div style="font-size: 12px">
+                {{ prefix }} {{ firstname }} {{ lastname }}
+              </div>
               <!-- <div style="font-size: 10px">รหัสอาจารย์: S2024</div> -->
-              <div style="font-size: 10px">รหัสอาจารย์: {{ teacher_code }} </div>
+              <div style="font-size: 10px">รหัสอาจารย์: {{ teacher_code }}</div>
             </div>
             <div class="col-1 d-flex align-items-center justify-content-center">
               <i

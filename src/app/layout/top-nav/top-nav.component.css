@@ -10,3 +10,29 @@
   margin-left: 15.625rem;
   transition: margin-left 0.5s;
 }
+
+/* notify */
+/* ปรับความกว้างสูงสุดของ notify-container */
+.notify-container {
+  min-width: 18rem; /* ความกว้างขั้นต่ำ */
+  max-width: 90vw; /* ความกว้างสูงสุดไม่เกิน 90% ของหน้าจอ */
+  overflow: hidden; /* ป้องกันการล้น */
+  word-wrap: break-word; /* ให้ข้อความห่อ */
+  word-break: break-word;
+}
+
+/* จัดการตำแหน่ง dropdown ให้เหมาะสมกับหน้าจอขนาดเล็ก */
+@media (max-width: 600px) {
+  .notify-container {
+    left: auto !important; /* ปรับตำแหน่ง dropdown */
+    right: 0 !important; /* ชิดขอบขวาของหน้าจอ */
+    transform: translateX(-5%); /* ดึงเข้าด้านในเล็กน้อย */
+  }
+}
+
+/* ปรับการแสดงผลข้อความให้เหมาะสม */
+.dropdown-item div {
+  font-size: 14px;
+  white-space: normal;
+  word-wrap: break-word;
+}
