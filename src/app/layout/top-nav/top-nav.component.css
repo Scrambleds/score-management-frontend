@@ -14,11 +14,16 @@
 /* notify */
 /* ปรับความกว้างสูงสุดของ notify-container */
 .notify-container {
-  min-width: 18rem; /* ความกว้างขั้นต่ำ */
+  min-width: 20rem; /* ความกว้างขั้นต่ำ */
   max-width: 90vw; /* ความกว้างสูงสุดไม่เกิน 90% ของหน้าจอ */
   overflow: hidden; /* ป้องกันการล้น */
   word-wrap: break-word; /* ให้ข้อความห่อ */
   word-break: break-word;
+}
+
+.notify-container .notify-list {
+  max-height: 25.938rem;
+  overflow-y: auto;
 }
 
 /* จัดการตำแหน่ง dropdown ให้เหมาะสมกับหน้าจอขนาดเล็ก */
@@ -35,4 +40,10 @@
   font-size: 14px;
   white-space: normal;
   word-wrap: break-word;
+}
+
+.no-notifications {
+  text-align: center;
+  list-style-type: none;
+  padding-left: 0;
 }

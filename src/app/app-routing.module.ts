@@ -51,7 +51,7 @@ const routes: Routes = [
         component: AddUserRoute,
         data: { messageKey: 'menu_usermanage' },
         canActivate: [AuthGuard],
-      }, 
+      },
       {
         path: 'UploadScore',
         component: UploadScoreComponent,

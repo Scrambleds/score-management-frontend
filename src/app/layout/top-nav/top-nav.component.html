@@ -32,9 +32,13 @@
         <ul
           class="notify-container dropdown-menu"
           aria-labelledby="notificationDropdown"
-          id="notificationList"
         >
           <li><h6 class="dropdown-header">Notifications</h6></li>
+          <!-- ถ้าไม่มีการแจ้งเตือน -->
+          <ul *ngIf="notifications.length === 0" class="no-notifications">
+            <li>{{ "navbar_notifyNoMessage" | translate }}</li>
+          </ul>
+          <div id="notify-list" class="notify-list"></div>
         </ul>
       </div>
       <!-- switch language -->

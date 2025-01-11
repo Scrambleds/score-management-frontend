@@ -5,6 +5,7 @@ import { TranslationService } from '../../core/services/translation.service';
 import { UserService } from '../../services/sharedService/userService/userService.service';
 import { SignalRService } from '../../services/sharedService/signalRService/signal-r.service';
 import { NotifyTemplateService } from '../../services/notify-template/notify-template.service';
+import * as Handlebars from 'handlebars';
 
 @Component({
   selector: 'app-top-nav',
@@ -25,7 +26,6 @@ export class TopNavComponent implements OnInit {
   role: string = '';
 
   //notify
-  notification: any = null;
   notifications: any[] = []; // Array สำหรับเก็บ Notifications
 
   constructor(
@@ -38,7 +38,6 @@ export class TopNavComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log('My nav');
     this.UserService.userInfo$.subscribe((userInfo) => {
       if (userInfo) {
         this.prefix = userInfo.prefix_description_th;
@@ -75,75 +74,44 @@ export class TopNavComponent implements OnInit {
     // เรียกใช้เมธอดนี้หลังจากที่ Angular ได้ทำการเรนเดอร์หน้าและเปลี่ยนเส้นทาง
     this.setInitialTitle();
 
-    this.signalRService.onNotification((data: any) => {
-      const template = this.notifyTemplate.getTemplateById(data.template_id);
-      if (template) {
-        const html = this.notifyTemplate.replacePlaceholders(template, data);
+    //call template notify
+    this.notifyTemplate.getTemplates().subscribe();
 
-        const notificationList = document.getElementById('notificationList');
-        if (notificationList) {
-          // const div = document.createElement('div');
-          const li = document.createElement('li');
-          li.innerHTML = html;
-          // ตรวจสอบว่ามีข้อความแจ้งเตือนอยู่ใน list แล้วหรือยัง
-          const notifications = notificationList.querySelectorAll('li');
+    //notify
+    this.notifyTemplate
+      .getNotifications(this.UserService.username)
+      .subscribe((data) => {
+        if (data && data.length > 0) {
+          this.notifications = data.map((item) => {
+            const notificationList = document.getElementById('notify-list');
+            if (notificationList) {
+              notificationList.innerHTML = ''; // ลบรายการเดิม
 
-          // ถ้าผลลัพธ์ของ notifications มีมากกว่าหนึ่ง (มีข้อมูลแจ้งเตือนก่อนหน้านี้)
-          if (notifications.length > 1) {
-            console.log('true');
-            // เพิ่ม divider ก่อนที่จะเพิ่ม <li> ใหม่
-            const divider = document.createElement('li');
-            divider.innerHTML = `<hr class="dropdown-divider" />`;
-            notificationList.insertBefore(divider, notifications[1]); // แทรก divider หลังจาก <h6> header
-            notificationList.insertBefore(li, divider); // แทรก notify ใหม่ก่อน divider ที่เพิ่งเพิ่ม
-            // แทรก divider ก่อน <li> ที่มีอยู่แล้ว
-          } else {
-            notificationList.insertBefore(li, notifications[1]); // แทรกใหม่ก่อน <li> ตัวแรก
-            console.log('false');
-          }
+              data.forEach((item) => {
+                const newItem = this.renderNotification(item); // Render Notification
+                notificationList.appendChild(newItem); // เพิ่มรายการใน notify-list
+              });
+            }
+          });
+        } else {
+          // หากไม่มีข้อมูลการแจ้งเตือน
+          this.notifications = [];
         }
-      } else {
-        console.error('Template not found for ID:', data.template_id);
+      });
+    //notify signalR
+    this.signalRService.startConnection(); // เริ่มการเชื่อมต่อกับ SignalR Hub
+    this.signalRService.onNotification((notification: any) => {
+      const renderedNotification = this.renderNotification(notification);
+      const notificationList = document.getElementById('notify-list');
+      if (notificationList) {
+        // notificationList.appendChild(renderedNotification);
+        // ถ้าไม่มีรายการใน list, firstChild จะเป็น null
+        const firstItem = notificationList.firstChild;
+
+        // แทรกรายการใหม่ที่ด้านบนสุด ถ้า firstItem เป็น null, renderedNotification จะถูกเพิ่มเป็นลูกแรก
+        notificationList.insertBefore(renderedNotification, firstItem); // ถ้าไม่มี firstChild, ให้แทรก renderedNotification ที่ตำแหน่งแรก
       }
     });
-    //notify
-    // this.notifyTemplate.loadTemplates(); // โหลดเทมเพลตเมื่อเริ่มต้น
-    // this.signalRService.startConnection();
-
-    // this.signalRService.onNotification((html: string) => {
-    //   const notificationList = document.getElementById('notificationList');
-    //   if (notificationList) {
-    //     // const div = document.createElement('li');
-    //     // div.innerHTML = html; // ใช้ HTML ที่แปลงแล้ว
-    //     // notificationList.appendChild(div);
-    //     const li = document.createElement('li');
-
-    //     // กำหนดโครงสร้างภายในของ li
-    //     li.innerHTML = `
-    //   <a class="dropdown-item" href="#">
-    //     <div style="font-size: 14px">
-    //       <span style="font-weight: 600">${html.subject_id}</span>
-    //       <span>
-    //         ส่งทั้งหมด ${html.total} รายการ
-    //         <span class="text-success">สำเร็จ ${html.success} รายการ</span>
-    //         <span class="text-danger">ไม่สำเร็จ ${html.fail} รายการ</span>
-    //       </span>
-    //     </div>
-    //     <div style="font-size: 12px; color: grey">${calculateTime(
-    //       html.createAt
-    //     )}</div>
-    //   </a>
-    // `;
-
-    //     // เพิ่ม li ใหม่เข้าไปใน notificationList
-    //     notificationList.appendChild(li);
-
-    //     // เพิ่ม Divider (optional)
-    //     const divider = document.createElement('li');
-    //     divider.innerHTML = `<hr class="dropdown-divider" />`;
-    //     notificationList.appendChild(divider);
-    //   }
-    // });
   }
 
   // Function สำหรับ Toggle Side Nav
@@ -174,25 +142,15 @@ export class TopNavComponent implements OnInit {
   }
 
   //notify
-  // Calculate elapsed time
-  calculateElapsedTime(createAt: Date): number {
-    const now = new Date();
-    const elapsedMilliseconds = now.getTime() - new Date(createAt).getTime();
-    return Math.floor(elapsedMilliseconds / 60000); // Convert to minutes
-  }
-  // ฟังก์ชันสำหรับคำนวณเวลาที่ผ่านมา
-  calculateTime(createAt: string): string {
-    const currentTime = new Date();
-    const createTime = new Date(createAt);
-    const diffMinutes = Math.floor(
-      (currentTime.getTime() - createTime.getTime()) / 60000
-    );
+  private renderNotification(item: any): HTMLElement {
+    const htmlContent = this.notifyTemplate.getTemplateById(item.templateId); // ดึง Template จาก ID
+    const template = Handlebars.compile(htmlContent); // คอมไพล์ Handlebars template
+    const parsedData = JSON.parse(item.data); // แปลง JSON data
+    const calculatedTime = this.notifyTemplate.calculateTime(item.createDate); // คำนวณเวลาที่ผ่านมา
+    const renderedHtml = template({ ...parsedData, calculatedTime }); // Render template
 
-    if (diffMinutes < 60) {
-      return `${diffMinutes} นาทีที่แล้ว`;
-    } else {
-      const diffHours = Math.floor(diffMinutes / 60);
-      return `${diffHours} ชั่วโมงที่แล้ว`;
-    }
+    const li = document.createElement('li');
+    li.innerHTML = renderedHtml;
+    return li;
   }
 }
