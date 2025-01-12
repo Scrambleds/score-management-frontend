@@ -56,7 +56,7 @@ import { CachingInterceptor } from './core/interceptors/caching.interceptor';
 import { CacheService } from './core/services/cache.service';
 import { MasterDataComponents } from '../../src/app/components/master-data/master-data.component';
 import { ModalMasterdataEditComponent } from './components/modal-masterdata-edit/modal-masterdata-edit.component';
-import { ModalMasterdataAddComponent } from './components/modal-masterdata-add/modal-masterdata-add.component'
+import { ModalMasterdataAddComponent } from './components/modal-masterdata-add/modal-masterdata-add.component';
 import { SearchFormScoreAnnouncementComponent } from './components/score-announcement/search-form/search-form-search-form-score-announcemen.component';
 import { TableScoreAnnouncementComponent } from './components/score-announcement/table-score-announcemen/table-score-announcemen.component';
 import { SearchMasterDataComponent } from './components/search-master-data/search-master-data.component';
