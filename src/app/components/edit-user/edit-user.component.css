@@ -1,57 +1,9 @@
-/* 
 .custom-card {
-    border-radius: 12px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-    overflow: hidden; 
-    padding: 10px;
-    margin: 20px;
-  }
-  
-  @media (max-width: 768px) {
-    .custom-card {
-      width: 95%;
-    }
-  }
-   */
-
-/* Button styles */
-/* .card1:hover,
-.card1:focus,
-.card:hover,
-.card:focus {
-  filter: brightness(95%) saturate(100%);
-} */
-
-/* .card1:disabled,
-.card:disabled {
-  opacity: 0.5;
-}
-
-.card1 {
-  margin-bottom: 1rem; 
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-  border-color: #ddd; 
-  border-width: 1px;
-  border-radius: 8px;
-} */
-/* @import "@ng-select/ng-select/themes/default.theme.css"; */
-/* @import "~@ng-select/ng-select/themes/material.theme.css"; */
-
-.custom-card {
-  /* margin-bottom: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-  border-color: #ddd; 
-  border-width: 1px;
-  border-radius: 8px; */
   border-radius: 0.75rem;
   box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.2);
   padding: 0.625rem;
-  /* margin: 1.25rem;  */
-  /* bottom: 10px; */
-  /* top: 0.625rem; */ /* ter remove fix top conflict */
   min-width: 5rem;
   border-color: #ddd;
-  /* overflow: hidden; */
   position: relative;
 }
 
@@ -61,18 +13,15 @@
   font-size: 0.875rem;
 }
 
-/* .ng-select{
-  z-index: 1000;
-} */
-
 .ng-dropdown-panel {
   position: absolute !important;
-  z-index: 1050; /* ค่านี้ควรสูงกว่า card */
+  z-index: 1050;
 }
 
 .card-body {
   overflow: visible;
 }
+
 .card {
   z-index: 1;
 }
@@ -115,111 +64,4 @@
   font-size: 1.8rem;
   color: #03a96b;
   transform: scale(0.8);
-  /* padding: 0.5rem; */
-  /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); */
-  /* margin: 0 0.5rem; */
 }
-
-/* 
-.ng-select .ng-select-container {
-  position: relative;
-  z-index: 1050;
-}
-
-.ng-select .ng-select-dropdown {
-  position: absolute;
-  z-index: 1050;
-  top: 100%; 
-}*/
-
-/* .ng-select {
-  position: fixed;
-} */
-
-/* .ng-select {
-  position: fixed;
-  z-index: 1050; 
-  width: 14.5%;
-} */
-
-/* .btn {
-    border-radius: 5px; 
-    padding: 0.6rem 1.2rem; 
-    font-size: 1rem; 
-  } */
-
-/* .btn-sm {
-    padding: 0.4rem 0.8rem; 
-    font-size: 0.9rem;
-  }
-  
-  .btn-lg {
-    padding: 0.8rem 1.5rem;
-    font-size: 1.2rem;
-  }
-  
-  @media (max-width: 768px) {
-    .btn {
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-    }
-  } */
-
-/* 
-.card-header {
-  border-bottom-width: 1px;
-}
-
-.card-actions a {
-  color: #333;
-  text-decoration: none;
-}
-
-.card-actions svg {
-  width: 16px;
-  height: 16px;
-}
-
-.card-actions .dropdown {
-  line-height: 1.4;
-} */
-
-/* .card-title {
-  font-size: 1.25rem; 
-  font-weight: 600; 
-  color: #333;
-} */
-/* 
-.card-subtitle {
-  font-weight: normal;
-} */
-/* 
-.card-table {
-  margin-bottom: 0;
-} */
-
-/* .card-table tr td:first-child,
-.card-table tr th:first-child {
-  padding-left: 1rem;
-} */
-
-/* .card-table tr td:last-child,
-.card-table tr th:last-child {
-  padding-right: 1rem;
-} */
-/* 
-.card-img,
-.card-img-top,
-.card-img-bottom {
-  width: 100%;
-  height: auto;
-} */
-
-/* 
-@media all and (-ms-high-contrast: none) {
-  .card-img,
-  .card-img-top,
-  .card-img-bottom {
-    height: 100%;
-  }
-} */

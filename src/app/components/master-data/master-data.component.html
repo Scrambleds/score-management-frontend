@@ -23,16 +23,17 @@
       <div *ngFor="let item of filteredData; let i = index">
         <div class="card p-3 mb-3 max-h-100">
           <div class="row d-flex justify-content-between">
-            <div class="col-6 d-flex align-items-center">
+            <div class="col-6 d-flex align-items-center clickable-area" (click)="toggleCollapse(i)">
               <p class="fw-bold mb-0">{{ item.byte_reference }}</p>
               <p class="badge bg-blue mb-0 ms-2 d-flex align-items-center">
                 {{ item.byteDetail.length }} {{ "add_masterdata_item" | translate}}
               </p>
             </div>
-
+            
             <div class="col-6 px-4 d-flex justify-content-end align-items-center">
               
-              <button type="submit" class="btn btn-primary" (click)="openAddModal(item.byte_reference, item.byteDetail)">
+              <div class="col-12 d-flex align-items-center justify-content-end" (click)="toggleCollapse(i)">
+              <button type="submit" class="btn btn-primary" (click)="openAddModal(item.byte_reference, item.byteDetail); $event.stopPropagation()">
                 <!-- <i class="bi bi-plus-circle-fill"></i> -->
                 <i class="bi bi-plus-circle"></i>
                 {{ "master_modal_header2" | translate }}
@@ -40,7 +41,7 @@
 
               <div class="me-2"></div>
                 <!-- Chevron Icon -->
-                <a (click)="toggleCollapse(i)" aria-expanded="openCollapse === i">
+                <!-- <a (click)="toggleCollapse(i)" aria-expanded="openCollapse === i"> -->
                   <i
                     class="bi"
                     [ngClass]="{
@@ -49,8 +50,9 @@
                     }"
                     style="font-size: 1.5rem; color: #007bff;">
                   </i>
-                </a>                
+                <!-- </a> -->
               </div>
+            </div>
 
             <div *ngIf="openCollapse === i" class="mt-2 mb-2">
               <div *ngFor="let detail of item.byteDetail" class="card p-3 mb-3">

@@ -84,8 +84,14 @@ export class ModalMasterdataAddComponent implements AfterViewInit, OnChanges {
     this.showChange.emit(false);
   }
 
+  // onBackdropClick(event: MouseEvent) {
+  //   if (event.target === this.modalElement?.nativeElement) {
+  //     this.closeModal();
+  //   }
+  // }
+
   onBackdropClick(event: MouseEvent) {
-    if (event.target === this.modalElement?.nativeElement) {
+    if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
       this.closeModal();
     }
   }

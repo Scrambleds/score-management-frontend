@@ -11,6 +11,14 @@ export class SelectBoxService {
 
   constructor(private http: HttpClient) {}
 
+  getSystemParamScoreType(): Observable<any> {
+    const params = new HttpParams().set('reference', 'score_type');
+    return this.http.get<Record<string, string>>(this.Url, { params }).pipe(
+      map((response: any) => response.objectResponse),
+      tap((_) => console.log(`get masterdata : section done!!`))
+    );
+  }
+
   getSystemParamRole(role: string): Observable<any> {
     const params = new HttpParams().append('reference', role);
 

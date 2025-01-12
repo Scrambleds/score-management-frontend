@@ -1,0 +1,91 @@
+<div class="card p-3 mb-2">
+  <form [formGroup]="form" class="mb-0">
+    <div class="row d-flex justify-content-between row-cols-1 row-cols-md-3 row-cols-lg-5 g-2">
+      <div class="col-12 col-md-12 col-lg-3 d-flex justify-content-start gap-2">
+        <div class="col-auto align-self-center">
+          <p class="fw-bold mb-0">{{ "subject_code" | translate }}/{{ "subject_name" | translate }}</p>
+        </div>
+        <div class="flex-grow-1">
+          <input type="text" class="form-control" [placeholder]="'placeholder_text' | translate"
+          formControlName="subject_detail"/>
+          </div>
+      </div>
+      <div class="col-12 col-md-12 col-lg-2 d-flex justify-content-start gap-2 me-2">
+        <div class="col-auto align-self-center">
+          <p class="fw-bold mb-0">{{ "academic_year" | translate }}</p>
+        </div>
+        <div class="flex-grow-1">
+            <ng-select
+            name="academicYearCode"
+            formControlName="academicYearCode"
+            [items]="academicYearList"
+            bindValue="byte_code"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown }}
+            </ng-template>
+          </ng-select>
+          </div>
+      </div>
+      <div class="col-12 col-md-12 col-lg-2 d-flex justify-content-start gap-2 me-2">
+        <div class="col-auto align-self-center">
+          <p class="fw-bold mb-0"> {{ "semester" | translate}}</p>
+        </div>
+        <div class="flex-grow-1">
+            <ng-select
+            name="semesterCode"
+            formControlName="semesterCode"
+            [items]="semesterList"
+            bindValue="byte_code"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown }}
+            </ng-template>
+          </ng-select>
+          </div>
+      </div>
+      <div class="col-12 col-md-12 col-lg-2 d-flex justify-content-start gap-2 me-2">
+        <div class="col-auto align-self-center">
+          <p class="fw-bold mb-0"> {{ "section" | translate }}</p>
+        </div>
+        <div class="flex-grow-1">
+            <ng-select
+            name="sectionCode"
+            formControlName="sectionCode"
+            [items]="sectionList"
+            bindValue="byte_code"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown }}
+            </ng-template>
+          </ng-select>
+          </div>
+      </div>
+      <div class="col-12 col-md-12 col-lg-2 d-flex justify-content-start gap-2 me-2">
+        <div class="col-auto align-self-center">
+          <p class="fw-bold mb-0">{{ "dashboard_scoretype" | translate }}</p>
+        </div>
+        <div class="flex-grow-1">
+          <ng-select
+          name="scoreType"
+          formControlName="scoreType"
+          [items]="scoreTypeList"
+          bindValue="byte_code"
+          [placeholder]="'placeholder_select' | translate"
+          [clearable]="true"
+        >
+          <ng-template ng-option-tmp ng-label-tmp let-item="item">
+            {{ item | translateDropdown }}
+          </ng-template>
+        </ng-select>
+          </div>
+      </div>
+    </div>
+  </form>
+  </div>  

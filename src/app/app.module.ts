@@ -62,6 +62,9 @@ import { TableScoreAnnouncementComponent } from './components/score-announcement
 import { SearchMasterDataComponent } from './components/search-master-data/search-master-data.component';
 import { TableScoreSearchComponent } from './components/score-search/table-score-search/table-score-search.component';
 import { SearchFormScoreComponent } from './components/score-search/search-form/search-form-score.component';
+import { BellCurveComponent } from './components/bell-curve/bell-curve.component';
+import { NgChartsModule } from 'ng2-charts';
+import { SearchDashboardComponent } from './components/search-dashboard/search-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -97,7 +100,9 @@ import { SearchFormScoreComponent } from './components/score-search/search-form/
     TableScoreAnnouncementComponent,
     SearchMasterDataComponent,
     SearchFormScoreComponent,
-    TableScoreSearchComponent
+    TableScoreSearchComponent,
+    BellCurveComponent,
+    SearchDashboardComponent,
   ],
   imports: [
     BrowserModule,
@@ -115,6 +120,7 @@ import { SearchFormScoreComponent } from './components/score-search/search-form/
     NgSelectComponent,
     MatSelectModule,
     RequiredMarkerDirective,
+    NgChartsModule
   ],
   providers: [
     CacheService,

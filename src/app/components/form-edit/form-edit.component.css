@@ -1,10 +1,7 @@
 .custom-card {
-  /* top: -0.6rem; */
   border-radius: 0.75rem;
   box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.2);
   padding: 0.625rem;
-  /* margin: 1.25rem; */
-  /* top: 1.25rem;  */ /* ter remove for fix top conflict */
   border-color: #ddd;
   overflow: hidden;
   position: relative;
