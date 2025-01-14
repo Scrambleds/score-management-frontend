@@ -8,5 +8,14 @@ import { Component } from '@angular/core';
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
+  dashboardData: any;
+  cardValue: any;
 
+  updateDashboardData(data: any) {
+    this.dashboardData = data;
+  }
+
+  cardRequest(data: any){
+    this.cardValue = data
+  }
 }

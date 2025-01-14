@@ -1,5 +1,8 @@
 <div class="route-container">
-    <app-search-dashboard></app-search-dashboard>
+    <app-search-dashboard 
+    (dashboardDataUpdated)="updateDashboardData($event)"
+    (cardRequest)="cardRequest($event)">
+</app-search-dashboard>
     <div class="col-12 d-flex justify-content-end">
     <button type="submit" class="btn btn-primary">
         <i class="bi bi-box-arrow-in-down"></i>
@@ -7,5 +10,5 @@
          ส่งออกไฟล์ Excel
       </button>
     </div>
-    <app-bell-curve></app-bell-curve>
+    <app-bell-curve [dashboardData]="dashboardData"></app-bell-curve>
 </div>

@@ -7,7 +7,7 @@
         </div>
         <div class="flex-grow-1">
           <input type="text" class="form-control" [placeholder]="'placeholder_text' | translate"
-          formControlName="subject_detail"/>
+          formControlName="subject_id"/>
           </div>
       </div>
       <div class="col-12 col-md-12 col-lg-2 d-flex justify-content-start gap-2 me-2">
@@ -16,10 +16,10 @@
         </div>
         <div class="flex-grow-1">
             <ng-select
-            name="academicYearCode"
-            formControlName="academicYearCode"
+            name="academic_year"
+            formControlName="academic_year"
             [items]="academicYearList"
-            bindValue="byte_code"
+            bindValue="byte_desc_th"
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
           >
@@ -35,10 +35,10 @@
         </div>
         <div class="flex-grow-1">
             <ng-select
-            name="semesterCode"
-            formControlName="semesterCode"
+            name="semester"
+            formControlName="semester"
             [items]="semesterList"
-            bindValue="byte_code"
+            bindValue="byte_desc_th"
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
           >
@@ -54,10 +54,10 @@
         </div>
         <div class="flex-grow-1">
             <ng-select
-            name="sectionCode"
-            formControlName="sectionCode"
+            name="section"
+            formControlName="section"
             [items]="sectionList"
-            bindValue="byte_code"
+            bindValue="byte_desc_th"
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
           >
@@ -73,10 +73,10 @@
         </div>
         <div class="flex-grow-1">
           <ng-select
-          name="scoreType"
-          formControlName="scoreType"
+          name="score_type"
+          formControlName="score_type"
           [items]="scoreTypeList"
-          bindValue="byte_code"
+          bindValue="byte_desc_th"
           [placeholder]="'placeholder_select' | translate"
           [clearable]="true"
         >
