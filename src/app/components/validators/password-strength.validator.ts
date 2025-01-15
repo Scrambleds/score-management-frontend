@@ -35,15 +35,15 @@ export function passwordStrengthValidator(): ValidatorFn {
       return null;
     }
     if (value.length < 8) {
-      errors.errorMessage = "ต้องมีอย่างน้อย 8 ตัวอักษร";
+      errors.errorMessage = "password_length_error";
     }
     
     else if (!/[A-Za-z]/.test(value) || !/\d/.test(value)) {
-      errors.errorMessage = "ต้องผสมด้วยตัวอักษรภาษาอังกฤษและตัวเลข";
+      errors.errorMessage = "password_must_include_letters_numbers";
     }
     
     else if (!/^[A-Za-z\d!@#$%^&]*$/.test(value)) {
-      errors.errorMessage = "อนุญาตเฉพาะอักขระพิเศษ !@#$%^& เท่านั้น";
+      errors.errorMessage = "password_invalid_special_characters";
     }
     
     // คืนค่าข้อผิดพลาดหรือ null ถ้าผ่านทุกเงื่อนไข

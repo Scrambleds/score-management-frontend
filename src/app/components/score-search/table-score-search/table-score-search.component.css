@@ -65,3 +65,19 @@
     font-size: 12px; /* ลดขนาดฟอนต์ของแถว */
   }
 }
+
+ag-grid-angular {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.ag-theme-quartz .ag-paging-panel {
+  flex-shrink: 0; /* ป้องกันไม่ให้แถบ pagination หายไป */
+}
+
+@media (max-width: 768px) {
+  .ag-theme-quartz .ag-paging-panel {
+    display: block;
+    font-size: 12px; /* ปรับขนาดฟอนต์ให้เล็กลง */
+  }
+}

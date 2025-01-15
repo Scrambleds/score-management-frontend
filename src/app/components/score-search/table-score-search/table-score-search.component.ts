@@ -11,18 +11,19 @@ export class TableScoreSearchComponent {
   @Input() gridData: any[] = [];
   selectedRows: any[] = [];
   pagination = true;
-  paginationPageSize = 100;
   columnDefs = [
     {
-      headerName: 'ลำดับ',
-      valueGetter: (params: any) => params.node.rowIndex + 1,
-      flex: 0.7,
+      headerName: 'เลขที่',
+      field: 'seat_no',
+      flex: 0.5,
+      minWidth: 60,  // Example minWidth
     },
     {
       headerName: 'รหัสนิสิต',
       field: 'student_id',
       headerStyle: { textAlign: 'center' },
       flex: 1,
+      minWidth: 120, // ความกว้างขั้นต่ำ
     },
     {
       headerName: 'ชื่อ-นามสกุล',
@@ -31,31 +32,41 @@ export class TableScoreSearchComponent {
       flex: 2,
       valueGetter: (params: any) =>
         `${params.data.prefix_desc_th} ${params.data.firstname} ${params.data.lastname}`,
+      minWidth: 200, // ความกว้างขั้นต่ำ
     },
-    { headerName: 'รหัสสาขา', field: 'major_code', flex: 1 },
+    {
+      headerName: 'รหัสสาขา',
+      field: 'major_code',
+      flex: 1,
+      minWidth: 120, // ความกว้างขั้นต่ำ
+    },
     {
       headerName: 'อีเมล',
       field: 'email',
       headerClass: 'text-center',
       flex: 2,
+      minWidth: 180, // ความกว้างขั้นต่ำ
     },
     {
       headerName: 'คะแนนเก็บ',
       field: 'accumulated_score',
       headerClass: 'text-center',
       flex: 1,
+      minWidth: 120, // ความกว้างขั้นต่ำ
     },
     {
       headerName: 'คะแนนกลางภาค',
       field: 'midterm_score',
       headerClass: 'text-center',
       flex: 1,
+      minWidth: 120, // ความกว้างขั้นต่ำ
     },
     {
       headerName: 'คะแนนปลายภาค',
       field: 'final_score',
       headerClass: 'text-center',
       flex: 1,
+      minWidth: 120, // ความกว้างขั้นต่ำ
     },
     {
       headerName: 'รวมคะแนน',
@@ -66,13 +77,14 @@ export class TableScoreSearchComponent {
         params.data.accumulated_score +
         params.data.midterm_score +
         params.data.final_score,
+      minWidth: 120, // ความกว้างขั้นต่ำ
     },
-  ];
+];
+
 
   defaultColDef = {
     resizable: true,
     sortable: true,
-    filter: true,
   };
 
   constructor() {}
