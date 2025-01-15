@@ -140,7 +140,7 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       this.updateChartData();
     });
 
-    // this.resetDashboard();
+    this.resetDashboard();
   }
 
   resetDashboard() {
