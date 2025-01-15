@@ -1,16 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { MasterDataComponent } from './route/master-data/master-data.component';
-import { UserManageComponent } from './route/user-manage/user-manage.component';
-import { ScoreAnnouncementComponent } from './route/score-announcement/score-announcement.component';
-import { UploadScoreComponent } from './route/upload-score/upload-score.component';
-import { SearchScoreComponent } from './route/search-score/search-score.component';
-import { DashboardComponent } from './route/dashboard/dashboard.component';
-import { LoginPageComponent } from './route/login-page/login-page.component';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { AddUserRoute } from './route/add-user/add-user.component';
+import { ChangePasswordComponent } from './route/change-password/change-password.component';
+import { DashboardComponent } from './route/dashboard/dashboard.component';
+import { LoginPageComponent } from './route/login-page/login-page.component';
+import { MasterDataComponent } from './route/master-data/master-data.component';
+import { ScoreAnnouncementComponent } from './route/score-announcement/score-announcement.component';
+import { SearchScoreComponent } from './route/search-score/search-score.component';
+import { UploadScoreComponent } from './route/upload-score/upload-score.component';
+import { UserManageComponent } from './route/user-manage/user-manage.component';
 
 const routes: Routes = [
   {
@@ -74,6 +75,12 @@ const routes: Routes = [
         path: 'Dashboard',
         component: DashboardComponent,
         data: { messageKey: 'menu_dashboard' },
+        canActivate: [AuthGuard],
+      },
+      {
+        path: 'ChangePWD',
+        component: ChangePasswordComponent,
+        data: { messageKey: 'change_pwd_title' },
         canActivate: [AuthGuard],
       },
     ],

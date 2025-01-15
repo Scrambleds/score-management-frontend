@@ -60,7 +60,9 @@ app-autocomplete {
   font-size: 18px;
   margin-left: 0.5rem;
 }
-
+.d-flex {
+  flex-wrap: wrap;
+}
 @media (min-width: 1600px) {
   .custom-btn {
     margin-top: 1rem;
@@ -96,4 +98,8 @@ li {
 
 li:hover {
   background: #f0f0f0;
+}
+
+div {
+  position: relative;
 }

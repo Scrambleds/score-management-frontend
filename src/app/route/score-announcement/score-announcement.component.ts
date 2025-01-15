@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ScoreAnnouncementService } from '../../services/score-announcement/score-announcement.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ScoreAnnouncementService } from '../../services/score-announcement/score-announcement.service';
 
 @Component({
   selector: 'app-score-announcement',
@@ -59,15 +59,15 @@ export class ScoreAnnouncementComponent {
     });
   }
   onReset() {
-    // ทำการรีเซ็ตข้อมูลทั้งหมด
-    this.gridData = []; // หรือรีเซ็ตค่าตามที่ต้องการ
+    this.gridData = [];
   }
-  ngOnInit() {
-  }
+
+  ngOnInit() {}
+
   updateGridData(newData: any[]): void {
     this.gridData = newData;
   }
-  
+
   onSearchSubmit(requestData: any) {
     this.scoreService.getScoreAnnouncementByCondition(requestData).subscribe(
       (response) => {

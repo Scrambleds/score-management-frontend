@@ -17,26 +17,26 @@ export class ContantService {
 
   constructor(private http: HttpClient) {}
 
-  
-  getLovContant( req:any ): Observable<{ label: string; value: string;}[]> {
-    const url = `${contantservice.apiUrl}/${req}`;
-    return this.http.post<any>(url, {}).pipe(
-      map((response) => {
-        if (response.isSuccess && response.objectResponse) {
-          return response.objectResponse.map((item: any) => ({
-            label: item.byte_desc_th,
-            value: item.byte_code,
-          }));
-        }
-        return [];
-      })
-    );
-  }
+  // contantLovService.ts
+getLovContant(req: string): Observable<{ desc_th: string; desc_en: string; placeholder_key: string }[]> {
+  const url = `${contantservice.apiUrl}/${req}`;
+  return this.http.post<any>(url, {}).pipe(
+    map(response => {
+      if (response.isSuccess && response.objectResponse) {
+        return response.objectResponse.map((item: any) => ({
+          desc_th: item.byte_desc_th,
+          desc_en: item.byte_desc_en,
+          placeholder_key: item.byte_code,
+        }));
+      }
+      return [];
+    })
+  );
+}
 
 
-  getDataByCondition(req:any ,data: any): Observable<any> {
+  getDataByCondition(req: any, data: any): Observable<any> {
     const url = `${environment.apiUrl}/${req}`;
     return this.http.post(url, data);
   }
-  
 }
