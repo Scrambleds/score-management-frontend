@@ -41,16 +41,29 @@ export class TableScoreAnnouncementComponent {
   pagination = true;
   paginationPageSize = 100;
   columnDefs = [
+    // {
+    //   headerName: 'ลำดับ',
+    //   valueGetter: (params: any) => params.node.rowIndex + 1,
+    //   flex: 0.7,
+    //   headerName: '',
+    //   checkboxSelection: true,
+    //   headerCheckboxSelection: true,
+    //   headerStyle: { textAlign: 'center' },
+    //   flex: 0.4,
+    //   minWidth: 20,
+    // },
     {
-      headerName: 'ลำดับ',
-      valueGetter: (params: any) => params.node.rowIndex + 1,
-      flex: 0.7,
+      headerName: 'เลขที่',
+      field: 'seat_no',
+      flex: 0.6,
+      minWidth: 70,
     },
     {
       headerName: 'รหัสนิสิต',
       field: 'student_id',
       // headerStyle: { textAlign: 'center' },
       flex: 1,
+      minWidth: 120,
     },
     {
       headerName: 'ชื่อ-นามสกุล',
@@ -59,53 +72,84 @@ export class TableScoreAnnouncementComponent {
       flex: 2,
       valueGetter: (params: any) =>
         `${params.data.prefix_desc_th} ${params.data.firstname} ${params.data.lastname}`,
+      minWidth: 200,
     },
-    { headerName: 'รหัสสาขา', field: 'major_code', flex: 1 },
+    {
+      headerName: 'สาขา',
+      field: 'major_code',
+      flex: 0.6,
+      minWidth: 70,
+    },
     {
       headerName: 'อีเมล',
       field: 'email',
       // headerClass: 'text-center',
       flex: 1.5,
+      // max
+      // headerClass: 'text-center',
+      // flex: 2,
+      minWidth: 180,
     },
     {
-      headerName: 'คะแนนเก็บ',
+      headerName: 'คะแนนระหว่างเรียน',
       field: 'accumulated_score',
       // headerClass: 'text-center',
       flex: 1,
+      minWidth: 120,
     },
     {
       headerName: 'คะแนนกลางภาค',
       field: 'midterm_score',
       // headerClass: 'text-center',
       flex: 1,
+      minWidth: 130,
     },
     {
       headerName: 'คะแนนปลายภาค',
       field: 'final_score',
       // headerClass: 'text-center',
       flex: 1,
+      minWidth: 130,
     },
     {
       headerName: 'รวมคะแนน',
       field: 'total_score',
-      flex: 1,
+      flex: 0.75,
+      minWidth: 100,
       // headerClass: 'text-center',
       valueGetter: (params: any) =>
         params.data.accumulated_score +
         params.data.midterm_score +
         params.data.final_score,
     },
-    { headerName: 'สถานะ', field: 'send_status_code_desc_th', flex: 1 },
+    {
+      headerName: 'สถานะ',
+      field: 'send_status_code_desc_th',
+      flex: 0.8,
+      minWidth: 80,
+      cellRenderer: (params: any) => {
+        const sendStatus = params.value || '';
+        const sendDesc = params.data.send_desc || '';
+        return `
+        <div style="position: relative;">
+          <span title="${sendDesc}" style="cursor: pointer;">
+            ${sendStatus}
+          </span>
+        </div>
+      `;
+      },
+    },
     {
       headerName: 'ส่งคะแนน',
-      flex: 0.7,
+      flex: 0.8,
       filter: false,
+      minWidth: 100,
       // headerClass: 'text-center',
       cellRenderer: (params: any) => {
         // ใช้ Template Element เพื่อสร้าง DOM จาก HTML String
         const template = `
           <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
-            <i class="bi bi-send" style="color: blue; font-size: 22px; cursor: pointer;" title="ส่งคะแนน"></i>
+            <i class="bi bi-send" style="color: blue; font-size: 14px; cursor: pointer;" title="ส่งคะแนน"></i>
           </div>
         `;
 
@@ -167,10 +211,13 @@ export class TableScoreAnnouncementComponent {
     }
   }
 
+  // max
   // onGridReady(params: any): void {
-  //   this.gridApi = params.api;
-  //   this.gridApi.sizeColumnsToFit();
+  //   this.gridApi = params.api; // เก็บ API ไว้ใช้งาน
+  //   const allColumnIds = params.columnApi.getAllColumns().map((col: any) => col.getId());
+  //   params.columnApi.autoSizeColumns(allColumnIds); // ปรับขนาดคอลัมน์ให้เหมาะสมกับเนื้อหา
   // }
+
   onGridReady(params: GridReadyEvent<any>) {
     this.gridApi = params.api;
     // this.gridApi.sizeColumnsToFit();

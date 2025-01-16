@@ -8,13 +8,14 @@
   data-bs-focus="false"
   tabindex="-1"
   aria-labelledby="announceScoreLabel"
-  aria-hidden="true"
 >
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <!-- Modal Header -->
       <div class="modal-header">
-        <h5 class="modal-title" id="announceScoreLabel">ประกาศคะแนนนิสิต</h5>
+        <h5 class="modal-title" id="announceScoreLabel">
+          {{ "modalSendMail_title" | translate }}
+        </h5>
         <button
           type="button"
           class="btn-close"
@@ -27,7 +28,9 @@
       <div class="modal-body pt-2">
         <!-- Recipient Email Input -->
         <div class="mb-2" *ngIf="isSendPerPerson">
-          <label for="recipientEmail" class="form-label">ถึง</label>
+          <label for="recipientEmail" class="form-label">{{
+            "modalSendMail_destinationMail" | translate
+          }}</label>
           <input
             type="email"
             class="form-control"
@@ -40,7 +43,9 @@
 
         <!-- Subject Input -->
         <div class="mb-2">
-          <label for="emailSubject" class="form-label">เรื่อง</label>
+          <label for="emailSubject" class="form-label">{{
+            "modalSendMail_subjectMail" | translate
+          }}</label>
           <input
             type="text"
             class="form-control"
@@ -54,14 +59,14 @@
         </div>
         <!-- Variable Selection -->
         <div class="mb-2">
-          <label for="variableSelect" class="form-label me-2"
-            >เพิ่มตัวแปร</label
-          >
+          <label for="variableSelect" class="form-label me-2">{{
+            "modalSendMail_labelAddVar" | translate
+          }}</label>
           <div class="d-flex align-items-center">
             <ng-select
               [items]="placeholderList"
               [(ngModel)]="selectedVariable"
-              placeholder="กรุณาเลือก"
+              [placeholder]="'placeholder_select' | translate"
               [searchable]="true"
               [clearable]="true"
               [dropdownPosition]="'auto'"
@@ -83,14 +88,17 @@
               (click)="addVariable()"
               [disabled]="!canAddVariable || !selectedVariable"
             >
-              <i class="bi bi-plus-square"></i> เพิ่ม
+              <i class="bi bi-plus-square"></i>
+              {{ "modalSendMail_btnAddVar" | translate }}
             </button>
           </div>
         </div>
 
         <!-- Message Textarea -->
         <div class="mb-1">
-          <label for="emailMessage" class="form-label">ข้อความ</label>
+          <label for="emailMessage" class="form-label">
+            {{ "modalSendMail_bodyMail" | translate }}
+          </label>
           <textarea
             class="form-control"
             id="emailMessage"
@@ -124,7 +132,7 @@
               class="bi bi-file-earmark-text-fill"
               style="font-size: 1rem; color: var(--white-color)"
             ></i>
-            เทมเพลต
+            {{ "modalSendMail_btnTemplate" | translate }}
           </button>
           <ul class="dropdown-menu">
             <li class="dropdown-item-container">
@@ -133,10 +141,14 @@
                 type="button"
                 (click)="$event.stopPropagation()"
               >
-                เทมเพลตพื้นฐาน
+                {{ "modalSendMail_menuTemplate_basicTemplate" | translate }}
               </button>
               <ul class="dropdown-submenu">
-                <li><h6 class="dropdown-header">เทมเพลตพื้นฐาน</h6></li>
+                <li>
+                  <h6 class="dropdown-header">
+                    {{ "modalSendMail_menuTemplate_basicTemplate" | translate }}
+                  </h6>
+                </li>
                 <div class="template-list-container">
                   <li *ngFor="let template of basicTemplateList">
                     <button
@@ -156,10 +168,16 @@
                 type="button"
                 (click)="$event.stopPropagation()"
               >
-                เทมเพลตส่วนตัว
+                {{ "modalSendMail_menuTemplate_privateTemplate" | translate }}
               </button>
               <ul class="dropdown-submenu">
-                <li><h6 class="dropdown-header">เทมเพลตส่วนตัว</h6></li>
+                <li>
+                  <h6 class="dropdown-header">
+                    {{
+                      "modalSendMail_menuTemplate_privateTemplate" | translate
+                    }}
+                  </h6>
+                </li>
                 <div class="template-list-container">
                   <li *ngFor="let template of privateTemplateList">
                     <button
@@ -179,10 +197,16 @@
                 type="button"
                 (click)="$event.stopPropagation()"
               >
-                กำหนดค่าเริ่มต้น
+                {{ "modalSendMail_menuTemplate_defaultTemplate" | translate }}
               </button>
               <ul class="dropdown-submenu">
-                <li><h6 class="dropdown-header">กำหนดค่าเริ่มต้น</h6></li>
+                <li>
+                  <h6 class="dropdown-header">
+                    {{
+                      "modalSendMail_menuTemplate_defaultTemplate" | translate
+                    }}
+                  </h6>
+                </li>
                 <div class="template-list-container">
                   <li *ngFor="let template of allTemplateList">
                     <button
@@ -202,10 +226,17 @@
                   class="bi bi-file-earmark-plus-fill"
                   style="font-size: 1rem; color: var(--grey-color)"
                 ></i>
-                บันทึกร่างเป็นเทมเพลต
+                {{ "modalSendMail_menuTemplate_updateTemplate" | translate }}
               </button>
               <ul class="dropdown-submenu">
-                <li><h6 class="dropdown-header">เขียนทับเทมเพลต</h6></li>
+                <li>
+                  <h6 class="dropdown-header">
+                    {{
+                      "modalSendMail_menuTemplate_updateTemplate_title"
+                        | translate
+                    }}
+                  </h6>
+                </li>
                 <div class="template-list-container">
                   <li *ngFor="let template of privateTemplateList">
                     <button
@@ -224,7 +255,10 @@
                     type="button"
                     (click)="toggleTemplateDialog(true)"
                   >
-                    บันทึกเทมเพลตใหม่
+                    {{
+                      "modalSendMail_menuTemplate_updateTemplate_add"
+                        | translate
+                    }}
                   </button>
                 </li>
               </ul>
@@ -235,10 +269,16 @@
                   class="bi bi-file-earmark-x-fill"
                   style="font-size: 1rem; color: var(--grey-color)"
                 ></i>
-                ลบเทมเพลต
+                {{ "modalSendMail_menuTemplate_deleteTemplate" | translate }}
               </button>
               <ul class="dropdown-submenu">
-                <li><h6 class="dropdown-header">ลบเทมเพลต</h6></li>
+                <li>
+                  <h6 class="dropdown-header">
+                    {{
+                      "modalSendMail_menuTemplate_deleteTemplate" | translate
+                    }}
+                  </h6>
+                </li>
                 <div class="template-list-container">
                   <li *ngFor="let template of privateTemplateList">
                     <button
@@ -261,14 +301,14 @@
             class="btn btn-secondary"
             (click)="closeModal()"
           >
-            ปิด
+            {{ "btn_close" | translate }}
           </button>
           <button type="button" class="btn btn-primary" (click)="sendEmail()">
             <i
               class="bi bi-send-fill"
               style="font-size: 1rem; color: var(--white-color)"
             ></i>
-            ส่งอีเมล
+            {{ "modalSendMail_btnSendMail" | translate }}
           </button>
         </div>
       </div>
@@ -293,7 +333,9 @@
     }"
   >
     <div class="mb-3">
-      <label for="templateName" class="form-label">ชื่อเทมเพลต</label>
+      <label for="templateName" class="form-label">
+        {{ "modalCreateTemplate_label" | translate }}
+      </label>
       <form
         [formGroup]="createTemplateForm"
         class="gap-1 d-flex flex-wrap mb-0"
@@ -306,7 +348,7 @@
             name="nameTemplate"
             type="text"
             id="templateName"
-            placeholder="กรอกชื่อเทมเพลตใหม่"
+            [placeholder]="'modalCreateTemplate_placeholder' | translate"
             class="form-control me-2 w-100"
             autocomplete="off"
           />
@@ -336,10 +378,10 @@
             [disabled]="createTemplateForm.invalid"
             (click)="onSave()"
           >
-            บันทึก
+            {{ "btn_save" | translate }}
           </button>
           <button type="button" class="btn btn-secondary" (click)="onCancel()">
-            ยกเลิก
+            {{ "btn_cancel" | translate }}
           </button>
         </div>
       </form>

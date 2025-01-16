@@ -133,7 +133,7 @@
                   [placeholder]="'placeholder_text' | translate" />
                 <div *ngIf="form.get('password')?.invalid && form.get('password')?.dirty" class="text-danger ps-2">
                   <div *ngIf="form.get('password')?.hasError('errorMessage')">
-                    {{ form.get('password')?.getError('errorMessage') }}
+                    {{ form.get('password')?.getError('errorMessage') | translate}}
                   </div>
                 </div>
               </div>

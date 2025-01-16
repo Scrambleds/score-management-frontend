@@ -23,6 +23,7 @@ import { ScoreAnnouncementService } from '../../../services/score-announcement/s
 import { ContantService } from '../../../shared/service/contants-service.service';
 import { Observable, of } from 'rxjs';
 import { ModalSendMailComponent } from '../../modal-send-mail/modal-send-mail.component';
+import { SelectBoxService } from '../../../services/select-box/select-box.service';
 
 @Component({
   selector: 'search-form-score-announcemen',
@@ -51,6 +52,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
   selectedSubjectCode: string = ''; // ตัวแปรที่เก็บค่าที่เลือก
   currentSubjectId: string = '';
 
+  selectedSection: string = '';
   isAutocompleteVisible = false;
   isSubjectNameReadonly = false;
   isSubmit: boolean = true;
@@ -61,61 +63,41 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
   isSearching: boolean = false; // ใช้สำหรับบอกว่ากำลังค้นหาหรือไม่
   selectedSubject: any = null; // เก็บข้อมูลที่ผู้ใช้เลือก
 
-  statuses: Array<{ label: string; value: string }> = [];
-  sectionLovItem: Array<{ label: string; value: string }> = [];
-  semesterLovItem: Array<{ label: string; value: string }> = [];
-  academic_yearLovItem: Array<{ label: string; value: string }> = [];
+  statuses: { desc_th: string; desc_en: string; placeholder_key: string }[] =
+    [];
+  sectionLovItem: {
+    desc_th: string;
+    desc_en: string;
+    placeholder_key: string;
+  }[] = [];
+  semesterLovItem: {
+    desc_th: string;
+    desc_en: string;
+    placeholder_key: string;
+  }[] = [];
+  academic_yearLovItem: {
+    desc_th: string;
+    desc_en: string;
+    placeholder_key: string;
+  }[] = [];
 
   suggestions$: Observable<any[]> = of([]);
 
   constructor(
     private fb: FormBuilder,
-    private contantLovService: ContantService
-  ) {}
-  getLabelForValue(
-    value: string,
-    lookupArray: Array<{ label: string; value: string }>
-  ): string {
-    const found = lookupArray.find((item) => item.value === value);
-    return found ? found.label : '';
-  }
-  getSectionLabelOrNull(
-    value: string,
-    lookupArray: Array<{ label: string; value: string }>
-  ): string | null {
-    if (!value) return null; // Return null if value is empty or undefined
+    private contantLovService: ContantService,
+    private selectBoxService: SelectBoxService
+  ) {
+    // สร้างฟอร์ม
+    this.form = this.fb.group({
+      subjectSearch: ['', Validators.required],
+      studentSearch: [{ value: '' }],
+      semester: [{ value: null }, Validators.required],
+      section: [{ value: null }, Validators.required],
+      sendStatus: [{ value: null }],
+      academic_year: [{ value: null }, Validators.required],
+    });
 
-    const found = lookupArray.find((item) => item.value === value);
-    return found ? found.label : null; // Return label or null if not found
-  }
-
-  // getValueLov(value: string, lookupArray: Array<{ label: string; value: string }>): string {
-  //   const found = lookupArray.find(item => item.label === value);
-  //   return found ? found.label : '';
-  // }
-
-  onReset() {
-    this.form.reset();
-    let teacher_code: string | null = null;
-    let role: string | null = null;
-    const userInfo = localStorage.getItem('userInfo');
-    const parsedUserInfo = JSON.parse(userInfo!);
-    if (parsedUserInfo.role == 1) {
-      teacher_code = '';
-      role = parsedUserInfo.role;
-    } else {
-      role = parsedUserInfo.role;
-
-      teacher_code = parsedUserInfo.teacher_code;
-    }
-    const requestData = { role, teacher_code };
-    this.searchSubmit.emit(requestData); // ส่ง requestData ไปยัง API
-  }
-  // onBlur(): void {
-  //   // เมื่อผู้ใช้เลิกโฟกัสช่อง input
-  //   this.showSuggestions = false;  // ซ่อนรายการแนะนำ
-  // }
-  ngOnInit(): void {
     this.contantLovService
       .getLovContant('GetLovSendStatus')
       .subscribe((data) => {
@@ -123,54 +105,68 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       });
     this.contantLovService.getLovContant('GetLovSection').subscribe((data) => {
       this.sectionLovItem = data;
+      console.log('section Lov item', this.sectionLovItem);
     });
     this.contantLovService.getLovContant('GetLovSemester').subscribe((data) => {
       this.semesterLovItem = data;
+      console.log('semester Lov item', this.semesterLovItem);
     });
     this.contantLovService
       .getLovContant('GetLovAcademicYear')
       .subscribe((data) => {
         this.academic_yearLovItem = data;
+        console.log('academic_year Lov item', this.academic_yearLovItem);
       });
 
-    this.form = this.fb.group({
-      subjectSearch: ['', Validators.required],
-      studentSearch: [{ value: '', disabled: true }],
-      section: [{ value: null, disabled: true }],
-      semester: [{ value: null, disabled: true }],
-      academic_year: [{ value: null, disabled: true }],
-      sendStatus: [{ value: null, disabled: true }],
-    });
+    // เรียก toggleFields เพื่อให้ตั้งค่าเริ่มต้นของฟอร์ม
+    this.toggleFields(this.form.value);
+  }
 
-    const toggleFields = (value: string | null) => {
-      if (value && value.trim() !== '') {
-        // Enable fields when subjectSearch has a value
-        this.form.get('studentSearch')?.enable();
-        this.form.get('section')?.enable();
-        this.form.get('semester')?.enable();
-        this.form.get('academic_year')?.enable();
-        this.form.get('sendStatus')?.enable();
-      } else {
-        this.form.get('studentSearch')?.disable();
-        this.form.get('studentSearch')?.reset('');
-        this.form.get('section')?.disable();
-        this.form.get('section')?.reset(null);
-        this.form.get('semester')?.disable();
-        this.form.get('semester')?.reset(null);
-        this.form.get('academic_year')?.disable();
-        this.form.get('academic_year')?.reset(null);
-        this.form.get('sendStatus')?.disable();
-        this.form.get('sendStatus')?.reset(null);
-      }
-    };
-
-    // Listen for changes in subjectSearch
-    this.form.get('subjectSearch')?.valueChanges.subscribe(toggleFields);
-
-    // Initialize form state based on initial subjectSearch value (in case there's an initial value)
-    toggleFields(this.form.get('subjectSearch')?.value);
-
+  ngOnInit(): void {
+    // ฟังก์ชันสำหรับแสดง Auto-complete เมื่อมีการกรอกข้อมูลใน subjectSearch
     this.showAutocomplete();
+
+    // ฟังการเปลี่ยนแปลงของฟอร์ม
+    this.form.valueChanges
+      .pipe(
+        debounceTime(300) // ลดความถี่ในการเรียกฟังก์ชัน
+      )
+      .subscribe((value) => {
+        this.toggleFields(value);
+      });
+  }
+
+  toggleFields(value: {
+    subjectSearch?: string | null;
+    academic_year?: string | null;
+    semester?: string | null;
+    section?: string | null;
+  }) {
+    if (
+      value.subjectSearch &&
+      value.subjectSearch.trim() !== '' &&
+      value.academic_year !== null &&
+      value.semester !== null &&
+      value.section !== null
+    ) {
+      // เปิดฟิลด์เมื่อ subjectSearch, academic_year, semester มีค่าครบ
+      this.form.get('studentSearch')?.enable();
+      // this.form.get('section')?.enable();
+      this.form.get('sendStatus')?.enable();
+    } else {
+      // ปิดฟิลด์และรีเซ็ตค่าหากไม่มีค่า
+      this.form.get('studentSearch')?.disable();
+      this.form.get('studentSearch')?.reset('');
+      // this.form.get('section')?.disable();
+      // this.form.get('section')?.reset(null);
+      this.form.get('sendStatus')?.disable();
+      this.form.get('sendStatus')?.reset(null);
+    }
+  }
+
+  onReset() {
+    this.form.reset();
+    this.resetForm.emit(); // ส่ง requestData ไปยัง API
   }
   selectSubject(subject: any): void {
     this.form.patchValue({
@@ -188,9 +184,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       this.showSuggestions = false;
     }, 200); // เพิ่มดีเลย์เพื่อป้องกันการคลิกหาย
   }
-  ngAfterViewInit() {}
 
-  loadStatuses(): void {}
   showAutocomplete() {
     this.form
       .get('subjectSearch')
@@ -208,7 +202,9 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
         this.filteredSuggestions = response.objectResponse || [];
       });
   }
+
   onSubmit(): void {
+    this.form.markAllAsTouched();
     console.log('Submitting form...');
     if (this.form.valid) {
       const userInfo = localStorage.getItem('userInfo');
@@ -239,16 +235,10 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
         role,
         subjectSearch: this.form.value.subjectSearch ?? '',
         studentSearch: this.form.value.studentSearch ?? '',
-        // semester: this.getSectionLabelOrNull(
-        //   this.form.value.semester,
-        //   this.semesterLovItem
-        // ),
         semester: this.form.value.semester ?? null,
-        section: this.form.value.section ?? null,
-        // semester: this.form.value.semester ?? null,
-        academic_year: this.form.value.academic_year ?? null,
+        section: this.form.value.setion ?? '',
+        academic_year: this.form.value.academic_year ?? '',
         send_status_code: this.form.value.sendStatus ?? '',
-        // send_status_code: this.getValueLov(this.form.value.send_status_code, this.statuses),
       };
 
       this.searchSubmit.emit(requestData); // ส่ง requestData ไปยัง API
@@ -258,10 +248,6 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     } else {
       this.form.markAllAsTouched();
     }
-  }
-
-  searchCode(term: string) {
-    console.log('search code');
   }
 
   selectCode(item: any) {

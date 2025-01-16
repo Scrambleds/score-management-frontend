@@ -44,3 +44,21 @@
   align-items: center;
   gap: 0.75rem;
 }
+
+ag-grid-angular {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ag-theme-quartz .ag-paging-panel {
+  flex-shrink: 0; /* ป้องกันไม่ให้แถบ pagination หายไป */
+  justify-content: center; /* จัดกลาง pagination */
+}
+
+@media (max-width: 768px) {
+  .ag-theme-quartz .ag-paging-panel {
+    font-size: 12px; /* ปรับขนาดฟอนต์ให้เล็กลง */
+    padding: 5px;
+  }
+}

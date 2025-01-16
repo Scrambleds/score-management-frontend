@@ -28,6 +28,12 @@ export class TopNavComponent implements OnInit {
   //notify
   notifications: any[] = []; // Array สำหรับเก็บ Notifications
 
+  isAuthorizedToChangePassword(): boolean {
+    const userInfo = localStorage.getItem('userInfo');
+    const parsedUserInfo = JSON.parse(userInfo!);
+    return parsedUserInfo.role === 1; // หรือเงื่อนไขอื่น
+  }
+
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,

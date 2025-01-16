@@ -1,4 +1,4 @@
-<div class="card p-3 mb-2">
+<div class="card p-3 mb-3">
   <form [formGroup]="form" class="mb-0">
     <div class="row d-flex justify-content-between row-cols-1 row-cols-md-3 row-cols-lg-5 g-2">
       <div class="col-12 col-md-12 col-lg-3 d-flex justify-content-start gap-2">
@@ -88,4 +88,13 @@
       </div>
     </div>
   </form>
-  </div>  
+  </div>
+
+  <div class="col-12 d-flex justify-content-end">
+    <button type="submit" class="btn btn-primary"
+    (click)="exportExcel()">
+        <i class="bi bi-box-arrow-in-down"></i>
+        <!-- ส่งออกไฟล์ Excel -->
+         ส่งออกไฟล์ Excel
+      </button>
+    </div>
