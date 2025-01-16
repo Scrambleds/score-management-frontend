@@ -48,10 +48,10 @@ export class TopNavComponent implements OnInit {
       }
     });
 
-    if (typeof window !== 'undefined') {
-      const savedLang = localStorage.getItem(`language`) || 'th';
-      this.currentLang = savedLang;
-    }
+    // เริ่มต้นให้ตรวจสอบภาษาปัจจุบัน
+    this.translationService.getTranslations().subscribe((translations) => {
+      this.currentLang = this.translationService.getCurrentLanguage(); // ดึงค่าภาษาปัจจุบันจากบริการ
+    });
 
     // โหลดคำแปลของภาษาเริ่มต้นหรือภาษาที่เลือก
     this.translationService.loadTranslations(this.currentLang);
@@ -78,26 +78,28 @@ export class TopNavComponent implements OnInit {
     this.notifyTemplate.getTemplates().subscribe();
 
     //notify
-    this.notifyTemplate
-      .getNotifications(this.UserService.username)
-      .subscribe((data) => {
-        if (data && data.length > 0) {
-          this.notifications = data.map((item) => {
-            const notificationList = document.getElementById('notify-list');
-            if (notificationList) {
-              notificationList.innerHTML = ''; // ลบรายการเดิม
+    this.waitForUserInfo().then(() => {
+      this.notifyTemplate
+        .getNotifications(this.UserService.username)
+        .subscribe((data) => {
+          if (data && data.length > 0) {
+            this.notifications = data.map((item) => {
+              const notificationList = document.getElementById('notify-list');
+              if (notificationList) {
+                notificationList.innerHTML = ''; // ลบรายการเดิม
 
-              data.forEach((item) => {
-                const newItem = this.renderNotification(item); // Render Notification
-                notificationList.appendChild(newItem); // เพิ่มรายการใน notify-list
-              });
-            }
-          });
-        } else {
-          // หากไม่มีข้อมูลการแจ้งเตือน
-          this.notifications = [];
-        }
-      });
+                data.forEach((item) => {
+                  const newItem = this.renderNotification(item); // Render Notification
+                  notificationList.appendChild(newItem); // เพิ่มรายการใน notify-list
+                });
+              }
+            });
+          } else {
+            // หากไม่มีข้อมูลการแจ้งเตือน
+            this.notifications = [];
+          }
+        });
+    });
     //notify signalR
     this.signalRService.startConnection(); // เริ่มการเชื่อมต่อกับ SignalR Hub
     this.signalRService.onNotification((notification: any) => {
@@ -152,5 +154,17 @@ export class TopNavComponent implements OnInit {
     const li = document.createElement('li');
     li.innerHTML = renderedHtml;
     return li;
+  }
+
+  private waitForUserInfo(): Promise<void> {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        const userInfo = localStorage.getItem('userInfo');
+        if (userInfo) {
+          clearInterval(interval);
+          resolve(); // ข้อมูลพร้อมแล้ว
+        }
+      }, 100); // ตรวจสอบทุก 100 มิลลิวินาที
+    });
   }
 }

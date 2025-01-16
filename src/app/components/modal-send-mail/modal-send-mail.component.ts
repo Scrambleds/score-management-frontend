@@ -1,13 +1,25 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnInit,
+  Renderer2,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { ScoreAnnouncementService } from '../../services/score-announcement/score-announcement.service';
 import { UserService } from '../../services/sharedService/userService/userService.service';
-import bootstrap from 'bootstrap';
+import { Modal } from 'bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { BehaviorSubject, switchMap } from 'rxjs';
 import { CacheService } from '../../core/services/cache.service';
+// @ts-ignore
+const $: any = window['$'];
 
 @Component({
   selector: 'app-modal-send-mail',
@@ -16,7 +28,7 @@ import { CacheService } from '../../core/services/cache.service';
   templateUrl: './modal-send-mail.component.html',
   styleUrl: './modal-send-mail.component.css',
 })
-export class ModalSendMailComponent implements OnInit {
+export class ModalSendMailComponent implements OnInit, OnChanges {
   messageText: string = ''; // ข้อความใน textarea
   emailSubject: string = ''; // ข้อความใน input subject
   selectedVariable: any = null; // ตัวแปรที่เลือกจาก select กำหนดเป็น null เพื่อแสดง placeholder
@@ -24,6 +36,19 @@ export class ModalSendMailComponent implements OnInit {
   focusedField: 'textarea' | 'subject' | null = null; // ฟิลด์ที่กำลัง focus อยู่
   language: string = 'th'; // ค่าภาษาเริ่มต้น
   templateName: string = '';
+  currentEmail: string = '';
+  currentDefaultTemplate: any = null;
+  currentSubject: {
+    subject_id: string;
+    academic_year: number;
+    semester: number;
+    section: number;
+  } = {
+    subject_id: '',
+    academic_year: 0,
+    semester: 0,
+    section: 0,
+  };
 
   placeholderList: any[] = [];
   privateTemplateList: any[] = [];
@@ -37,10 +62,24 @@ export class ModalSendMailComponent implements OnInit {
   //flg
   isCreateTemplateSubmited: boolean = false;
   isSendMailSubmited: boolean = false;
+  // @Input() isSendPerPerson: boolean = false;
   isSendPerPerson: boolean = false;
+
+  //viewchild
+  @ViewChild('modal') modal: ElementRef | undefined;
 
   //form
   public createTemplateForm: FormGroup;
+
+  //current student data
+  currentStudentData: any = [];
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['isSendPerPerson']) {
+      // ทำบางอย่างเมื่อค่า isSendPerPerson เปลี่ยนแปลง
+      console.log('isSendPerPerson changed:', this.isSendPerPerson);
+    }
+  }
 
   //interface
   constructor(
@@ -50,7 +89,8 @@ export class ModalSendMailComponent implements OnInit {
     private renderer: Renderer2,
     private el: ElementRef,
     private fb: FormBuilder,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private cdr: ChangeDetectorRef
   ) {
     this.createTemplateForm = this.fb.group({
       nameTemplate: ['', Validators.required],
@@ -84,7 +124,8 @@ export class ModalSendMailComponent implements OnInit {
             ...this.privateTemplateList,
             ...this.basicTemplateList,
           ];
-          this.initDefaultTemplate(resp.defaultTemplates);
+          this.currentDefaultTemplate = resp.defaultTemplates;
+          this.initDefaultTemplate(this.currentDefaultTemplate);
         });
     });
   }
@@ -96,25 +137,26 @@ export class ModalSendMailComponent implements OnInit {
       this.placeholderList = resp;
     });
   }
-  loadEmailTemplate(): void {
-    this.scoreAnnouncementService
-      .loadEmailTemplate('pamornpon')
-      .subscribe((resp: any) => {
-        this.basicTemplateList = resp.basicTemplates;
-        this.privateTemplateList = resp.privateTemplates;
-        this.allTemplateList = [
-          ...this.privateTemplateList,
-          ...this.basicTemplateList,
-        ];
-        let defaultTemplate = resp.defaultTemplates;
-        console.log(this.basicTemplateList);
-        console.log(this.privateTemplateList);
-        console.log(defaultTemplate);
 
-        // เรียก initBasicTemplate หลังจากโหลดข้อมูลเสร็จ
-        this.initDefaultTemplate(defaultTemplate);
-      });
-  }
+  // loadEmailTemplate(): void {
+  //   this.scoreAnnouncementService
+  //     .loadEmailTemplate('pamornpon')
+  //     .subscribe((resp: any) => {
+  //       this.basicTemplateList = resp.basicTemplates;
+  //       this.privateTemplateList = resp.privateTemplates;
+  //       this.allTemplateList = [
+  //         ...this.privateTemplateList,
+  //         ...this.basicTemplateList,
+  //       ];
+  //       this.currentDefaultTemplate = resp.defaultTemplates;
+  //       console.log(this.basicTemplateList);
+  //       console.log(this.privateTemplateList);
+  //       console.log(this.currentDefaultTemplate);
+
+  //       // เรียก initBasicTemplate หลังจากโหลดข้อมูลเสร็จ
+  //       this.initDefaultTemplate(this.currentDefaultTemplate);
+  //     });
+  // }
 
   // เมื่อ textarea ได้ focus
   onTextareaFocus(): void {
@@ -193,6 +235,46 @@ export class ModalSendMailComponent implements OnInit {
     }
   }
 
+  openModal(isPerson: boolean, rowData: any[], subjectData: any): void {
+    this.isSendPerPerson = isPerson;
+    if (this.isSendPerPerson === true) {
+      this.currentEmail = rowData[0].email;
+    }
+    const modal = new Modal(this.modal?.nativeElement);
+    console.log('person -> ', isPerson);
+    this.initDefaultTemplate(this.currentDefaultTemplate);
+    this.cdr.detectChanges(); // บังคับให้ Angular re-render
+    modal.show();
+    // $(this.modal?.nativeElement).modal('show');
+    console.log('show modal');
+    this.updateCurrentSubject(subjectData); //update current Subject
+    if (rowData && rowData.length > 0) {
+      // this.currentStudentData = rowData;
+      rowData.forEach((row, index) => {
+        this.currentStudentData.push(row.student_id);
+      });
+      console.log('open Modal currentStudentData => ', this.currentStudentData);
+    }
+  }
+
+  closeModal(): void {
+    // $(this.modal?.nativeElement).modal('hide');
+    this.currentEmail = '';
+    this.currentStudentData = [];
+    this.emailSubject = '';
+    this.messageText = '';
+
+    // const modal = new Modal(this.modal?.nativeElement);
+    if (this.modal) {
+      const modalInstance = Modal.getInstance(this.modal.nativeElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+    }
+    // modal?.hide();
+    console.warn('modal hide');
+  }
+
   //template
 
   // เรียกใช้งานเพื่อ refresh template
@@ -235,6 +317,7 @@ export class ModalSendMailComponent implements OnInit {
       this.messageText = template.detail.body;
     }
   }
+
   loadPrivateTemplate(templateKey: number): void {
     let template = this.privateTemplateList.find(
       (t) => t.templateId === templateKey
@@ -247,6 +330,7 @@ export class ModalSendMailComponent implements OnInit {
       this.messageText = template.detail.body;
     }
   }
+
   setDefaultTemplate(templateKey: number): void {
     console.log(`setDefault template : ${templateKey}`);
     const payload = {
@@ -287,6 +371,7 @@ export class ModalSendMailComponent implements OnInit {
       }
     );
   }
+
   createTemplate() {
     console.log('createTemplate');
     const payload = {
@@ -305,6 +390,7 @@ export class ModalSendMailComponent implements OnInit {
     );
     this.toggleTemplateDialog(false); // ปิด dialog หลังบันทึก
   }
+
   updateTemplate(templateKey: number) {
     console.log(`update Template : ${templateKey}`);
     const payload = {
@@ -351,6 +437,7 @@ export class ModalSendMailComponent implements OnInit {
       }
     });
   }
+
   deleteTemplate(templateKey: number) {
     console.log(`deleteTemplate : ${templateKey}`);
     const payload = {
@@ -422,15 +509,10 @@ export class ModalSendMailComponent implements OnInit {
 
   // Method ที่ถูกเรียกเมื่อกดปุ่ม "ส่งอีเมล"
   sendEmail() {
+    console.log('sendEmail: CurrentSubject => ', this.currentSubject);
     const payload = {
-      subjectDetail: {
-        subject_id: '01418442-60',
-        subject_name: 'Web service and Web api I',
-        academic_year: '2024',
-        semester: '1',
-        section: '800',
-      },
-      student_id: ['6430250229', '6430250261'],
+      subjectDetail: this.currentSubject,
+      student_id: this.currentStudentData,
       //username teacher
       username: this.userService.username,
       emailDetail: {
@@ -438,56 +520,63 @@ export class ModalSendMailComponent implements OnInit {
         contentEmail: this.messageText,
       },
     };
+    // const payload = {
+    //   subjectDetail: {
+    //     subject_id: '01418442-60',
+    //     subject_name: 'Web service and Web api I',
+    //     academic_year: '4',
+    //     semester: '1',
+    //     section: '1',
+    //   },
+    //   student_id: ['6430250229', '6430250261'],
+    //   //username teacher
+    //   username: this.userService.username,
+    //   emailDetail: {
+    //     subjectEmail: this.emailSubject,
+    //     contentEmail: this.messageText,
+    //   },
+    // };
 
     console.log('Email Payload:', payload); // แสดงค่าใน console
-    this.scoreAnnouncementService.sendMail(payload).subscribe(
-      (response) => {
-        this.createTemplateForm.reset();
-        this.isTemplateDialogVisible = false;
-        console.log('Success', response);
-        if (response.isSuccess) {
-          Swal.fire({
-            title: 'ส่งอีเมลสำเร็จ',
-            icon: 'success',
-            confirmButtonColor: 'var(--primary-color)',
-            confirmButtonText: 'ตกลง',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // หากคลิก "ตกลง"
-              console.log('success : ', response.messageDesc);
-            }
-          });
-        } else {
-          Swal.fire({
-            title: 'เกิดข้อผิดพลาด',
-            text: response.message.messageDescription,
-            icon: 'error',
-            confirmButtonColor: 'var(--secondary-color)',
-            confirmButtonText: 'ปิด',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // หากคลิก "ตกลง"
-              console.log('error : ', response.messageDesc);
-            }
-          });
-        }
-      },
-      (error) => {
-        console.log('Error', error);
-      },
-      () => {
-        this.isCreateTemplateSubmited = false; // reset flg
-      }
-    );
-    // this.http
-    //   .post(`${environment.apiUrl}/api/StudentScore/SendStudentScore`, payload)
-    //   .subscribe((response: any) => {
+    // this.scoreAnnouncementService.sendMail(payload).subscribe(
+    //   (response) => {
+    //     this.createTemplateForm.reset();
+    //     this.isTemplateDialogVisible = false;
+    //     console.log('Success', response);
     //     if (response.isSuccess) {
-    //       console.log(response);
+    //       Swal.fire({
+    //         title: 'ส่งอีเมลสำเร็จ',
+    //         icon: 'success',
+    //         confirmButtonColor: 'var(--primary-color)',
+    //         confirmButtonText: 'ตกลง',
+    //       }).then((result) => {
+    //         if (result.isConfirmed) {
+    //           // หากคลิก "ตกลง"
+    //           console.log('success : ', response.messageDesc);
+    //         }
+    //       });
     //     } else {
-    //       console.log(response);
+    //       Swal.fire({
+    //         title: 'เกิดข้อผิดพลาด',
+    //         text: response.message.messageDescription,
+    //         icon: 'error',
+    //         confirmButtonColor: 'var(--secondary-color)',
+    //         confirmButtonText: 'ปิด',
+    //       }).then((result) => {
+    //         if (result.isConfirmed) {
+    //           // หากคลิก "ตกลง"
+    //           console.log('error : ', response.messageDesc);
+    //         }
+    //       });
     //     }
-    //   });
+    //   },
+    //   (error) => {
+    //     console.log('Error', error);
+    //   },
+    //   () => {
+    //     this.isCreateTemplateSubmited = false; // reset flg
+    //   }
+    // );
   }
 
   isTemplateDialogVisible = false;
@@ -635,5 +724,20 @@ export class ModalSendMailComponent implements OnInit {
         }
       }, 100); // ตรวจสอบทุก 100 มิลลิวินาที
     });
+  }
+
+  //update subject from search
+  updateCurrentSubject(subjectData: {
+    subject_id: string;
+    academic_year: number;
+    semester: number;
+    section: number;
+  }) {
+    console.log('onUpdateCurrentSubject:subjectData => ', subjectData);
+    this.currentSubject = subjectData;
+    console.log(
+      'onUpdateCurrentSubject:currentSubject => ',
+      this.currentSubject
+    );
   }
 }

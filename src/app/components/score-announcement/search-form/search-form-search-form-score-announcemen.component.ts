@@ -22,6 +22,7 @@ import Swal from 'sweetalert2';
 import { ScoreAnnouncementService } from '../../../services/score-announcement/score-announcement.service';
 import { ContantService } from '../../../shared/service/contants-service.service';
 import { Observable, of } from 'rxjs';
+import { ModalSendMailComponent } from '../../modal-send-mail/modal-send-mail.component';
 
 @Component({
   selector: 'search-form-score-announcemen',
@@ -36,14 +37,19 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
   gridData: any[] = [];
   @Output() searchSubmit = new EventEmitter<any>();
   @Output() resetForm = new EventEmitter<void>();
+  @Output() currentSubject = new EventEmitter<any>();
+
+  //viewchild
   @ViewChild('subjectCode', { read: ElementRef }) subjectCodeRef?: ElementRef;
   @ViewChild('subjectDetailForm', { static: false })
   subjectDetailForm?: FormGroup;
+  @ViewChild(ModalSendMailComponent) modal?: ModalSendMailComponent;
 
   filteredSuggestions: any[] = [];
   showSuggestions = true;
   filteredSubjects: { subjectCode: string; subjectName: string }[] = [];
   selectedSubjectCode: string = ''; // ตัวแปรที่เก็บค่าที่เลือก
+  currentSubjectId: string = '';
 
   isAutocompleteVisible = false;
   isSubjectNameReadonly = false;
@@ -172,6 +178,9 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     });
     this.filteredSuggestions = [];
     this.showSuggestions = false;
+    //add update current subject_id
+    console.log('select :', subject);
+    this.currentSubjectId = subject.subject_id;
   }
 
   hideSuggestions(): void {
@@ -235,20 +244,17 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
         //   this.semesterLovItem
         // ),
         semester: this.form.value.semester ?? null,
-        section: this.getLabelForValue(
-          this.form.value.section,
-          this.sectionLovItem
-        ),
+        section: this.form.value.section ?? null,
         // semester: this.form.value.semester ?? null,
-        academic_year: this.getLabelForValue(
-          this.form.value.academic_year,
-          this.academic_yearLovItem
-        ),
+        academic_year: this.form.value.academic_year ?? null,
         send_status_code: this.form.value.sendStatus ?? '',
         // send_status_code: this.getValueLov(this.form.value.send_status_code, this.statuses),
       };
 
       this.searchSubmit.emit(requestData); // ส่ง requestData ไปยัง API
+
+      //call updateCurrentSubject
+      this.onCurrentSubject();
     } else {
       this.form.markAllAsTouched();
     }
@@ -280,5 +286,22 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
 
   onUlClick(event: Event): void {
     console.log('UL clicked:', event);
+  }
+
+  onCurrentSubject() {
+    const subjectData: {
+      subject_id: string;
+      academic_year: number;
+      semester: number;
+      section: number;
+    } = {
+      subject_id: this.currentSubjectId,
+      academic_year: parseInt(this.form.value.academic_year),
+      semester: parseInt(this.form.value.semester),
+      section: parseInt(this.form.value.section),
+    };
+    console.log('current Subject : ', subjectData);
+    this.currentSubject.emit(subjectData);
+    // this.modal?.updateCurrentSubject(subjectData);
   }
 }

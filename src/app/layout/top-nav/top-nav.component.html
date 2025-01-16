@@ -3,10 +3,12 @@
   style="background-color: var(--green-color)"
 >
   <div class="container-fluid">
-    <div class="burger-icon" [ngClass]="{ 'd-none': isOpen }">
+    <!-- Burger icon for mobile -->
+    <div class="burger-icon">
       <i class="bi bi-list" (click)="toggleNav()"></i>
     </div>
-    <!-- title menu -->
+
+    <!-- Title menu -->
     <div
       class="title-menu"
       [ngClass]="{ 'nav-opened': isOpen }"
@@ -14,6 +16,7 @@
     >
       {{ currentTitle | translate }}
     </div>
+
     <div class="d-flex ms-auto">
       <!-- Notify -->
       <div class="dropdown d-flex align-items-center">
@@ -34,29 +37,24 @@
           aria-labelledby="notificationDropdown"
         >
           <li><h6 class="dropdown-header">Notifications</h6></li>
-          <!-- ถ้าไม่มีการแจ้งเตือน -->
           <ul *ngIf="notifications.length === 0" class="no-notifications">
             <li>{{ "navbar_notifyNoMessage" | translate }}</li>
           </ul>
           <div id="notify-list" class="notify-list"></div>
         </ul>
       </div>
-      <!-- switch language -->
-      <div class="dropdown d-flex align-items-center">
+
+      <!-- Language switch (desktop only) -->
+      <div class="dropdown d-flex align-items-center desktop-only">
         <a
-          class="btn btn-link dropdown-toggle"
+          class="swithLang-btn btn-link dropdown-toggle"
           href="#"
           role="button"
           id="languageMenu"
           data-bs-toggle="dropdown"
           aria-expanded="false"
-          style="color: var(--white-color); text-decoration: none"
         >
           <span id="currentLanguage">{{ currentLang.toUpperCase() }}</span>
-          <!-- <i
-            class="bi bi-chevron-bar-down"
-            style="font-size: var(--icon-size); color: var(--white-color)"
-          ></i> -->
         </a>
         <ul class="dropdown-menu" aria-labelledby="languageMenu">
           <li>
@@ -77,105 +75,59 @@
           </li>
         </ul>
       </div>
-      <!-- profile menu -->
-      <div class="dropdown d-flex align-items-center">
+
+      <!-- Profile menu -->
+      <div class="dropdown d-flex align-items-center dropdown-toggle">
         <button
-          class="btn btn-link"
+          class="btn btn-link profile-btn"
           type="button"
           id="dropdownMenuButton"
           data-bs-toggle="dropdown"
           aria-expanded="false"
-          style="color: var(--white-color); text-decoration: none"
         >
-          <div class="row">
-            <div class="col-1">
-              <i
-                class="bi bi-person-fill"
-                style="
-                  font-size: var(--icon-size);
-                  color: var(--grey-color);
-                  background-color: white; /* Background color (black circle) */
-                  -webkit-mask-image: radial-gradient(
-                    circle,
-                    var(--grey-color) 60%,
-                    transparent 61%
-                  );
-                  mask-image: radial-gradient(
-                    circle,
-                    var(--grey-color) 60%,
-                    transparent 61%
-                  );
-                  -webkit-mask-composite: source-in;
-                  mask-composite: intersect;
-                  padding: 6px; /* Optional padding for better appearance */
-                  border-radius: 50%; /* Ensure it remains circular */
-                "
-              ></i>
+          <div class="profile-container">
+            <div class="">
+              <i class="user-icon bi bi-person-fill"></i>
             </div>
-            <div class="col-8 d-flex flex-column text-end">
-              <!-- <div style="font-size: 12px">ดร.ฉัตรชัย เกษมทวีโชค</div> -->
+            <div class="d-flex flex-column text-end profile-info desktop-only">
               <div style="font-size: 12px">
                 {{ prefix }} {{ firstname }} {{ lastname }}
               </div>
-              <!-- <div style="font-size: 10px">รหัสอาจารย์: S2024</div> -->
-              <div style="font-size: 10px">รหัสอาจารย์: {{ teacher_code }}</div>
-            </div>
-            <div class="col-1 d-flex align-items-center justify-content-center">
-              <i
-                class="bi bi-chevron-down"
-                style="font-size: 12px; color: white"
-              ></i>
+              <div style="font-size: 10px">
+                {{ "nav_teacherCode" | translate }} {{ teacher_code }}
+              </div>
             </div>
           </div>
         </button>
         <ul
-          class="dropdown-menu dropdown-menu-end"
+          class="dropdown-menu dropdown-menu-end profile-dropdown"
           aria-labelledby="dropdownMenuButton"
-          style="width: 200px; padding: 0; border-radius: 4px"
         >
           <li>
             <div
-              class="d-flex flex-column align-items-center justify-content-center"
-              style="
-                background-color: var(--green-color);
-                width: 100%;
-                height: 100px;
-                color: var(--white-color);
-                font-size: 14px;
-              "
+              class="profileDropdown-container d-flex flex-column align-items-center justify-content-center"
             >
               <div>{{ prefix }} {{ firstname }} {{ lastname }}</div>
-              <div>รหัสอาจารย์: {{ teacher_code }}</div>
-              <div>หน้าที่: {{ role }}</div>
+              <div>{{ "nav_teacherCode" | translate }} {{ teacher_code }}</div>
+              <div>{{ "nav_role" | translate }} {{ role }}</div>
             </div>
           </li>
           <li>
-            <a class="dropdown-item text-center" href="#"
-              ><i
-                class="bi bi-key-fill"
-                style="
-                  font-size: 12px;
-                  color: var(--grey-color);
-                  -webkit-text-stroke: 0.8px var(--grey-color); /* Adds thickness */
-                  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-                "
-              ></i>
-              เปลี่ยนรหัส</a
+            <a
+              class="profile-dropdown-changePassword dropdown-item text-center"
+              href="#"
+              ><i class="bi bi-key-fill"></i>
+              {{ "nav_chagePassword" | translate }}</a
             >
           </li>
           <li><hr class="dropdown-divider" style="margin: 0" /></li>
           <li>
-            <a class="dropdown-item text-center" href="#" (click)="onLogout()"
-              ><i
-                class="bi bi-box-arrow-right"
-                style="
-                  font-size: 12px;
-                  color: var(--grey-color);
-                  -webkit-text-stroke: 0.8px var(--grey-color); /* Adds thickness */
-                  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-                "
-              ></i>
-              ออกจากระบบ</a
+            <a
+              class="profile-dropdown-logout dropdown-item text-center"
+              href="#"
+              (click)="onLogout()"
+              ><i class="bi bi-box-arrow-right"></i>
+              {{ "nav_logout" | translate }}</a
             >
           </li>
         </ul>

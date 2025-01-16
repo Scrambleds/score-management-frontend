@@ -47,6 +47,7 @@ export class ScoreAnnouncementComponent {
   scoreForm!: FormGroup;
   teacherCode: string | null = null;
   rowData: any[] = []; // ข้อมูลสำหรับ ag-grid
+  currentSubjectData: any = null;
 
   constructor(
     private scoreService: ScoreAnnouncementService,
@@ -62,12 +63,8 @@ export class ScoreAnnouncementComponent {
     // ทำการรีเซ็ตข้อมูลทั้งหมด
     this.gridData = []; // หรือรีเซ็ตค่าตามที่ต้องการ
   }
-  ngOnInit() {
-  }
-  updateGridData(newData: any[]): void {
-    this.gridData = newData;
-  }
-  
+  ngOnInit() {}
+
   onSearchSubmit(requestData: any) {
     this.scoreService.getScoreAnnouncementByCondition(requestData).subscribe(
       (response) => {
@@ -84,5 +81,9 @@ export class ScoreAnnouncementComponent {
         console.error('Error fetching scores:', error);
       }
     );
+  }
+
+  onCurrentSubjectHandle(subjectData: any) {
+    this.currentSubjectData = subjectData;
   }
 }

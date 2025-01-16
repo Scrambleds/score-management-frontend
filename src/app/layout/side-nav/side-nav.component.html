@@ -1,4 +1,9 @@
-<div id="mySidenav" class="sidenav" [ngClass]="{ 'sidenav-open': isOpen }">
+<!-- sidebar desktop -->
+<div
+  id="mySidenav"
+  class="sidebar-desktop sidenav"
+  [ngClass]="{ 'sidenav-open': isOpen }"
+>
   <div class="header-row">
     <div class="logo-img">
       <img src="assets/logo/ku-logo.png" alt="logo" />
@@ -14,6 +19,7 @@
       routerLink="/MasterData"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
       ><i class="bi bi-gear-fill"></i>
       <!-- จัดการข้อมูลหลัก -->
       {{ "menu_masterdata" | translate }}
@@ -22,6 +28,7 @@
       routerLink="/UserManagement"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
       ><i class="bi bi-person-fill"></i>
       <!-- จัดการผู้ใช้งาน -->
       {{ "menu_usermanage" | translate }}
@@ -30,6 +37,7 @@
       routerLink="/UploadScore"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
       ><i class="bi bi-box-arrow-in-down"></i>
       <!-- อัปโหลดคะแนนนิสิต -->
       {{ "menu_uploadscore" | translate }}
@@ -38,6 +46,7 @@
       routerLink="/SearchScore"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
       ><i class="bi bi-clipboard-data-fill"></i>
       <!-- ค้นหาคะแนน -->
       {{ "menu_searchscore" | translate }}
@@ -46,6 +55,7 @@
       routerLink="/ScoreAnnouncement"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
       ><i class="bi bi-megaphone-fill"></i>
       <!-- ประกาศคะแนน -->
       {{ "menu_scoreannounce" | translate }}
@@ -54,9 +64,115 @@
       routerLink="/Dashboard"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
       ><i class="bi bi-journal"></i>
       <!-- รายงาน -->
       {{ "menu_dashboard" | translate }}
     </a>
+  </div>
+</div>
+
+<!-- sidebar mobile -->
+<div
+  id="mySidenav"
+  class="sidebar-mobile sidenav"
+  [ngClass]="{ 'sidenav-open': isOpen }"
+>
+  <div class="header-row">
+    <div class="logo-img">
+      <img src="assets/logo/ku-logo.png" alt="logo" />
+    </div>
+    <div class="header-title">Kasetsart University</div>
+    <div class="burger-icon">
+      <i class="bi bi-list" (click)="closeNav()"></i>
+    </div>
+  </div>
+  <hr style="color: white; margin: 0.313rem 0" />
+  <div class="menu-container">
+    <a
+      routerLink="/MasterData"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
+      ><i class="bi bi-gear-fill"></i>
+      <!-- จัดการข้อมูลหลัก -->
+      {{ "menu_masterdata" | translate }}
+    </a>
+    <a
+      routerLink="/UserManagement"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
+      ><i class="bi bi-person-fill"></i>
+      <!-- จัดการผู้ใช้งาน -->
+      {{ "menu_usermanage" | translate }}
+    </a>
+    <a
+      routerLink="/UploadScore"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
+      ><i class="bi bi-box-arrow-in-down"></i>
+      <!-- อัปโหลดคะแนนนิสิต -->
+      {{ "menu_uploadscore" | translate }}
+    </a>
+    <a
+      routerLink="/SearchScore"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
+      ><i class="bi bi-clipboard-data-fill"></i>
+      <!-- ค้นหาคะแนน -->
+      {{ "menu_searchscore" | translate }}
+    </a>
+    <a
+      routerLink="/ScoreAnnouncement"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
+      ><i class="bi bi-megaphone-fill"></i>
+      <!-- ประกาศคะแนน -->
+      {{ "menu_scoreannounce" | translate }}
+    </a>
+    <a
+      routerLink="/Dashboard"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="closeNav()"
+      ><i class="bi bi-journal"></i>
+      <!-- รายงาน -->
+      {{ "menu_dashboard" | translate }}
+    </a>
+  </div>
+  <div class="switchLang-container mt-2">
+    <div
+      data-bs-toggle="collapse"
+      href="#switchLanguage"
+      role="button"
+      aria-expanded="false"
+      aria-controls="collapseLanguage"
+    >
+      <i class="bi bi-globe"></i>
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <div>{{ "menu_switchLang" | translate }}</div>
+        <div class="btn-container">
+          <label class="switch btn-color-mode-switch">
+            <input
+              value="1"
+              id="switch_lang"
+              name="switch_lang"
+              type="checkbox"
+              (change)="switchLanguage()"
+            />
+            <label
+              class="btn-color-mode-switch-inner"
+              data-off="TH"
+              data-on="EN"
+              for="switch_lang"
+            ></label>
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

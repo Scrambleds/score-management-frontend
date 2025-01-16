@@ -1,0 +1,187 @@
+/* ซ่อน Mobile Navbar เมื่อหน้าจอกว้างกว่า 575.98px */
+@media (min-width: 768px) {
+  .sidebar-mobile {
+    display: none !important;
+  }
+}
+
+/* ซ่อน Desktop Navbar เมื่อหน้าจอแคบกว่า 575.98px */
+@media (max-width: 767.98px) {
+  .sidebar-desktop {
+    display: none !important;
+  }
+}
+
+/* side bar */
+.sidenav {
+  height: 100%;
+  width: 15.625rem;
+  position: fixed;
+  z-index: 1041;
+  top: 0;
+  left: -15.625rem; /* ซ่อน sidebar ออกนอกหน้าจอ */
+  background-color: var(--grey-color);
+  overflow-x: hidden;
+  transition: left 0.5s; /* ใช้ transition กับ left */
+}
+
+.sidenav a:hover {
+  color: var(--white-color);
+}
+
+.sidenav-open {
+  left: 0; /* เลื่อน sidebar กลับเข้ามา */
+}
+
+/* add new side bar header */
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.438rem 0.625rem;
+}
+
+.logo-img img {
+  max-height: 3.125rem; /* กำหนดความสูงของโลโก้ */
+  width: auto; /* รักษาสัดส่วนของภาพ */
+}
+
+.header-title {
+  flex: 1; /* ให้พื้นที่ส่วนนี้ยืดตามความจำเป็น */
+  text-align: center; /* จัดข้อความให้อยู่กึ่งกลางแนวนอน */
+  font-size: var(--font-size); /* ขนาดตัวอักษร */
+  color: var(--white-color);
+}
+
+/* menu */
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  /* gap: 0.625rem; */
+}
+
+.menu-container a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: var(--font-size);
+  padding: 0.625rem 1rem;
+  transition: background-color 0.3s;
+  color: var(--secondary-color);
+}
+
+.menu-container a i {
+  margin-right: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.menu-container a:hover {
+  color: var(--white-color);
+}
+.menu-container a.active {
+  background-color: var(--green-color);
+  color: var(--white-color);
+}
+
+/* toggle */
+.btn-container {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 0.75rem; /* ตั้งขนาดฟอนต์พื้นฐานเป็น 1rem (หรือปรับตามความต้องการ) */
+}
+
+.btn-color-mode-switch {
+  display: inline-block;
+  margin: 0;
+  position: relative;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner {
+  margin: 0;
+  width: 5em; /* ปรับขนาดเป็น em แทน rem */
+  height: 1.875em; /* ปรับขนาดเป็น em แทน rem */
+  background-color: var(--dark-color);
+  border-radius: 1.625em; /* ปรับขนาดเป็น em แทน rem */
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner:before {
+  content: attr(data-on);
+  position: absolute;
+  font-size: 0.875em; /* ปรับขนาดเป็น em แทน rem */
+  font-weight: 600;
+  top: 0.4375em; /* ปรับขนาดเป็น em แทน rem */
+  right: 0.8125em; /* ปรับขนาดเป็น em แทน rem */
+  color: var(--white-color);
+}
+
+.btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+  content: attr(data-off);
+  width: 3em; /* ปรับขนาดเป็น em แทน rem */
+  height: 1.8625em; /* ปรับขนาดเป็น em แทน rem */
+  background: var(--white-color);
+  border-radius: 1.625em; /* ปรับขนาดเป็น em แทน rem */
+  position: absolute;
+  font-size: 0.875em; /* ปรับขนาดเป็น em แทน rem */
+  display: flex;
+  justify-content: center;
+  left: 0.125em; /* ปรับขนาดเป็น em แทน rem */
+  top: 0.125em; /* ปรับขนาดเป็น em แทน rem */
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0.375em -0.125em #111; /* ปรับขนาดเป็น em แทน rem */
+  padding: 0.3125em 0; /* ปรับขนาดเป็น em แทน rem */
+  color: var(--dark-color);
+  font-weight: 600;
+}
+
+.btn-color-mode-switch input[type="checkbox"] {
+  cursor: pointer;
+  width: 3.125em; /* ปรับขนาดเป็น em แทน rem */
+  height: 1.5625em; /* ปรับขนาดเป็น em แทน rem */
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  margin: 0;
+}
+
+.btn-color-mode-switch
+  input[type="checkbox"]:checked
+  + label.btn-color-mode-switch-inner {
+  background-color: var(--dark-color);
+}
+
+.btn-color-mode-switch
+  input[type="checkbox"]:checked
+  + label.btn-color-mode-switch-inner:after {
+  content: attr(data-on);
+  left: 2.5em; /* ปรับขนาดเป็น em แทน rem */
+}
+
+.btn-color-mode-switch
+  input[type="checkbox"]:checked
+  + label.btn-color-mode-switch-inner:before {
+  content: attr(data-off);
+  right: auto;
+  left: 0.8125em; /* ปรับขนาดเป็น em แทน rem */
+}
+
+.switchLang-container > div {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: var(--font-size);
+  padding: 0.625rem 1rem;
+  transition: background-color 0.3s;
+  color: var(--secondary-color);
+}
+
+.switchLang-container i {
+  margin-right: 0.5rem;
+  font-size: 1.25rem;
+}

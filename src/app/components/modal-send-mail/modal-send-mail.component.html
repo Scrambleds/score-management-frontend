@@ -1,5 +1,6 @@
 <!-- Modal -->
 <div
+  #modal
   class="modal fade modal-custom"
   id="announceScoreModal"
   data-bs-backdrop="static"
@@ -8,7 +9,6 @@
   tabindex="-1"
   aria-labelledby="announceScoreLabel"
   aria-hidden="true"
-  style=""
 >
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
@@ -18,7 +18,7 @@
         <button
           type="button"
           class="btn-close"
-          data-bs-dismiss="modal"
+          (click)="closeModal()"
           aria-label="Close"
         ></button>
       </div>
@@ -32,7 +32,7 @@
             type="email"
             class="form-control"
             id="recipientEmail"
-            value="pamornpon.t@ku.th"
+            [(ngModel)]="currentEmail"
             readonly
             disabled
           />
@@ -259,7 +259,7 @@
           <button
             type="button"
             class="btn btn-secondary"
-            data-bs-dismiss="modal"
+            (click)="closeModal()"
           >
             ปิด
           </button>
