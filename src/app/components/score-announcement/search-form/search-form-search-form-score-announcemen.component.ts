@@ -236,7 +236,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
         subjectSearch: this.form.value.subjectSearch ?? '',
         studentSearch: this.form.value.studentSearch ?? '',
         semester: this.form.value.semester ?? null,
-        section: this.form.value.setion ?? '',
+        section: this.form.value.section ?? '',
         academic_year: this.form.value.academic_year ?? '',
         send_status_code: this.form.value.sendStatus ?? '',
       };
