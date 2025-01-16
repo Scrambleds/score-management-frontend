@@ -69,15 +69,15 @@ export class SearchFormScoreComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private contantLovService: ContantService
+    private contantLovService: ContantService,
   ) {
     // สร้างฟอร์ม
     this.form = this.fb.group({
       subjectSearch: ['', Validators.required],
       studentSearch: [{ value: '', disabled: true }],
       section: [{ value: '', disabled: true }],
-      semester: [{ value: '' }, Validators.required],
-      academic_year: [{ value: '' }, Validators.required],
+      semester: [null, Validators.required],
+      academic_year: [null, Validators.required],
     });
 
     // ดึงข้อมูลจาก API และเก็บไว้ในตัวแปร
@@ -86,16 +86,12 @@ export class SearchFormScoreComponent implements OnInit {
       .subscribe((data) => {
         this.statuses = data;
       });
-    this.contantLovService
-      .getLovContant('GetLovSection')
-      .subscribe((data) => {
-        this.sectionLovItem = data;
-      });
-    this.contantLovService
-      .getLovContant('GetLovSemester')
-      .subscribe((data) => {
-        this.semesterLovItem = data;
-      });
+    this.contantLovService.getLovContant('GetLovSection').subscribe((data) => {
+      this.sectionLovItem = data;
+    });
+    this.contantLovService.getLovContant('GetLovSemester').subscribe((data) => {
+      this.semesterLovItem = data;
+    });
     this.contantLovService
       .getLovContant('GetLovAcademicYear')
       .subscribe((data) => {
@@ -111,18 +107,29 @@ export class SearchFormScoreComponent implements OnInit {
     this.showAutocomplete();
 
     // ฟังการเปลี่ยนแปลงของฟอร์ม
-    this.form.valueChanges.pipe(
-      debounceTime(300) // ลดความถี่ในการเรียกฟังก์ชัน
-    ).subscribe(value => {
-      this.toggleFields(value);
-    });
+    this.form.valueChanges
+      .pipe(
+        debounceTime(300) // ลดความถี่ในการเรียกฟังก์ชัน
+      )
+      .subscribe((value) => {
+        this.toggleFields(value);
+      });
   }
 
   // ฟังก์ชันที่ตรวจสอบค่าของฟอร์มเพื่อเปิด/ปิดฟิลด์
-  toggleFields(value: { subjectSearch?: string | null, academic_year?: string | null, semester?: string | null }) {
-    if (value.subjectSearch && value.subjectSearch.trim() !== '' &&
-        value.academic_year && value.academic_year.trim() !== '' &&
-        value.semester && value.semester.trim() !== '') {
+  toggleFields(value: {
+    subjectSearch?: string | null;
+    academic_year?: string | null;
+    semester?: string | null;
+  }) {
+    if (
+      value.subjectSearch &&
+      value.subjectSearch.trim() !== '' &&
+      value.academic_year &&
+      value.academic_year.trim() !== '' &&
+      value.semester &&
+      value.semester.trim() !== ''
+    ) {
       // เปิดฟิลด์เมื่อ subjectSearch, academic_year, semester มีค่าครบ
       this.form.get('studentSearch')?.enable();
       this.form.get('section')?.enable();
@@ -211,4 +218,3 @@ export class SearchFormScoreComponent implements OnInit {
     this.form.reset();
   }
 }
-

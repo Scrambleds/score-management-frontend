@@ -25,7 +25,6 @@ export class SearchScoreComponent {
   constructor(private scoreService: SearchScoreService) {}
 
   ngOnInit(): void {
-    this.loadInitialData(); // โหลดข้อมูลตอนเข้าหน้า
   }
 
   loadInitialData(): void {

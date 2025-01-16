@@ -83,10 +83,10 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     this.form = this.fb.group({
       subjectSearch: ['', Validators.required],
       studentSearch: [{ value: '', disabled: true }],
-      semester: [{ value: null }, Validators.required],
+      semester: [ null , Validators.required],
       section: [{ value: null ,disabled: true }],
-      sendStatus: [{ value: null }],
-      academic_year: [{ value: null }, Validators.required],
+      sendStatus: [null],
+      academic_year: [ null , Validators.required],
     });
 
     this.contantLovService
