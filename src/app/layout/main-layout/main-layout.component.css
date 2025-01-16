@@ -1,0 +1,65 @@
+/* ซ่อน Mobile Navbar เมื่อหน้าจอกว้างกว่า 575.98px */
+@media (min-width: 768px) {
+  .main-mobile {
+    display: none !important;
+  }
+
+  /* body router */
+  .content-with-sidenav {
+    margin-left: 15.625rem; /* ระยะห่างเมื่อตัวเมนูเปิด */
+    transition: margin-left 0.5s; /* เพิ่มความนุ่มนวลในการเปลี่ยนแปลง */
+  }
+
+  .content-full-width {
+    transition: margin-left 0.5s;
+    margin-left: 0;
+  }
+}
+
+/* ซ่อน Desktop Navbar เมื่อหน้าจอแคบกว่า 575.98px */
+@media (max-width: 767.98px) {
+  .main-desktop {
+    display: none !important;
+  }
+
+  /* body router */
+  .content-with-sidenav {
+    margin-left: 0; /* ระยะห่างเมื่อตัวเมนูเปิด */
+    transition: margin-left 0.5s; /* เพิ่มความนุ่มนวลในการเปลี่ยนแปลง */
+  }
+
+  .content-full-width {
+    transition: margin-left 0.5s;
+    margin-left: 0;
+  }
+
+  /* backdrop */
+  .backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* สีดำโปร่งใส */
+    z-index: 1040; /* ต่ำกว่า sidebar */
+    opacity: 0.55; /* ซ่อน backdrop เริ่มต้น */
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .backdrop-visible {
+    opacity: 1; /* แสดง backdrop */
+  }
+}
+
+/* body container */
+.body-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.body-container .content {
+  flex: 1;
+  padding: 1.25rem;
+  background-color: var(--body-color);
+}

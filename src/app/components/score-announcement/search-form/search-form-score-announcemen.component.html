@@ -43,10 +43,11 @@
             class="text-danger ps-2 mt-1"
           >
             {{ "alert_enterData" | translate }}
+            {{ "subject_code" | translate }} / {{ "subject_name" | translate }}
           </div>
         </div>
 
-        <!-- Subject Name -->
+        <!-- academic_year -->
         <div class="col-12 col-sm-4 col-md-3 col-lg-2">
           <label for="academic_year" class="fw-bold mb-2 d-flex flex-wrap"
             >{{ "academic_year" | translate }}
@@ -61,7 +62,7 @@
             [items]="academic_yearLovItem"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
-              {{ item | translateDropdown : { th: "desc_th", en: "desc_en" } }}
+              {{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
             </ng-template>
           </ng-select>
           <div
@@ -71,7 +72,8 @@
             "
             class="text-danger ps-2 mt-1"
           >
-            {{ "alert_enterData" | translate }}{{"academic_year"|translate}}
+            {{ "alert_enterData" | translate }}
+            {{ "academic_year" | translate }}
           </div>
         </div>
         <div class="col-12 col-sm-4 col-md-3 col-lg-2">
@@ -97,14 +99,14 @@
             "
             class="text-danger ps-2 mt-1"
           >
-            {{ "alert_enterData" | translate }}{{"semester"|translate}}
+            {{ "alert_enterData" | translate }} {{ "semester" | translate }}
           </div>
         </div>
       </div>
       <div class="d-flex justify-content-center gap-3 mt-3">
         <div class="col-12 col-sm-4 col-md-4 col-lg-3">
           <label for="studentSearch" class="fw-bold mb-2"
-            >{{ "student_name" | translate }} / {{"student_id"|translate}}
+            >{{ "student_name" | translate }} / {{ "student_id" | translate }}
           </label>
           <input
             id="studentSearch"
@@ -123,9 +125,10 @@
           </div>
         </div>
         <div class="col-12 col-sm-4 col-md-3 col-lg-2">
-          <label for="section" class="fw-bold mb-2">{{
-            "section" | translate
-          }}</label>
+          <label for="section" class="fw-bold mb-2 d-flex flex-warp"
+            >{{ "section" | translate }}
+            <p class="text-danger mb-0 ms-1">*</p>
+          </label>
           <ng-select
             name="section"
             formControlName="section"
@@ -134,15 +137,12 @@
             [clearable]="true"
             [items]="sectionLovItem"
           >
-            <ng-template ng-option-tmp ng-item-tmp let-item="item">
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
             </ng-template>
           </ng-select>
           <div
-            *ngIf="
-              form.get('semesterCode')?.touched &&
-              form.get('semesterCode')?.invalid
-            "
+            *ngIf="form.get('section')?.touched && form.get('section')?.invalid"
             class="text-danger ps-2"
           >
             {{ "alert_enterData" | translate }}
@@ -166,8 +166,7 @@
           </ng-select>
           <div
             *ngIf="
-              form.get('semesterCode')?.touched &&
-              form.get('semesterCode')?.invalid
+              form.get('sendStatus')?.touched && form.get('sendStatus')?.invalid
             "
             class="text-danger ps-2"
           >

@@ -47,6 +47,7 @@ export class ScoreAnnouncementComponent {
   scoreForm!: FormGroup;
   teacherCode: string | null = null;
   rowData: any[] = []; // ข้อมูลสำหรับ ag-grid
+  currentSubjectData: any = null;
 
   constructor(
     private scoreService: ScoreAnnouncementService,
@@ -84,5 +85,9 @@ export class ScoreAnnouncementComponent {
         console.error('Error fetching scores:', error);
       }
     );
+  }
+
+  onCurrentSubjectHandle(subjectData: any) {
+    this.currentSubjectData = subjectData;
   }
 }

@@ -1,16 +1,47 @@
-/* Default title menu */
-.title-menu {
-  flex: 1;
-  transition: margin-left 0.5s;
-  padding: 0.625rem 0.625rem;
+/* ซ่อน Mobile Navbar เมื่อหน้าจอกว้างกว่า 575.98px */
+@media (min-width: 768px) {
+  .navbar-mobile {
+    display: none !important;
+  }
+
+  /* เมื่อ side nav เปิด */
+  .title-menu.nav-opened {
+    margin-left: 15.625rem;
+    transition: margin-left 0.5s;
+    padding: 0.625rem 0.625rem;
+  }
+
+  .desktop-only {
+    display: block;
+  }
+
+  .profile-info {
+    display: block;
+  }
 }
 
-/* เมื่อ side nav เปิด */
-.title-menu.nav-opened {
-  margin-left: 15.625rem;
-  transition: margin-left 0.5s;
+/* ซ่อน Desktop Navbar เมื่อหน้าจอแคบกว่า 575.98px */
+@media (max-width: 767.98px) {
+  .navbar-desktop {
+    display: none !important;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  .burger-icon {
+    display: block;
+  }
+
+  .profile-info {
+    display: none !important;
+  }
 }
 
+nav {
+  height: 4.063rem;
+}
 /* notify */
 /* ปรับความกว้างสูงสุดของ notify-container */
 .notify-container {
@@ -27,7 +58,7 @@
 }
 
 /* จัดการตำแหน่ง dropdown ให้เหมาะสมกับหน้าจอขนาดเล็ก */
-@media (max-width: 600px) {
+@media (max-width: 767.98px) {
   .notify-container {
     left: auto !important; /* ปรับตำแหน่ง dropdown */
     right: 0 !important; /* ชิดขอบขวาของหน้าจอ */
@@ -37,7 +68,7 @@
 
 /* ปรับการแสดงผลข้อความให้เหมาะสม */
 .dropdown-item div {
-  font-size: 14px;
+  font-size: 0.875rem;
   white-space: normal;
   word-wrap: break-word;
 }
@@ -46,4 +77,77 @@
   text-align: center;
   list-style-type: none;
   padding-left: 0;
+}
+
+/* Default title menu */
+.title-menu {
+  flex: 1;
+  transition: margin-left 0.5s;
+  padding: 0.625rem 0.625rem;
+}
+
+/* profile */
+.user-icon {
+  font-size: var(--icon-size);
+  color: var(--grey-color);
+  background-color: white;
+  -webkit-mask-image: radial-gradient(
+    circle,
+    var(--grey-color) 60%,
+    transparent 61%
+  );
+  mask-image: radial-gradient(circle, var(--grey-color) 60%, transparent 61%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  padding: 6px;
+  border-radius: 50%;
+}
+
+.profile-btn,
+.swithLang-btn {
+  color: var(--white-color);
+  text-decoration: none !important;
+}
+.profile-btn:hover {
+  color: var(--white-color);
+}
+
+.profile-dropdown {
+  width: 200px;
+  padding: 0;
+  border-radius: 4px;
+}
+
+.profile-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.profileDropdown-container {
+  background-color: var(--green-color);
+  width: 100%;
+  height: 100px;
+  color: var(--white-color);
+  font-size: 14px;
+}
+
+.profile-dropdown-changePassword,
+.profile-dropdown-logout {
+  font-size: 12px !important;
+  color: var(--grey-color);
+  -webkit-text-stroke: 0.8px var(--grey-color); /* Adds thickness */
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.profile-dropdown-changePassword:active,
+.profile-dropdown-logout:active {
+  font-size: 12px !important;
+  color: var(--white-color);
+  -webkit-text-stroke: 0.8px var(--white-color);
+  text-shadow: 2px 2px 5px var(--white-color);
+}
+
+.navbar .dropdown-toggle::after {
+  color: var(--white-color);
 }
