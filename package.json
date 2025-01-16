@@ -24,6 +24,7 @@
     "@microsoft/signalr": "^8.0.7",
     "@ng-select/ng-select": "^14.1.0",
     "@sweetalert2/ngx-sweetalert2": "^12.4.0",
+    "@types/date-fns": "^2.6.3",
     "ag-grid-angular": "^32.3.3",
     "ag-grid-community": "^32.3.3",
     "bootstrap": "^5.3.3",

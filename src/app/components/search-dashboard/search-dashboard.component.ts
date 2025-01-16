@@ -7,25 +7,22 @@ import {
   Output,
   ViewChild,
   EventEmitter,
-  output,
 } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SelectBoxService } from '../../services/select-box/select-box.service';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
 import { ChangeDetectorRef } from '@angular/core';
-import { DashboardComponent } from '../../route/dashboard/dashboard.component';
 import { BellCurveComponent } from '../bell-curve/bell-curve.component';
 import { ExcelExportService } from '../../services/excel-export/excel-export';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-search-dashboard',
   standalone: false,
-  
   templateUrl: './search-dashboard.component.html',
-  styleUrl: './search-dashboard.component.css'
+  styleUrls: ['./search-dashboard.component.css']
 })
 export class SearchDashboardComponent implements OnInit {
-  // @ViewChild(BellCurveComponent) resetDashboard? : BellCurveComponent;
   @ViewChild(BellCurveComponent) bellcurve?: BellCurveComponent;
   @Output() dashboardDataUpdated = new EventEmitter<any>();
   @Output() cardRequest = new EventEmitter<any>();
@@ -35,14 +32,12 @@ export class SearchDashboardComponent implements OnInit {
   academicYearList: any[] = [];
   scoreTypeList: any[] = [];
   dashboardData: any;
-  dashboardComponent: any;
 
-  constructor(private fb: FormBuilder, private selectBoxService: SelectBoxService
-              ,private DashboardService: DashboardService, private cdr: ChangeDetectorRef
-              ,private ExcelExportService: ExcelExportService
-  ){}
+  constructor(private fb: FormBuilder, private selectBoxService: SelectBoxService,
+              private DashboardService: DashboardService, private cdr: ChangeDetectorRef,
+              private ExcelExportService: ExcelExportService) {}
 
-  ngOnInit(){
+  ngOnInit() {
     this.form = this.fb.group({
       subject_id: [null],
       academic_year: [null],
@@ -76,7 +71,21 @@ export class SearchDashboardComponent implements OnInit {
     this.ExcelExportService.getBase64Excel(requestData).subscribe(response => {
       console.log('Response from API:', response);
       if (response && response.file) {
-        this.downloadExcel(response.file);
+
+        // ดึงวันที่และเวลาปัจจุบันในรูปแบบ "ปี-เดือน-วัน-ชั่วโมง-นาที"
+        const now = new Date();
+
+        // const formattedDateTime = format(now, "yyyy-MM-dd_HH-mm");
+
+        const formattedDate = format(now, "yyyy-MM-dd");
+        
+        const formattedTime = format(now, "HH-mm");
+        console.log("My formatTIME!!!: ",formattedTime);
+        // const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDateTime}`;
+
+        const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDate}_${formattedTime}`;
+  
+        this.downloadExcel(response.file, fileName);
       } else {
         console.error('No base64 data received');
       }
@@ -84,9 +93,8 @@ export class SearchDashboardComponent implements OnInit {
       console.error('Error exporting Excel:', error);
     });    
   }
-  
 
-  downloadExcel(base64Data: string) {
+  downloadExcel(base64Data: string, fileName: string) {
     const byteCharacters = atob(base64Data);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
@@ -94,69 +102,74 @@ export class SearchDashboardComponent implements OnInit {
     }
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  
+
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'ExportedData.xlsx';
+    link.download = `${fileName}.xlsx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   }
-  
 
   loadDashboardStats = (): void => { 
+    // const requestData = this.form.value;
+
     this.DashboardService.getDashboardStats({}).subscribe((response) => {
       if (response.isSuccess) {
         this.dashboardData = response.objectResponse;
         console.log('Dashboard Data: ', this.dashboardData);
+
+        // ดึงวันที่และเวลาปัจจุบัน
+        // const now = new Date();
+        // const formattedDateTime = format(now, "yyyy-MM-dd_HH-mm");
+
+        // สร้างชื่อไฟล์
+        // const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDateTime}`;
+
+        // this.downloadExcel(response.objectResponse.base64Excel, fileName);
       }
     });
-  }  
+  };
 
   loadSection(): void {
     this.selectBoxService.getSystemParamSection().subscribe((resp) => {
-      console.log(resp);
       this.sectionList = resp;
     });
   }
 
   loadSemester(): void {
     this.selectBoxService.getSystemParamSemester().subscribe((resp) => {
-      console.log(resp);
       this.semesterList = resp;
     });
   }
 
   loadAcademicYear(): void {
     this.selectBoxService.getSystemParamAcademicYear().subscribe((resp) => {
-      console.log(resp);
       this.academicYearList = resp;
     });
   }
 
   LoadScoreType(): void {
     this.selectBoxService.getSystemParamScoreType().subscribe((resp) => {
-      console.log(resp);
       this.scoreTypeList = resp;
-    })
+    });
   }
 
   onSubmit() {
     const formData = this.form.value;
     console.log('Form Data:', formData);
-  
 
     if (Object.values(formData).every(value => value === null || value === '')) {
       console.log('Form is empty, setting dashboard data to 0.');
-  
+
       function resetScores(data: any) {
         return Object.keys(data).reduce((acc, key) => {
           if (typeof data[key] === "object" && !Array.isArray(data[key])) {
-            acc[key] = resetScores(data[key]); // รีเซ็ตทุก key ใน object
+            acc[key] = resetScores(data[key]);
           } else if (Array.isArray(data[key])) {
-            acc[key] = []; // รีเซ็ต array เป็นว่าง
+            acc[key] = [];
           } else {
-            acc[key] = 0; // ตั้งค่าทุกตัวเลขเป็น 0
+            acc[key] = 0;
           }
           return acc;
         }, {} as any);
@@ -168,15 +181,12 @@ export class SearchDashboardComponent implements OnInit {
       
       return;
     }
-  
-    // Send a new request if form is not empty
-    console.log('Sending request with data:', formData);
+
     this.DashboardService.getDashboardStats(formData).subscribe((response) => {
       if (response.isSuccess) {
         this.dashboardData = response.objectResponse;
         this.dashboardDataUpdated.emit(this.dashboardData);
         this.cardRequest.emit(formData.score_type);
-        console.log('Updated Dashboard Data:', this.dashboardData);
       } else {
         this.dashboardData = null;
         this.dashboardDataUpdated.emit(this.dashboardData);
