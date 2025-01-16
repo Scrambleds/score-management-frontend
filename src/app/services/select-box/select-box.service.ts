@@ -42,10 +42,10 @@ export class SelectBoxService {
     );
   }
   getSystemParamAcademicYear(): Observable<any> {
-    const params = new HttpParams().set('reference', 'acedemic_year');
+    const params = new HttpParams().set('reference', 'academic_year');
     return this.http.get<Record<string, string>>(this.Url, { params }).pipe(
       map((response: any) => response.objectResponse),
-      tap((_) => console.log(`get masterdata : acedemic_year done!!`))
+      tap((_) => console.log(`get masterdata : academic_year done!!`))
     );
   }
   getSystemParamSemester(): Observable<any> {
