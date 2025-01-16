@@ -1,7 +1,9 @@
 <div class="custom-card">
   <div class="card-body">
     <div class="fw-bold">{{ "uploadscore_details" | translate }}</div>
-
+    <div class="text-danger">
+      {{ "title_score_ann_form" | translate }}
+    </div>
     <!-- parent will submit this form instead -->
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-100">
       <div
@@ -57,15 +59,6 @@
               {{ item | translateDropdown : { th: "desc_th", en: "desc_en" } }}
             </ng-template>
           </ng-select>
-          <div
-            *ngIf="
-              form.get('academic_year')?.touched &&
-              form.get('academic_year')?.invalid
-            "
-            class="text-danger ps-2"
-          >
-            {{ "alert_enterData" | translate }}
-          </div>
         </div>
         <div class="col-12 col-sm-12 col-md-2 col-lg col-xl col-xxl-1">
           <label for="semester" class="fw-bold mb-2 d-flex flex-wrap"
@@ -84,15 +77,6 @@
               {{ item | translateDropdown : { th: "desc_th", en: "desc_en" } }}
             </ng-template>
           </ng-select>
-          <div
-            *ngIf="
-              form.get('semesterCode')?.touched &&
-              form.get('semesterCode')?.invalid
-            "
-            class="text-danger ps-2"
-          >
-            {{ "alert_enterData" | translate }}
-          </div>
         </div>
         <div
           class="d-none d-md-block d-lg-none d-xl-none d-xxl-none col-md-2"
@@ -162,12 +146,42 @@
       </div>
       <div
         *ngIf="
-          form.get('subjectSearch')?.touched &&
-          form.get('subjectSearch')?.invalid
+          (form.get('subjectSearch')?.touched &&
+            form.get('subjectSearch')?.invalid) ||
+          (form.get('academic_year')?.touched &&
+            form.get('academic_year')?.invalid) ||
+          (form.get('semester')?.touched && form.get('semester')?.invalid)
         "
-        class="text-danger ps-2 d-flex"
+        class="text-danger ps-2 mt-1"
       >
         {{ "alert_enterData" | translate }}
+        <ng-container
+          *ngIf="
+            form.get('subjectSearch')?.touched &&
+            form.get('subjectSearch')?.invalid
+          "
+        >
+          {{ "subject_code" | translate }} / {{ "subject_name" | translate }}
+        </ng-container>
+        <ng-container
+          *ngIf="
+            form.get('academic_year')?.touched &&
+            form.get('academic_year')?.invalid
+          "
+        >
+          {{ form.get("subjectSearch")?.invalid ? ", " : ""
+          }}{{ "academic_year" | translate }}
+        </ng-container>
+        <ng-container
+          *ngIf="form.get('semester')?.touched && form.get('semester')?.invalid"
+        >
+          {{
+            form.get("subjectSearch")?.invalid ||
+            form.get("academic_year")?.invalid
+              ? ", "
+              : ""
+          }}{{ "semester" | translate }}
+        </ng-container>
       </div>
     </form>
   </div>
