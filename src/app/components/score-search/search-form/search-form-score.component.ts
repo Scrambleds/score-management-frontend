@@ -75,7 +75,7 @@ export class SearchFormScoreComponent implements OnInit {
     this.form = this.fb.group({
       subjectSearch: ['', Validators.required],
       studentSearch: [{ value: '', disabled: true }],
-      section: [{ value: '', disabled: true }],
+      section: [ null, Validators.required],
       semester: [null, Validators.required],
       academic_year: [null, Validators.required],
     });
@@ -132,14 +132,11 @@ export class SearchFormScoreComponent implements OnInit {
     ) {
       // เปิดฟิลด์เมื่อ subjectSearch, academic_year, semester มีค่าครบ
       this.form.get('studentSearch')?.enable();
-      this.form.get('section')?.enable();
       this.form.get('sendStatus')?.enable();
     } else {
       // ปิดฟิลด์และรีเซ็ตค่าหากไม่มีค่า
       this.form.get('studentSearch')?.disable();
       this.form.get('studentSearch')?.reset('');
-      this.form.get('section')?.disable();
-      this.form.get('section')?.reset(null);
       this.form.get('sendStatus')?.disable();
       this.form.get('sendStatus')?.reset(null);
     }

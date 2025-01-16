@@ -77,6 +77,31 @@
               {{ item | translateDropdown : { th: "desc_th", en: "desc_en" } }}
             </ng-template>
           </ng-select>
+        </div><div class="col-12 col-sm-12 col-lg-2 col-md-2 col-xl-1 col-xxl-1">
+          <label for="section" class="fw-bold mb-2 d-flex flex-warp">{{
+            "section" | translate
+          }}<p class="text-danger mb-0 ms-1">*</p></label>
+          <ng-select
+            name="section"
+            formControlName="section"
+            bindValue="placeholder_key"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [items]="sectionLovItem"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown : { th: "desc_th", en: "desc_en" } }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('semesterCode')?.touched &&
+              form.get('semesterCode')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
         </div>
         <div
           class="d-none d-md-block d-lg-none d-xl-none d-xxl-none col-md-2"
@@ -102,32 +127,7 @@
             {{ "alert_enterData" | translate }}
           </div>
         </div>
-        <div class="col-12 col-sm-12 col-lg-2 col-md-2 col-xl-1 col-xxl-1">
-          <label for="section" class="fw-bold mb-2">{{
-            "section" | translate
-          }}</label>
-          <ng-select
-            name="section"
-            formControlName="section"
-            bindValue="placeholder_key"
-            [placeholder]="'placeholder_select' | translate"
-            [clearable]="true"
-            [items]="sectionLovItem"
-          >
-            <ng-template ng-option-tmp ng-label-tmp let-item="item">
-              {{ item | translateDropdown : { th: "desc_th", en: "desc_en" } }}
-            </ng-template>
-          </ng-select>
-          <div
-            *ngIf="
-              form.get('semesterCode')?.touched &&
-              form.get('semesterCode')?.invalid
-            "
-            class="text-danger ps-2"
-          >
-            {{ "alert_enterData" | translate }}
-          </div>
-        </div>
+        
         <div
           class="col-12 col-sm-12 col-md-4 col-lg col-xl-2 col-xxl text-center text-xl-start mx-sm-1"
         >
@@ -181,6 +181,17 @@
               ? ", "
               : ""
           }}{{ "semester" | translate }}
+        </ng-container>
+        <ng-container
+          *ngIf="form.get('section')?.touched && form.get('section')?.invalid"
+        >
+          {{
+            form.get("subjectSearch")?.invalid ||
+            form.get("academic_year")?.invalid||
+            form.get("semester")?.invalid
+              ? ", "
+              : ""
+          }}{{ "section" | translate }}
         </ng-container>
       </div>
     </form>
