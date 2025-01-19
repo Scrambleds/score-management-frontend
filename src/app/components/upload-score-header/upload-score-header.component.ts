@@ -53,6 +53,7 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
   sectionList: any[] = [];
   semesterList: any[] = [];
   academicYearList: any[] = [];
+  teacherList: any[] = [];
 
   //for send state to parent
   @Output() formStatusChange = new EventEmitter<boolean>();
@@ -74,6 +75,7 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
       academicYearCode: [{ value: null, disabled: true }, Validators.required],
       semesterCode: [{ value: null, disabled: true }, Validators.required],
       sectionCode: [{ value: null, disabled: true }, Validators.required],
+      teacher: [{ value: null, disabled: true }, Validators.required],
     });
 
     // ตรวจจับการเปลี่ยนแปลงของฟอร์ม
@@ -86,12 +88,9 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
     this.loadSection();
     this.loadSemester();
     this.loadAcademicYear();
-
-    console.log('oninit');
-    console.log(this.form.get('subjectCode')?.value); // ดูค่าว่ามีการอัปเดต
-    console.log(this.form.get('subjectCode')?.invalid); // ตรวจสอบว่า invalid หรือไม่
-    console.log(this.form.get('subjectCode')?.touched); // ตรวจสอบว่า touched หรือไม่
+    this.loadTeacher();
   }
+
   ngAfterViewInit() {
     // ตรวจสอบว่ามี ViewChild หรือไม่
     if (!this.subjectCodeRef) {
@@ -123,10 +122,12 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
         this.form.get('academicYearCode')?.enable();
         this.form.get('semesterCode')?.enable();
         this.form.get('sectionCode')?.enable();
+        this.form.get('teacher')?.enable();
       } else {
         this.form.get('academicYearCode')?.disable();
         this.form.get('semesterCode')?.disable();
         this.form.get('sectionCode')?.disable();
+        this.form.get('teacher')?.disable();
       }
     });
   }
@@ -150,6 +151,13 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
     this.selectBoxService.getSystemParamAcademicYear().subscribe((resp) => {
       console.log(resp);
       this.academicYearList = resp;
+    });
+  }
+
+  loadTeacher(): void {
+    this.selectBoxService.getTeacher().subscribe((resp) => {
+      console.log(resp);
+      this.teacherList = resp;
     });
   }
 

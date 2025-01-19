@@ -81,3 +81,11 @@ html {
 .swal2-title {
   font-size: 1.375rem; /* Adjust font size as needed */
 }
+
+/* label-truncate */
+.label-truncate {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
