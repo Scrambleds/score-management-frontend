@@ -23,6 +23,7 @@ import {
   GridReadyEvent,
   RowSelectedEvent,
 } from 'ag-grid-community';
+import { TranslationService } from '../../../core/services/translation.service';
 
 @Component({
   selector: 'table-score-announcemen',
@@ -34,174 +35,319 @@ import {
 export class TableScoreAnnouncementComponent {
   @Input() gridData: any[] = [];
   @Input() currentSubject: any[] = [];
-
+  gridApi?: GridApi<any>;
   @ViewChild(ModalSendMailComponent) modal?: ModalSendMailComponent;
-
+  columnDefs: any[] = [];
+  gridOptions?: GridOptions;
   isRowSelected = false; // Boolean สำหรับตรวจสอบการเลือกแถว
   pagination = true;
   paginationPageSize = 100;
-  columnDefs = [
-    // {
-    //   headerName: 'ลำดับ',
-    //   valueGetter: (params: any) => params.node.rowIndex + 1,
-    //   flex: 0.7,
-    //   headerName: '',
-    //   checkboxSelection: true,
-    //   headerCheckboxSelection: true,
-    //   headerStyle: { textAlign: 'center' },
-    //   flex: 0.4,
-    //   minWidth: 20,
-    // },
-    {
-      headerName: 'เลขที่',
-      field: 'seat_no',
-      flex: 0.6,
-      minWidth: 70,
-    },
-    {
-      headerName: 'รหัสนิสิต',
-      field: 'student_id',
-      // headerStyle: { textAlign: 'center' },
-      flex: 1,
-      minWidth: 120,
-    },
-    {
-      headerName: 'ชื่อ-นามสกุล',
-      field: 'fullname',
-      // headerStyle: { textAlign: 'center' },
-      flex: 2,
-      valueGetter: (params: any) =>
-        `${params.data.prefix_desc_th} ${params.data.firstname} ${params.data.lastname}`,
-      minWidth: 200,
-    },
-    {
-      headerName: 'สาขา',
-      field: 'major_code',
-      flex: 0.6,
-      minWidth: 70,
-    },
-    {
-      headerName: 'อีเมล',
-      field: 'email',
-      // headerClass: 'text-center',
-      flex: 1.5,
-      // max
-      // headerClass: 'text-center',
-      // flex: 2,
-      minWidth: 180,
-    },
-    {
-      headerName: 'คะแนนระหว่างเรียน',
-      field: 'accumulated_score',
-      // headerClass: 'text-center',
-      flex: 1,
-      minWidth: 120,
-    },
-    {
-      headerName: 'คะแนนกลางภาค',
-      field: 'midterm_score',
-      // headerClass: 'text-center',
-      flex: 1,
-      minWidth: 130,
-    },
-    {
-      headerName: 'คะแนนปลายภาค',
-      field: 'final_score',
-      // headerClass: 'text-center',
-      flex: 1,
-      minWidth: 130,
-    },
-    {
-      headerName: 'รวมคะแนน',
-      field: 'total_score',
-      flex: 0.75,
-      minWidth: 100,
-      // headerClass: 'text-center',
-      valueGetter: (params: any) =>
-        params.data.accumulated_score +
-        params.data.midterm_score +
-        params.data.final_score,
-    },
-    {
-      headerName: 'สถานะ',
-      field: 'send_status_code_desc_th',
-      flex: 0.8,
-      minWidth: 80,
-      cellRenderer: (params: any) => {
-        const sendStatus = params.value || '';
-        const sendDesc = params.data.send_desc || '';
-        return `
-        <div style="position: relative;">
-          <span title="${sendDesc}" style="cursor: pointer;">
-            ${sendStatus}
-          </span>
-        </div>
-      `;
+  constructor(private translationService: TranslationService) {
+    this.generateColumnDefs();
+    this.gridOptions = {
+      columnDefs: this.columnDefs,
+      defaultColDef: this.defaultColDef,
+      rowSelection: {
+        mode: 'multiRow',
+        enableClickSelection: true, // คลิกที่แถวเพื่อเลือก
+        enableSelectionWithoutKeys: true, // เลือกหลายแถวโดยไม่ต้องกด Ctrl หรือ Shift
       },
-    },
-    {
-      headerName: 'ส่งคะแนน',
-      flex: 0.8,
-      filter: false,
-      minWidth: 100,
-      // headerClass: 'text-center',
-      cellRenderer: (params: any) => {
-        // ใช้ Template Element เพื่อสร้าง DOM จาก HTML String
-        const template = `
+      selectionColumnDef: {
+        sortable: true,
+        pinned: 'left',
+      },
+      onRowSelected: this.onRowSelected.bind(this), // ผูกฟังก์ชันกับอีเวนต์ selectRow
+      // suppressRowClickSelection: false, // เปิดให้คลิกแถวเพื่อเลือก
+    };
+  }
+  refreshColumnDefs() {
+    if (this.gridApi) {
+      this.gridApi.getColumnDefs();
+    }
+  }
+  // columnDefs = [
+  //   {
+  //     headerName: 'เลขที่',
+  //     field: 'seat_no',
+  //     flex: 0.6,
+  //     minWidth: 70,
+  //   },
+  //   {
+  //     headerName: 'รหัสนิสิต',
+  //     field: 'student_id',
+  //     flex: 1,
+  //     minWidth: 120,
+  //   },
+  //   {
+  //     headerName: 'ชื่อ-นามสกุล',
+  //     field: 'fullname',
+  //     flex: 2,
+  //     valueGetter: (params: any) =>
+  //       `${params.data.prefix_desc_th} ${params.data.firstname} ${params.data.lastname}`,
+  //     minWidth: 200,
+  //   },
+  //   {
+  //     headerName: 'สาขา',
+  //     field: 'major_code',
+  //     flex: 0.6,
+  //     minWidth: 70,
+  //   },
+  //   {
+  //     headerName: 'อีเมล',
+  //     field: 'email',
+  //     flex: 1.5,
+
+  //     minWidth: 180,
+  //   },
+  //   {
+  //     headerName: 'คะแนนระหว่างเรียน',
+  //     field: 'accumulated_score',
+  //     flex: 1,
+  //     minWidth: 120,
+  //   },
+  //   {
+  //     headerName: 'คะแนนกลางภาค',
+  //     field: 'midterm_score',
+  //     flex: 1,
+  //     minWidth: 130,
+  //   },
+  //   {
+  //     headerName: 'คะแนนปลายภาค',
+  //     field: 'final_score',
+  //     flex: 1,
+  //     minWidth: 130,
+  //   },
+  //   {
+  //     headerName: 'รวมคะแนน',
+  //     field: 'total_score',
+  //     flex: 0.75,
+  //     minWidth: 100,
+  //     valueGetter: (params: any) =>
+  //       params.data.accumulated_score +
+  //       params.data.midterm_score +
+  //       params.data.final_score,
+  //   },
+  //   {
+  //     headerName: 'สถานะ',
+  //     field: 'send_status_code_desc_th',
+  //     flex: 0.8,
+  //     minWidth: 80,
+  //     cellRenderer: (params: any) => {
+  //       const sendStatus = params.value || '';
+  //       const sendDesc = params.data.send_desc || '';
+  //       return `
+  //       <div style="position: relative;">
+  //         <span title="${sendDesc}" style="cursor: pointer;">
+  //           ${sendStatus}
+  //         </span>
+  //       </div>
+  //     `;
+  //     },
+  //   },
+  //   {
+  //     headerName: 'ส่งคะแนน',
+  //     flex: 0.8,
+  //     filter: false,
+  //     minWidth: 100,
+  //     // headerClass: 'text-center',
+  //     cellRenderer: (params: any) => {
+  //       // ใช้ Template Element เพื่อสร้าง DOM จาก HTML String
+  //       const template = `
+  //         <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+  //           <i class="bi bi-send" style="color: blue; font-size: 14px; cursor: pointer;" title="ส่งคะแนน"></i>
+  //         </div>
+  //       `;
+
+  //       const wrapper = document.createElement('div'); // ใช้ wrapper ชั่วคราว
+  //       wrapper.innerHTML = template.trim(); // trim() เพื่อกำจัดช่องว่างที่ไม่จำเป็น
+
+  //       const div = wrapper.firstChild as HTMLElement;
+  //       console.log('click on open modal from person');
+  //       div.addEventListener('click', (event) => {
+  //         event.stopPropagation(); // หยุดการแพร่กระจายของ event ไปยัง row
+  //         console.log(params.data);
+  //         params.openModal([params.data]);
+  //       });
+
+  //       return div;
+  //     },
+  //     // context: this,
+  //     cellRendererParams: {
+  //       openModal: this.open.bind(this), // ส่งฟังก์ชันจาก parent
+  //     },
+  //   },
+  // ];
+  ngOnInit(): void {
+    this.translationService.getTranslations().subscribe(() => {
+      this.generateColumnDefs(); // รีเฟรชชื่อคอลัมน์เมื่อเปลี่ยนภาษา
+    });
+  }
+  async generateColumnDefs() {
+    this.columnDefs = [
+      {
+        headerName:
+          this.translationService.getTranslation(
+            'uploadscore_tableFieldSeatNo'
+          ) || 'เลขที่',
+        field: 'seat_no',
+        flex: 0.6,
+        minWidth: 70,
+      },
+      {
+        headerName:
+          this.translationService.getTranslation('student_id') || 'รหัสนิสิต',
+        field: 'student_id',
+        flex: 1,
+        minWidth: 120,
+      },
+      {
+        headerName:
+          this.translationService.getTranslation(
+            'uploadscore_tableFieldFirstName'
+          ) +
+            ' - ' +
+            this.translationService.getTranslation(
+              'uploadscore_tableFieldLastName'
+            ) || 'ชื่อ-นามสกุล',
+        field: 'fullname',
+        flex: 2,
+        valueGetter: (params: any) =>
+          `${params.data.prefix_desc_th} ${params.data.firstname} ${params.data.lastname}`,
+        minWidth: 200,
+      },
+      {
+        headerName:
+          this.translationService.getTranslation(
+            'uploadscore_tableFieldMajor'
+          ) || 'สาขา',
+        field: 'major_code',
+        flex: 0.6,
+        minWidth: 70,
+      },
+      {
+        headerName:
+          this.translationService.getTranslation(
+            'uploadscore_tableFieldEmail'
+          ) || 'อีเมล',
+        field: 'email',
+        flex: 1.5,
+
+        minWidth: 180,
+      },
+      {
+        headerName:
+          this.translationService.getTranslation(
+            'uploadscore_tableFieldAccScore'
+          ) || 'คะแนนระหว่างเรียน',
+        field: 'accumulated_score',
+        flex: 1,
+        minWidth: 120,
+      },
+      {
+        headerName:
+          this.translationService.getTranslation('midterm_score') ||
+          'คะแนนกลางภาค',
+        field: 'midterm_score',
+        flex: 1,
+        minWidth: 130,
+      },
+      {
+        headerName:
+          this.translationService.getTranslation(
+            'uploadscore_tableFieldFinScore'
+          ) || 'คะแนนปลายภาค',
+        field: 'final_score',
+        flex: 1,
+        minWidth: 130,
+      },
+      {
+        headerName:
+          this.translationService.getTranslation('total_score') || 'รวมคะแนน',
+        field: 'total_score',
+        flex: 0.75,
+        minWidth: 100,
+        valueGetter: (params: any) =>
+          params.data.accumulated_score +
+          params.data.midterm_score +
+          params.data.final_score,
+      },
+      {
+        headerName: this.translationService.getTranslation('status') || 'สถานะ',
+        field: 'send_status_code_desc_th',
+        flex: 0.8,
+        minWidth: 80,
+        cellRenderer: (params: any) => {
+          const sendStatus = params.value || '';
+          const sendDesc = params.data.send_desc || '';
+          let backgroundColor = '';
+          switch (sendStatus.toLowerCase()) {
+            case 'สำเร็จ':
+              backgroundColor = '#4caf50'; // สีเขียว
+              break;
+            case 'ยังไม่ดำเนินการ':
+              backgroundColor = '#ff9800'; // สีส้ม
+              break;
+            case 'ไม่สำเร็จ':
+              backgroundColor = '#f44336'; // สีแดง
+              break;
+            default:
+              backgroundColor = '#e0e0e0'; // สีเทา
+          }
+      
+          return `
+            <div style="position: relative; background-color: ${backgroundColor}; padding: 5px; border-radius: 4px;">
+              <span title="${sendDesc}" style="cursor: pointer; color: #ffffff;">
+                ${sendStatus}
+              </span>
+            </div>
+          `;
+        },
+      },
+      
+      {
+        headerName:
+          this.translationService.getTranslation('send_score_table_title') ||
+          'ส่งคะแนน',
+        flex: 0.8,
+        filter: false,
+        minWidth: 100,
+        // headerClass: 'text-center',
+        cellRenderer: (params: any) => {
+          // ใช้ Template Element เพื่อสร้าง DOM จาก HTML String
+          const template = `
           <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
-            <i class="bi bi-send" style="color: blue; font-size: 14px; cursor: pointer;" title="ส่งคะแนน"></i>
+            <i class="bi bi-send" style="color: blue; font-size: 20px; cursor: pointer;" title="ส่งคะแนน"></i>
           </div>
         `;
 
-        const wrapper = document.createElement('div'); // ใช้ wrapper ชั่วคราว
-        wrapper.innerHTML = template.trim(); // trim() เพื่อกำจัดช่องว่างที่ไม่จำเป็น
+          const wrapper = document.createElement('div'); // ใช้ wrapper ชั่วคราว
+          wrapper.innerHTML = template.trim(); // trim() เพื่อกำจัดช่องว่างที่ไม่จำเป็น
 
-        const div = wrapper.firstChild as HTMLElement;
-        console.log('click on open modal from person');
-        div.addEventListener('click', (event) => {
-          event.stopPropagation(); // หยุดการแพร่กระจายของ event ไปยัง row
-          console.log(params.data);
-          params.openModal([params.data]);
-        });
+          const div = wrapper.firstChild as HTMLElement;
+          console.log('click on open modal from person');
+          div.addEventListener('click', (event) => {
+            event.stopPropagation(); // หยุดการแพร่กระจายของ event ไปยัง row
+            console.log(params.data);
+            params.openModal([params.data]);
+          });
 
-        return div;
+          return div;
+        },
+        // context: this,
+        cellRendererParams: {
+          openModal: this.open.bind(this), // ส่งฟังก์ชันจาก parent
+        },
       },
-      // context: this,
-      cellRendererParams: {
-        openModal: this.open.bind(this), // ส่งฟังก์ชันจาก parent
-      },
-    },
-  ];
-
+    ];
+    if (this.gridApi) {
+      this.gridApi.setGridOption('rowData', this.gridData);
+    }
+  }
   defaultColDef = {
     resizable: true,
     sortable: true,
     filter: false,
   };
-
-  gridOptions: GridOptions = {
-    columnDefs: this.columnDefs,
-    defaultColDef: this.defaultColDef,
-    rowSelection: {
-      mode: 'multiRow',
-      enableClickSelection: true, // คลิกที่แถวเพื่อเลือก
-      enableSelectionWithoutKeys: true, // เลือกหลายแถวโดยไม่ต้องกด Ctrl หรือ Shift
-    },
-    selectionColumnDef: {
-      sortable: true,
-      // resizable: true,
-      // width: 300,
-      // suppressHeaderMenuButton: true,
-      pinned: 'left',
-    },
-    onRowSelected: this.onRowSelected.bind(this), // ผูกฟังก์ชันกับอีเวนต์ selectRow
-    // suppressRowClickSelection: false, // เปิดให้คลิกแถวเพื่อเลือก
-  };
-
-  constructor(private scoreService: ScoreAnnouncementService) {}
-  // @Input() gridData: any[] = [];
-  // gridApi: any;
-  gridApi!: GridApi<any>;
 
   // ใน ngOnInit หรือเมื่อ gridData ถูกอัปเดต
   ngOnChanges(): void {
@@ -210,13 +356,6 @@ export class TableScoreAnnouncementComponent {
       this.gridApi.setGridOption('rowData', this.gridData);
     }
   }
-
-  // max
-  // onGridReady(params: any): void {
-  //   this.gridApi = params.api; // เก็บ API ไว้ใช้งาน
-  //   const allColumnIds = params.columnApi.getAllColumns().map((col: any) => col.getId());
-  //   params.columnApi.autoSizeColumns(allColumnIds); // ปรับขนาดคอลัมน์ให้เหมาะสมกับเนื้อหา
-  // }
 
   onGridReady(params: GridReadyEvent<any>) {
     this.gridApi = params.api;
@@ -270,7 +409,7 @@ export class TableScoreAnnouncementComponent {
 
   // อัปเดตค่า isRowSelected
   updateIsRowSelected() {
-    const selectedRowsCount = this.gridApi.getSelectedRows().length;
+    const selectedRowsCount = this.gridApi!.getSelectedRows().length;
     this.isRowSelected = selectedRowsCount > 0;
     console.log('isSelectRow => ', this.isRowSelected);
   }
