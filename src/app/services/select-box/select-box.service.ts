@@ -62,4 +62,11 @@ export class SelectBoxService {
       tap((_) => console.log(`get masterdata : major_code done!!`))
     );
   }
+  getTeacher(): Observable<any> {
+    const url = `${environment.apiUrl}/api/MasterData/Teacher`;
+    return this.http.get<Record<string, string>>(url).pipe(
+      map((response: any) => response.objectResponse),
+      tap((_) => console.log(`get masterdata : Teacher done!!`))
+    );
+  }
 }

@@ -74,4 +74,16 @@ export class TranslationService {
     // เมื่อมีการเปลี่ยนภาษา จะโหลดคำแปลใหม่และเก็บไว้ใน localStorage
     this.loadTranslations(lang);
   }
+
+  //for pipe translate
+  transform(value: string, variables?: Record<string, string>): string {
+    let translation = this.getTranslation(value) || value;
+
+    if (variables) {
+      Object.keys(variables).forEach((key) => {
+        translation = translation.replace(`{${key}}`, variables[key]);
+      });
+    }
+    return translation;
+  }
 }

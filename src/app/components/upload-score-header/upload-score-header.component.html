@@ -6,10 +6,13 @@
     <form [formGroup]="form" class="w-100">
       <div class="row">
         <!-- Subject Code -->
-        <div class="col-6 col-sm-5 col-md-2">
-          <label for="subjectNo" class="fw-bold mb-2">{{
-            "subject_code" | translate
-          }}</label>
+        <div class="col-6 col-sm-5 col-md-4 col-xxl-2">
+          <label
+            for="subjectNo"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('subjectCode')"
+            >{{ "subject_code" | translate }}
+          </label>
           <div class="input-group-autocomplete mb-2">
             <app-autocomplete
               #subjectCode
@@ -43,10 +46,13 @@
         </div>
 
         <!-- Subject Name -->
-        <div class="col-6 col-sm-7 col-md-4">
-          <label for="subjectName" class="fw-bold mb-2">{{
-            "subject_name" | translate
-          }}</label>
+        <div class="col-6 col-sm-7 col-md-8 col-xxl-3">
+          <label
+            for="subjectName"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('subjectName')"
+            >{{ "subject_name" | translate }}
+          </label>
           <app-autocomplete
             id="subjectName"
             [name]="'subjectName'"
@@ -72,10 +78,13 @@
         </div>
 
         <!-- Academic Year -->
-        <div class="col-6 col-sm-4 col-md-2">
-          <label for="academic_year" class="fw-bold mb-2">{{
-            "academic_year" | translate
-          }}</label>
+        <div class="col-6 col-sm-6 col-md-3 col-xxl-2">
+          <label
+            for="academic_year"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('academicYearCode')"
+            >{{ "academic_year" | translate }}
+          </label>
           <ng-select
             name="academicYearCode"
             formControlName="academicYearCode"
@@ -101,10 +110,13 @@
         </div>
 
         <!-- Semester -->
-        <div class="col-6 col-sm-4 col-md-2">
-          <label for="semester" class="fw-bold mb-2">{{
-            "semester" | translate
-          }}</label>
+        <div class="col-6 col-sm-6 col-md-3 col-xxl-2">
+          <label
+            for="semester"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('semesterCode')"
+            >{{ "semester" | translate }}
+          </label>
           <ng-select
             name="semesterCode"
             formControlName="semesterCode"
@@ -130,10 +142,13 @@
         </div>
 
         <!-- Section -->
-        <div class="col-6 col-sm-4 col-md-2">
-          <label for="sectionCode" class="fw-bold mb-2">{{
-            "section" | translate
-          }}</label>
+        <div class="col-6 col-sm-6 col-md-3 col-xxl-1">
+          <label
+            for="sectionCode"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('sectionCode')"
+            >{{ "section" | translate }}
+          </label>
           <ng-select
             name="sectionCode"
             formControlName="sectionCode"
@@ -152,6 +167,36 @@
               form.get('sectionCode')?.touched &&
               form.get('sectionCode')?.invalid
             "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+
+        <!-- Teacher -->
+        <div class="col-6 col-sm-6 col-md-3 col-xxl-2">
+          <label
+            for="sectionCode"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('teacher')"
+            >{{ "uploadScore_searchTeacher" | translate }}
+          </label>
+          <ng-select
+            name="teacher"
+            formControlName="teacher"
+            [items]="teacherList"
+            bindValue="teacherCode"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [multiple]="true"
+            (change)="onSelectChange($event, 'teacher')"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item.teacherName }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="form.get('teacher')?.touched && form.get('teacher')?.invalid"
             class="text-danger ps-2"
           >
             {{ "alert_enterData" | translate }}

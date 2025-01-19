@@ -516,7 +516,7 @@ export class UploadExcelContainerComponent implements OnInit {
         academic_year: formData.academicYearCode,
         semester: formData.semesterCode,
         section: formData.sectionCode,
-        teacher: ['6430250440', 'S2042'],
+        teacher: formData.teacher,
       },
     };
     console.log(this.rowData);
@@ -543,9 +543,13 @@ export class UploadExcelContainerComponent implements OnInit {
             }
           });
         } else {
+          const failText = this.translationService.transform(
+            response.message.messageKey,
+            response.parameter
+          );
           Swal.fire({
             title: failTitle,
-            text: response.message.messageDescription,
+            text: failText || response.message.messageDescription,
             icon: 'error',
             confirmButtonColor: 'var(--secondary-color)',
             confirmButtonText: closeBtnText,
