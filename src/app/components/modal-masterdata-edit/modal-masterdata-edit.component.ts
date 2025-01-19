@@ -117,7 +117,7 @@ export class ModalMasterdataEditComponent implements AfterViewInit, OnChanges {
 
     const Success_title = this.translate.getTranslation('sweet_alert_success');
     const Success_text = this.translate.getTranslation('sweet_alert_edit');
-    const Submit_Button = this.translate.getTranslation('add_user_ok');
+    const Submit_Button = this.translate.getTranslation('btn_ok');
     const Fail_title = this.translate.getTranslation('sweet_alert_fail_title');
     const Fail_text = this.translate.getTranslation('sweet_alert_fail_text');
     const description_duplicated = this.translate.getTranslation('description_duplicated');

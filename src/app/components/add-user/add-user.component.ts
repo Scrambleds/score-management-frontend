@@ -57,6 +57,7 @@ export class AddUserComponent implements OnInit {
   searchCriteria: any;
   rowData: any[] = [];
   columnDefs: any[] = [];
+  // columnDef: any[] = [];
   originalData: any[] = [];
   filteredData: any[] = [];
   isFileUploaded = false;
@@ -113,6 +114,12 @@ export class AddUserComponent implements OnInit {
     }
   }
   
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.processFile(file);
+    }
+  }
 
   onLoading = (): void =>{
     this.onSomeAction()
@@ -178,6 +185,10 @@ export class AddUserComponent implements OnInit {
         this.filteredData = this.filterData(this.originalData, criteria);
         this.rowData = [...this.filteredData]; // อัปเดตข้อมูลใน ag-Grid
       }
+    });
+
+    this.translate.getTranslations().subscribe(() => {
+      this.refreshHeaderNames(); // รีเฟรชชื่อคอลัมน์เมื่อเปลี่ยนภาษา
     });
   }
 
@@ -263,202 +274,475 @@ export class AddUserComponent implements OnInit {
   
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(sheet);
+        // ใช้ header: 1 เพื่อให้แถวแรกเป็น header
+              const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+              console.log(jsonData); // ตรวจสอบข้อมูลที่ได้
   
-        if (this.validateFields(jsonData)) {
-          ////debugger;
-          const modifiedData = this.processData(jsonData);
+              const mappedData = this.mapJsonData(jsonData); 
+        // if (this.validateFields(jsonData)) {
+          console.log("MAPDATA: ",mappedData);
+          const modifiedData = this.processData(mappedData);
+          console.log("modifiedData: ",modifiedData);
+          this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
+          // this.rowData = []; 
+          // this.originalData = []; 
   
-          // เคลียร์ข้อมูลเก่าก่อนโหลดข้อมูลใหม่
-          this.rowData = [];  // เคลียร์ rowData
-          this.originalData = [];  // เคลียร์ originalData
-  
-          this.LoadGridData(modifiedData); // โหลดข้อมูลใหม่
+          // this.generateColumnDefs(modifiedData);
           this.isFileUploaded = true;
           this.isUploaded.emit(true);
-        } 
-        // else {
-        //   alert('ไฟล์ไม่ถูกต้อง กรุณาอัปโหลดไฟล์ที่มีฟิลด์ครบถ้วน');
-        // }
+        // } 
       };
       reader.readAsArrayBuffer(file);
     }
   }
   
+   processFile(file: File) {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+  
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        // ใช้ header: 1 เพื่อให้แถวแรกเป็น header
+              const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+              console.log(jsonData); // ตรวจสอบข้อมูลที่ได้
+  
+              const mappedData = this.mapJsonData(jsonData); 
+        // if (this.validateFields(jsonData)) {
+          console.log("MAPDATA: ",mappedData);
+          const modifiedData = this.processData(mappedData);
+          console.log("modifiedData: ",modifiedData);
+          this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
+          // this.rowData = []; 
+          // this.originalData = []; 
+  
+          // this.generateColumnDefs(modifiedData);
+          this.isFileUploaded = true;
+          this.isUploaded.emit(true);
+        // } 
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  }
+  mapJsonData(data: any[]): any[] {
+    const headers = data[0]; // ใช้แถวแรกเป็น header
+    const rows = data.slice(1); // ใช้แถวที่เหลือเป็นข้อมูลจริง
+
+    return rows.map((row, index) => {
+      // สร้างอ็อบเจ็กต์โดยจับคู่ชื่อฟิลด์จาก headers กับข้อมูลในแถว
+      const rowData: any = {};
+
+      headers.forEach((header: string, index: number) => {
+        rowData[header] = row[index]; // ค่าของแต่ละคอลัมน์
+      });
+
+      // คืนค่าข้อมูลในรูปแบบที่ต้องการ
+      return {
+        row_id: index,
+        email: rowData['อีเมล'] || rowData['email'] || null,
+        teacher_code: rowData['รหัสอาจารย์'] || rowData['teacher_code'] || null,
+        prefix: rowData['คำนำหน้า'] || rowData['prefix'] || null,
+        firstname: rowData['ชื่อ'] || rowData['firstname'] || null,
+        lastname: rowData['นามสกุล'] || rowData['lastname'] || null,
+        role: rowData['หน้าที่'] || rowData['role'] || null,
+      };
+    });
+  }
   processData(data: any[]): any[] {
-    return data.map((row, index) => ({
-      row_id: index,
-      email: row['อีเมล'] || row['email'] || null,
-      teacher_code: row['รหัสอาจารย์'] || row['teacher_code'] || null,
-      prefix: row['คำนำหน้า'] || row['prefix'] || null,
-      firstname: row['ชื่อ'] || row['firstname'] || null,
-      lastname: row['นามสกุล'] || row['lastname'] || null,
-      role: row['หน้าที่'] || row['role'] || null,
-    }));
+    return data.map((row, index) => {
+      // const [firstName, lastName] = (row['ชื่อ-นามสกุล'] || '').split(' '); // แยกชื่อและนามสกุล
+      // const totalScore =
+      //   (row['คะแนนระหว่างเรียน'] || 0) +
+      //   (row['คะแนนกลางภาค'] || 0) +
+      //   (row['คะแนนปลายภาค'] || 0); // คำนวณคะแนนรวม
+
+      // // จัดเรียงข้อมูลตามลำดับที่กำหนด
+      return {
+        row_id: index + 1 ,
+        email: row['อีเมล'] || row['email'] || null,
+        teacher_code: row['รหัสอาจารย์'] || row['teacher_code'] || null,
+        prefix: row['คำนำหน้า'] || row['prefix'] || null,
+        firstname: row['ชื่อ'] || row['firstname'] || null,
+        lastname: row['นามสกุล'] || row['lastname'] || null,
+        role: row['หน้าที่'] || row['role'] || null,
+        manage: null
+      };
+    });
+  }
+  // processData(data: any[]): any[] {
+  //   return data.map((row, index) => ({
+      // row_id: index,
+      // email: row['อีเมล'] || row['email'] || null,
+      // teacher_code: row['รหัสอาจารย์'] || row['teacher_code'] || null,
+      // prefix: row['คำนำหน้า'] || row['prefix'] || null,
+      // firstname: row['ชื่อ'] || row['firstname'] || null,
+      // lastname: row['นามสกุล'] || row['lastname'] || null,
+      // role: row['หน้าที่'] || row['role'] || null,
+  //   }));
+  // }
+
+  loadGridData(data: any[]) {
+    if (data.length > 0) {
+      console.log(data);
+      this.rowData = data;
+      this.originalData = data;
+      this.columnDefs = this.generateColumnDefs(data);
+      // this.columnDefs.push({
+      //   headerName: '',
+      //   field: 'action',
+      //   width: 100,
+      //   cellRenderer: (params: any) => {
+      //     const rowId = params.data.row_id; // Use row_id to identify the row
+          
+      //     // Create container for delete button
+      //     const container = document.createElement('div');
+      //     container.innerHTML = `
+      //       <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+      //         <button style="background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;">
+      //           <i class="bi bi-trash3" style="color: #d33; font-size: 1.2rem;"></i>
+      //         </button>
+      //       </div>
+      //     `;
+          
+      //     // Add event listener for delete
+      //     container.querySelector('button')?.addEventListener('click', () => {
+      //       this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
+      //     });
+
+      //     return container;
+      //   },
+      //   suppressHeaderMenuButton: true,
+      // });
+      console.log("LOAD DATA: ",this.rowData);
+    }
   }
 
-  LoadGridData(data: any[]) {
-    if (data.length > 0) {
-      ////debugger;
-      console.log('Original data: ', data);
-
-      // this.columnDefs = Object.keys(data[0]).map((key) => {
-      //   let customWidth = 100;
-      //   let flexValue = 1;
-      //   let cellClass = '';
-      //   let headerName = '';
-      //   let cellEditor = null;
-
-      this.columnDefs = [
-        {
-          headerName: 'ลำดับที่ซ่อน (ใช้ลบ)',
-          field: 'hiddenIndex',
-          hide: true, // ซ่อนคอลัมน์จาก UI
-        },
-        {
-          headerName: 'ลำดับ',
-          valueGetter: (params: any) => params.node.rowIndex + 1, // ใช้ index ของ row
-          minWidth: 70,
-          flex: 0.3,
-        },
-        ...Object.keys(data[0]).map((key) => {
-          let customWidth = 100;
-          let flexValue = 1;
-          let cellClass = '';
-          let headerName = '';
-          let cellEditor = null;
-
-        switch (key) {
-          case 'row_id':
-            headerName = 'ลำดับ';
-            customWidth = 70;
-            flexValue = 0.3;
-            return {
-              field: key,
-              headerName: headerName,
-              hide: true, // ซ่อนคอลัมน์นี้จาก UI
-            };
-          case 'email':
-            headerName = 'อีเมล';
-            customWidth = 70;
-            flexValue = 1.7;
-            break;
-          case 'teacher_code':
-            headerName = 'รหัสอาจารย์';
-            customWidth = 70;
-            flexValue = 0.8;
-            break;
-          case 'prefix':
-            headerName = 'คำนำหน้า';
-            customWidth = 70;
-            flexValue = 0.6;
-            cellEditor = 'agSelectCellEditor';
-            break;
-          case 'firstname':
-            headerName = 'ชื่อ';
-            customWidth = 70;
-            flexValue = 1.2;
-            break;
-          case 'lastname':
-            headerName = 'นามสกุล';
-            customWidth = 70;
-            flexValue = 1.2;
-            break;
-          case 'role':
-            headerName = 'หน้าที่';
-            customWidth = 70;
-            flexValue = 0.8;
-            cellClass = 'text-end';
-            cellEditor = 'agSelectCellEditor';
-            break;
-          // case 'active_status':
-          //   headerName = 'สถานะการใช้งาน';
-          //   customWidth = 70;
-          //   flexValue = 0.8;
-          //   cellClass = 'text-end';
-          //   break;
-          default:
-            headerName = key;
-            customWidth = 160;
-        }
-
-        return {
-          field: key,
-          headerName: headerName,
-          // editable: true,
-          flex: flexValue,
-          minWidth: customWidth,
-          cellRenderer: (params: any) => {
-            const value = params.value?.toString().trim();
-            if (value === '' || value === null || value === undefined) {
-              return '<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>';
-            } else if (value === '-') {
-              return '<span style="color: red; font-weight: bold;">-</span>';
-            }
-            return params.value;
-          },
-          // Apply select-box for prefix and role only
-          cellEditorParams: key === 'prefix' ? {
-            values: this.prefixData.map(item => item.byte_desc_th),
-          } : key === 'role' ? {
-            values: this.roleData.map(item => item.byte_desc_th),
-          } : null,
-          cellEditor: cellEditor, // Apply select-box editor
-        };
-      }),
-    ];
-
-      this.columnDefs.push({
-        headerName: '',
-        field: 'action',
-        width: 100,
-        cellRenderer: (params: any) => {
-          const rowId = params.data.row_id; // Use row_id to identify the row
+  // ฟังก์ชันสำหรับรีเฟรชชื่อคอลัมน์เมื่อเปลี่ยนภาษา
+  refreshHeaderNames() {
+    if (this.originalData && this.originalData.length > 0) {
+      this.columnDefs = this.generateColumnDefs(this.originalData);
+      // this.columnDefs.push({
+      //   headerName: '',
+      //   field: 'action',
+      //   width: 100,
+      //   cellRenderer: (params: any) => {
+      //     const rowId = params.data.row_id; // Use row_id to identify the row
           
-          // Create container for delete button
-          const container = document.createElement('div');
-          container.innerHTML = `
-            <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-              <button style="background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;">
-                <i class="bi bi-trash3" style="color: #d33; font-size: 1.2rem;"></i>
-              </button>
-            </div>
-          `;
+      //     // Create container for delete button
+      //     const container = document.createElement('div');
+      //     container.innerHTML = `
+      //       <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+      //         <button style="background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;">
+      //           <i class="bi bi-trash3" style="color: #d33; font-size: 1.2rem;"></i>
+      //         </button>
+      //       </div>
+      //     `;
           
-          // Add event listener for delete
-          container.querySelector('button')?.addEventListener('click', () => {
-            this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
-          });
+      //     // Add event listener for delete
+      //     container.querySelector('button')?.addEventListener('click', () => {
+      //       this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
+      //     });
 
-          return container;
-        },
-        suppressHeaderMenuButton: true,
-      });
-      
-      // Processed Data
-      const processedData = data.map((row) => {
-        const updatedRow: any = {};
-        Object.keys(row).forEach((key) => {
-          updatedRow[key] =
-            row[key]?.toString().trim() === '' ? null : row[key];
-        });
-        return updatedRow;
-      });
-
-      this.rowData = [...data];
-      this.originalData = [...data];
-      
-      console.log("Data load: ", this.rowData);
-    } else {
-      console.log('No data to load');
+      //     return container;
+      //   },
+      //   suppressHeaderMenuButton: true,
+      // });
     }
+  }
+
+  // generateColumnDefs(data: any[]) {
+  //   if (data.length > 0) {
+  //     console.log('Original data: ', data);
+
+  //     this.columnDefs = [
+  //       {
+  //         headerName: 'ลำดับที่ซ่อน (ใช้ลบ)',
+  //         field: 'hiddenIndex',
+  //         hide: true, // ซ่อนคอลัมน์จาก UI
+  //       },
+        // {
+        //   headerName: 'uploadscore_tableFieldSeatNo',
+        //   valueGetter: (params: any) => params.node.rowIndex + 1, // ใช้ index ของ row
+        //   minWidth: 70,
+        //   flex: 0.3,
+        // },
+  //       ...Object.keys(data[0]).map((key) => {
+  //         let customWidth = 100;
+  //         let flexValue = 1;
+  //         let cellClass = '';
+  //         let headerName = '';
+  //         let cellEditor = null;
+  //         let fieldNameKey = '';
+
+  //       switch (key) {
+  //         case 'row_id':
+  //           headerName = 'uploadscore_tableFieldSeatNo';
+  //           customWidth = 70;
+  //           flexValue = 0.3;
+  //           return {
+  //             field: key,
+  //             fieldNameKey: 'uploadscore_tableFieldSeatNo',
+  //             hide: true, // ซ่อนคอลัมน์นี้จาก UI
+  //           };
+  //         case 'email':
+  //           fieldNameKey = 'user_manage_email';
+  //           customWidth = 70;
+  //           flexValue = 1.7;
+  //           break;
+  //         case 'teacher_code':
+  //           fieldNameKey = 'user_manage_teachercode';
+  //           customWidth = 70;
+  //           flexValue = 0.8;
+  //           break;
+  //         case 'prefix':
+  //           fieldNameKey = 'user_manage_prefix';
+  //           customWidth = 70;
+  //           flexValue = 0.6;
+  //           cellEditor = 'agSelectCellEditor';
+  //           break;
+  //         case 'firstname':
+  //           fieldNameKey = 'user_manage_name';
+  //           customWidth = 70;
+  //           flexValue = 1.2;
+  //           break;
+  //         case 'lastname':
+  //           fieldNameKey = 'user_manage_surname';
+  //           customWidth = 70;
+  //           flexValue = 1.2;
+  //           break;
+  //         case 'role':
+  //           fieldNameKey = 'user_manage_role';
+  //           customWidth = 70;
+  //           flexValue = 0.8;
+  //           cellClass = 'text-end';
+  //           cellEditor = 'agSelectCellEditor';
+  //           break;
+  //         // case 'active_status':
+  //         //   headerName = 'สถานะการใช้งาน';
+  //         //   customWidth = 70;
+  //         //   flexValue = 0.8;
+  //         //   cellClass = 'text-end';
+  //         //   break;
+  //         default:
+  //           customWidth = 160;
+  //           fieldNameKey = key;
+  //       }
+
+  //       const translatedHeader =
+  //       this.translate.getTranslation(fieldNameKey);
+
+  //       return {
+  //         field: key,
+  //         headerName: translatedHeader || key,
+  //         // editable: true,
+  //         flex: flexValue,
+  //         minWidth: customWidth,
+  //         cellRenderer: (params: any) => {
+  //           const value = params.value?.toString().trim();
+  //           if (value === '' || value === null || value === undefined) {
+  //             return '<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>';
+  //           } else if (value === '-') {
+  //             return '<span style="color: red; font-weight: bold;">-</span>';
+  //           }
+  //           return params.value;
+  //         },
+  //         // Apply select-box for prefix and role only
+  //         cellEditorParams: key === 'prefix' ? {
+  //           values: this.prefixData.map(item => item.byte_desc_th),
+  //         } : key === 'role' ? {
+  //           values: this.roleData.map(item => item.byte_desc_th),
+  //         } : null,
+  //         cellEditor: cellEditor, // Apply select-box editor
+  //       };
+  //     }),
+  //   ];
+
+  //     this.columnDefs.push({
+  //       headerName: '',
+  //       field: 'action',
+  //       width: 100,
+  //       cellRenderer: (params: any) => {
+  //         const rowId = params.data.row_id; // Use row_id to identify the row
+          
+  //         // Create container for delete button
+  //         const container = document.createElement('div');
+  //         container.innerHTML = `
+  //           <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+  //             <button style="background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;">
+  //               <i class="bi bi-trash3" style="color: #d33; font-size: 1.2rem;"></i>
+  //             </button>
+  //           </div>
+  //         `;
+          
+  //         // Add event listener for delete
+  //         container.querySelector('button')?.addEventListener('click', () => {
+  //           this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
+  //         });
+
+  //         return container;
+  //       },
+  //       suppressHeaderMenuButton: true,
+  //     });
+      
+  //     // Processed Data
+  //     // const processedData = data.map((row) => {
+  //     //   const updatedRow: any = {};
+  //     //   Object.keys(row).forEach((key) => {
+  //     //     updatedRow[key] =
+  //     //       row[key]?.toString().trim() === '' ? null : row[key];
+  //     //   });
+  //     //   return updatedRow;
+  //     // });
+
+  //     this.rowData = [...data];
+  //     this.originalData = [...data];
+      
+  //     console.log("Data load: ", this.rowData);
+  //   } else {
+  //     console.log('No data to load');
+  //   }
+  // }
+
+  generateColumnDefs(data: any[]) {
+    console.log("GENERATE COLUMN",data)
+    if (data.length === 0) {
+      return [];
+    }
+
+    return [
+    // {
+    //   headerName: 'uploadscore_tableFieldSeatNo',
+    //   valueGetter: (params: any) => params.node.rowIndex + 1, // ใช้ index ของ row
+    //   minWidth: 70,
+    //   flex: 0.3,
+    // },
+    ...
+    Object.keys(data[0]).map((key) => {
+      let customWidth = 100;
+      let flexValue = 1;
+      let cellClass = '';
+      let fieldNameKey = '';
+
+      switch (key) {
+        case 'row_id':
+          fieldNameKey = 'uploadscore_tableFieldSeatNo';
+          customWidth = 70;
+          flexValue = 0.3;
+          // return {
+          //   field: key,
+          //   fieldNameKey: 'uploadscore_tableFieldSeatNo',
+          //   // hide: true, // ซ่อนคอลัมน์นี้จาก UI
+          // };
+          break;
+        case 'email':
+          fieldNameKey = 'user_manage_email';
+          customWidth = 70;
+          flexValue = 1.7;
+          break;
+        case 'teacher_code':
+          fieldNameKey = 'user_manage_teachercode';
+          customWidth = 70;
+          flexValue = 0.8;
+          break;
+        case 'prefix':
+          fieldNameKey = 'user_manage_prefix';
+          customWidth = 70;
+          flexValue = 0.6;
+          cellClass = 'agSelectCellEditor';
+          break;
+        case 'firstname':
+          fieldNameKey = 'user_manage_name';
+          customWidth = 70;
+          flexValue = 1.2;
+          break;
+        case 'lastname':
+          fieldNameKey = 'user_manage_surname';
+          customWidth = 70;
+          flexValue = 1.2;
+          break;
+        case 'role':
+          fieldNameKey = 'user_manage_role';
+          customWidth = 70;
+          flexValue = 0.8;
+          cellClass = 'text-end';
+          cellClass = 'agSelectCellEditor';
+          break;
+        // case 'active_status':
+        //   headerName = 'สถานะการใช้งาน';
+        //   customWidth = 70;
+        //   flexValue = 0.8;
+        //   cellClass = 'text-end';
+        //   break;
+        case 'manage':
+          return {
+            headerName: '',
+            field: 'action',
+            width: 100,
+            cellRenderer: (params: any) => {
+              const rowId = params.data.row_id; // Use row_id to identify the row
+              
+              // Create container for delete button
+              const container = document.createElement('div');
+              container.innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                  <button style="background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;">
+                    <i class="bi bi-trash3" style="color: #d33; font-size: 1.2rem;"></i>
+                  </button>
+                </div>
+              `;
+              
+              // Add event listener for delete
+              container.querySelector('button')?.addEventListener('click', () => {
+                this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
+              });
+    
+              return container;
+            },
+            suppressHeaderMenuButton: true,
+          }
+        default:
+          customWidth = 160;
+          fieldNameKey = key;
+      }
+
+      const translatedHeader =
+        this.translate.getTranslation(fieldNameKey);
+
+      return {
+        field: key,
+        headerName: translatedHeader || key,
+        flex: flexValue,
+        minWidth: customWidth,
+        cellClass: cellClass,
+        cellRenderer: (params: any) => {
+          const value = params.value?.toString().trim();
+          if (value === '' || value === null || value === undefined) {
+            return '<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>';
+          } else if (value === '-') {
+            return '<span style="color: red; font-weight: bold;">-</span>';
+          }
+          return params.value;
+        },
+        // Apply select-box for prefix and role only
+        cellEditorParams: key === 'prefix' ? {
+          values: this.prefixData.map(item => item.byte_desc_th),
+        } : key === 'role' ? {
+          values: this.roleData.map(item => item.byte_desc_th),
+        } : null,
+        cellEditor: cellClass, // Apply select-box editor
+      };
+    }
+  )];
+
   }
 
   onDeleteRow(rowId: number) {
     const title =  this.translate.getTranslation('add_user_question_1');
     const text =  this.translate.getTranslation('add_user_question_2');
     const delete_button = this.translate.getTranslation('add_user_delete');
-    const cancel_button = this.translate.getTranslation('add_user_cancel');
+    const cancel_button = this.translate.getTranslation('btn_cancel');
 
     console.log(this.originalData)
     const rowIndex = this.originalData.findIndex(row => row.row_id === rowId);
@@ -561,10 +845,11 @@ export class AddUserComponent implements OnInit {
 
     const Success_title = this.translate.getTranslation('sweet_alert_success');
     const Success_text = this.translate.getTranslation('sweet_alert_edit');
-    const Submit_Button = this.translate.getTranslation('add_user_ok');
+    const Submit_Button = this.translate.getTranslation('btn_ok');
     const Fail_title = this.translate.getTranslation('sweet_alert_fail_title');
     const Fail_text = this.translate.getTranslation('sweet_alert_fail_text');
     const email_duplicated = this.translate.getTranslation('email_duplicated');
+    const teacherCode_duplicated = this.translate.getTranslation('add_user_duplicated_teachercode')
     
     // ส่งข้อมูลไปยัง API
     this.addUserService.insertUser(dataToSend).subscribe(
@@ -584,22 +869,46 @@ export class AddUserComponent implements OnInit {
   
         if (error && error.errors) {
           const errorMessages = error.errors;
+          const errorMessage_code = error.message
   
-          if (errorMessages.length > 0) {
-            const errorMessage = errorMessages
-            .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
-              .join('<br>');
+          if (errorMessages.length > 0 && errorMessage_code == 'มีอีเมลบางรายการที่ใช้งานแล้ว') {
+            console.log(errorMessages)
+            console.log("My error email: ", errorMessage_code)
+            // const errorMessage = errorMessages
+            // .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
+            //   .join('<br>');
+            const duplicatedEmail = errorMessages.join('<br>');
             
             Swal.fire({
               title: Fail_title,
-              html: `${email_duplicated}<br>${errorMessage}`,
+              html: `${email_duplicated}<br>${duplicatedEmail}`,
               icon: 'error',
               confirmButtonColor: '#0d6efd',
               confirmButtonText: Submit_Button,
             });
             return;
           }
+
+        if (errorMessages.length > 0 && errorMessage_code == 'มีรหัสอาจารย์ถูกใช้งานแล้ว') {
+          console.log(errorMessages)
+          console.log("My error teacher_code: ", errorMessage_code)
+          // const errorMessage = errorMessages
+          // .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
+          // .join('<br>');
+
+          const duplicatedCodes = errorMessages.join('<br>');
+          
+          Swal.fire({
+            title: Fail_title,
+            // html: `${teacherCode_duplicated}<br>${errorMessage}`,
+            html: `${teacherCode_duplicated}<br>${duplicatedCodes}`, 
+            icon: 'error',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: Submit_Button,
+          });
+          return;
         }
+      }
   
         Swal.fire({
           title: Fail_title,
@@ -616,7 +925,7 @@ export class AddUserComponent implements OnInit {
     const title =  this.translate.getTranslation('add_user_question_1');
     const text =  this.translate.getTranslation('add_user_question_2');
     const delete_button = this.translate.getTranslation('add_user_delete');
-    const cancel_button = this.translate.getTranslation('add_user_cancel');
+    const cancel_button = this.translate.getTranslation('btn_cancel');
 
     Swal.fire({
       // title: 'ต้องการลบข้อมูลใช่หรือไม่',
@@ -649,7 +958,7 @@ validateFields(data: any[]): boolean {
   if (!data || data.length === 0 || !data[0]) {
     const Failed_title = this.translate.getTranslation('add_user_failed_title');
     const Failed_text = this.translate.getTranslation('add_user_failed_text');
-    const submit = this.translate.getTranslation('add_user_ok');
+    const submit = this.translate.getTranslation('btn_ok');
 
     Swal.fire({
       title: Failed_title,
@@ -661,7 +970,7 @@ validateFields(data: any[]): boolean {
     return false;
   }
 
-  const Ok_button = this.translate.getTranslation('add_user_ok');
+  const Ok_button = this.translate.getTranslation('btn_ok');
   const Invalid_header = this.translate.getTranslation('add_user_invalid_header');
   const Validate_excel = this.translate.getTranslation('add_user_validate_excel');
 
@@ -674,14 +983,8 @@ validateFields(data: any[]): boolean {
     'หน้าที่',
   ];
 
-  // ตรวจสอบคอลัมน์ที่มีอยู่ในไฟล์
   const fileFields = Object.keys(data[0]).map(field => field.trim());
 
-  // const missingFields = requiredFields.filter(
-  //   (field) => field !== 'อีเมล' && !fileFields.some(f => f.trim() === field.trim())
-  // );
-
-    // ตรวจสอบคอลัมน์ที่ขาดหายไป
     const missingFields = requiredFields.filter(
       (field) => !fileFields.some(f => f.trim() === field.trim())
     );
@@ -698,7 +1001,6 @@ validateFields(data: any[]): boolean {
     return false;
   }
 
-  // หากไม่มีคอลัมน์ที่ขาดหายไป สามารถอัปโหลดไฟล์ได้
   return true;
 }
 }

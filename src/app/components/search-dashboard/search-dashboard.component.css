@@ -16,3 +16,114 @@
     position: absolute !important;
     z-index: 1050;
   }
+
+  /* body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+} */
+
+.form-container {
+    width: 100%;
+    /* max-width: 1400px; */
+    /* background-color: #fff; */
+    padding: 20px;
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+    /* border-radius: 8px; */
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    gap: 10px;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    flex-basis: calc(20% - 35px); /* 5 items per row with 10px gap */
+    /*min-width: 200px;*/
+}
+
+.subject-group{
+  display: flex;
+  align-items: center;
+  flex-basis: calc(20% - 10px);
+}
+
+.select-group {
+  display: flex;
+  flex-direction: column;
+  width: 220px;
+}
+
+label {
+    margin-right: 10px;
+    font-weight: bold;
+  text-wrap: nowrap;
+}
+
+ng-select {
+    /* padding: 8px; */
+    /* border: 1px solid #ccc; */
+    /* border-radius: 4px; */
+    flex: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .form-group {
+        flex-basis: calc(33% - 10px); /* 4 items per row */
+    }
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .subject-group{
+      flex-basis: calc(66% - 10px);
+    }
+}
+
+
+/* @media (max-width: 900px) {
+    .form-group, .subject-group {
+        flex-basis: calc(33.33% - 10px);
+    }
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+} */
+/*
+@media (max-width: 600px) {
+    .form-group {
+        flex-basis: calc(50% - 10px); items per row 
+    }
+}*/
+
+@media (max-width: 900px) {
+    .form-group, .subject-group {
+        flex-basis: 100%; /* 1 item per row */
+        flex-direction: column; /* Stack label on top of input */
+        align-items: flex-start; /* Align items to the start */
+    }
+
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    label {
+        margin-right: 0;
+        margin-bottom: 5px; /* Add margin to the bottom of the label */
+    }
+}

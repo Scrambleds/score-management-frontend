@@ -49,6 +49,9 @@ export class ModalEditComponent {
   modalInstance: Modal | undefined;
   isDisabled = true;
   submitted = false;
+  isCurrentPasswordVisible = false;
+  showPassword = false;
+  showConfirmPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -243,7 +246,7 @@ export class ModalEditComponent {
 
       const Success_title = this.translate.getTranslation('sweet_alert_success');
       const Success_text = this.translate.getTranslation('sweet_alert_edit');
-      const Submit_Button = this.translate.getTranslation('add_user_ok');
+      const Submit_Button = this.translate.getTranslation('btn_ok');
 
       const userData = this.form.getRawValue();
       userData.update_by = UserInfo;
@@ -265,10 +268,8 @@ export class ModalEditComponent {
           if (this.modalInstance) {
             this.modalInstance.hide();
           }
-        // window.location.reload();
-        this.Router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-          this.Router.navigate([this.Router.url]);
-        });
+
+        window.location.reload();
       });
       
         this.form.reset();

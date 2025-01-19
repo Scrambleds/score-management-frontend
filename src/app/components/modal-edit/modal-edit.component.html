@@ -125,15 +125,28 @@
               <div class="col-6 col-md-4">
                 <label for="password" class="form-label ps-2">
                   <!-- รหัสผ่าน -->
-                   {{ "password" | translate }}
+                  {{ "password" | translate }}
                 </label>
-                <input type="password" id="password" class="form-control" formControlName="password"
-                  autocomplete="current-password"
-                  [ngClass]="{'is-valid': form.get('password')?.valid && form.get('password')?.dirty && form.get('password')?.value.length > 0}"
-                  [placeholder]="'placeholder_text' | translate" />
+          
+                <div class="input-group">
+                  <input 
+                    [type]="showPassword ? 'text' : 'password'" 
+                    id="password" 
+                    class="form-control" 
+                    formControlName="password"
+                    autocomplete="current-password"
+                    [ngClass]="{'is-valid': form.get('password')?.valid && form.get('password')?.dirty && form.get('password')?.value.length > 0}"
+                    [placeholder]="'placeholder_text' | translate"/>
+                  
+                  <!-- ปุ่มเปิด/ซ่อนรหัสผ่าน (ใช้ showPassword) -->
+                  <button type="button" class="btn btn-outline-secondary" (click)="showPassword = !showPassword">
+                    <i class="bi" [ngClass]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                  </button>
+                </div>
+          
                 <div *ngIf="form.get('password')?.invalid && form.get('password')?.dirty" class="text-danger ps-2">
                   <div *ngIf="form.get('password')?.hasError('errorMessage')">
-                    {{ form.get('password')?.getError('errorMessage') | translate}}
+                    {{ form.get('password')?.getError('errorMessage') | translate }}
                   </div>
                 </div>
               </div>
@@ -141,15 +154,27 @@
               <div *ngIf="form.contains('confirm_password')" class="col-6 col-md-4">
                 <label for="confirm_password" class="form-label ps-2">
                   <!-- ยืนยันรหัสผ่าน -->
-                   {{ "user_manage_confirm" | translate }}
+                  {{ "user_manage_confirm" | translate }}
                 </label>
-                <input type="password" id="confirm_password" class="form-control"
-                  [ngClass]="{'is-valid': form.get('confirm_password')?.valid && form.get('password')?.valid && form.get('password')?.value === form.get('confirm_password')?.value, 
-                  'is-invalid': form.get('confirm_password')?.touched && form.get('confirm_password')?.invalid && form.get('password')?.valid && form.get('password')?.value !== form.get('confirm_password')?.value}"
-                  formControlName="confirm_password" 
-                  autocomplete="current-password"
-                  [placeholder]="'user_manage_validatepassword' | translate"
-                  (blur)="onBlurConfirmPassword()" />
+          
+                <div class="input-group">
+                  <input 
+                    [type]="showConfirmPassword ? 'text' : 'password'" 
+                    id="confirm_password" 
+                    class="form-control"
+                    [ngClass]="{'is-valid': form.get('confirm_password')?.valid && form.get('password')?.valid && form.get('password')?.value === form.get('confirm_password')?.value, 
+                    'is-invalid': form.get('confirm_password')?.touched && form.get('confirm_password')?.invalid && form.get('password')?.valid && form.get('password')?.value !== form.get('confirm_password')?.value}"
+                    formControlName="confirm_password" 
+                    autocomplete="current-password"
+                    [placeholder]="'user_manage_validatepassword' | translate"
+                    (blur)="onBlurConfirmPassword()" />
+          
+                  <!-- ปุ่มเปิด/ซ่อนรหัสผ่าน (ใช้ showConfirmPassword) -->
+                  <button type="button" class="btn btn-outline-secondary" (click)="showConfirmPassword = !showConfirmPassword">
+                    <i class="bi" [ngClass]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                  </button>
+                </div>
+          
                 <div *ngIf="form.get('confirm_password')?.touched" class="text-danger ps-2">
                   <div *ngIf="form.get('confirm_password')?.hasError('required')">
                     <!-- กรุณากรอกข้อมูล -->

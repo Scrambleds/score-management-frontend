@@ -16,7 +16,7 @@
       ></i>
       {{ "add_user_upload" | translate }}
     </label>
-    <input id="uploadfile" type="file" class="d-none" />
+    <input id="uploadfile" type="file" class="d-none" (change)="onFileSelected($event)"/>
   </div>
 </div>
 
