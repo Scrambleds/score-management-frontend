@@ -106,6 +106,7 @@ export class LoginPageComponent {
         }
       );
   }
+  
   getUserInfo(username: string) {
     // Assuming you need to send the token in the Authorization header and username in the body
     const token = localStorage.getItem('token');
@@ -127,7 +128,9 @@ export class LoginPageComponent {
               );
               console.log('User info stored in localStorage:', response.objectResponse);
               const userInfo = response.objectResponse;
+              const roleInfo = response.objectResponse.role;
               this.UserService.updateUserInfo(userInfo)
+              this.UserService.updateRole(roleInfo);
             } else {
               console.error(
                 'Failed to fetch user info:',

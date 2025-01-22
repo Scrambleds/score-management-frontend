@@ -6,7 +6,7 @@
         <!-- <div class="row"> -->
         <div class="subject-group">
           <label class="fw-bold mb-0 ps-2" [appRequiredMarker]="form.get('subject_id')">{{ "subject_code" | translate }}/{{
-            "subject_name" | translate }}</label>
+            "add_dashboard_label_subject" | translate }}</label>
           <div class="select-group">
             <ng-select class="w-100" id="subject_id" formControlName="subject_id" [items]="SubjectList"
               bindValue="subjectCode" [placeholder]="'placeholder_select' | translate" [clearable]="true">
@@ -40,7 +40,7 @@
             </ng-template>
           </ng-select>
           <div *ngIf="form.get('academic_year')?.touched && form.get('academic_year')?.invalid"
-            class="text-danger ps-2">
+            class="text-danger ps-1">
             <!-- กรุณากรอกข้อมูล -->
             {{ "alert_enterData" | translate }}
           </div>
@@ -57,7 +57,7 @@
               {{ item | translateDropdown }}
             </ng-template>
           </ng-select>
-          <div *ngIf="form.get('semester')?.touched && form.get('semester')?.invalid" class="text-danger ps-2">
+          <div *ngIf="form.get('semester')?.touched && form.get('semester')?.invalid" class="text-danger ps-1">
             <!-- กรุณากรอกข้อมูล -->
             {{ "alert_enterData" | translate }}
           </div>
@@ -73,7 +73,7 @@
               {{ item | translateDropdown }}
             </ng-template>
           </ng-select>
-          <div *ngIf="form.get('section')?.touched && form.get('section')?.invalid" class="text-danger ps-2">
+          <div *ngIf="form.get('section')?.touched && form.get('section')?.invalid" class="text-danger ps-1">
             <!-- กรุณากรอกข้อมูล -->
             {{ "alert_enterData" | translate }}
           </div>
@@ -91,7 +91,7 @@
               {{ item | translateDropdown }}
             </ng-template>
           </ng-select>
-          <div *ngIf="form.get('score_type')?.touched && form.get('score_type')?.invalid" class="text-danger ps-2">
+          <div *ngIf="form.get('score_type')?.touched && form.get('score_type')?.invalid" class="text-danger ps-1">
             <!-- กรุณากรอกข้อมูล -->
             {{ "alert_enterData" | translate }}
           </div>

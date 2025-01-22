@@ -49,7 +49,11 @@
                 <label for="active_status" class="form-label ps-2" [appRequiredMarker]="form.get('active_status')">{{ "user_manage_status" | translate }} </label>
                 <ng-select [items]="statusData" bindLabel="byte_desc_th" bindValue="byte_desc_th"
                   [placeholder]="'placeholder_select' | translate" formControlName="active_status"
-                  [searchable]="true"></ng-select>
+                  [searchable]="true">
+                  <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                    {{ item | translateDropdown }}
+                  </ng-template>
+                </ng-select>
                   <div *ngIf="form.get('active_status')?.invalid && form.get('active_status')?.touched" class="text-danger ps-2">
                     {{ "alert_enterData" | translate }}
                   </div>

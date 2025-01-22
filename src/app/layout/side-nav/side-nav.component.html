@@ -16,6 +16,7 @@
   <hr style="color: white; margin: 0.313rem 0" />
   <div class="menu-container">
     <a
+      *ngIf="showMasterData"
       routerLink="/MasterData"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -24,6 +25,7 @@
       {{ "menu_masterdata" | translate }}
     </a>
     <a
+      *ngIf="showUserManagement"
       routerLink="/UserManagement"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -32,6 +34,7 @@
       {{ "menu_usermanage" | translate }}
     </a>
     <a
+      *ngIf="showUploadScore"
       routerLink="/UploadScore"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -40,6 +43,7 @@
       {{ "menu_uploadscore" | translate }}
     </a>
     <a
+      *ngIf="showSearchScore"
       routerLink="/SearchScore"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -48,6 +52,7 @@
       {{ "menu_searchscore" | translate }}
     </a>
     <a
+      *ngIf="showScoreAnnouncement"
       routerLink="/ScoreAnnouncement"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -56,6 +61,7 @@
       {{ "menu_scoreannounce" | translate }}
     </a>
     <a
+      *ngIf="showDashboard"
       routerLink="/Dashboard"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -84,6 +90,7 @@
   <hr style="color: white; margin: 0.313rem 0" />
   <div class="menu-container">
     <a
+      *ngIf="showMasterData"
       routerLink="/MasterData"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -93,6 +100,7 @@
       {{ "menu_masterdata" | translate }}
     </a>
     <a
+     *ngIf="showUserManagement"
       routerLink="/UserManagement"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -102,6 +110,7 @@
       {{ "menu_usermanage" | translate }}
     </a>
     <a
+     *ngIf="showUploadScore"
       routerLink="/UploadScore"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -111,6 +120,7 @@
       {{ "menu_uploadscore" | translate }}
     </a>
     <a
+     *ngIf="showSearchScore"
       routerLink="/SearchScore"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -120,6 +130,7 @@
       {{ "menu_searchscore" | translate }}
     </a>
     <a
+     *ngIf="showScoreAnnouncement"
       routerLink="/ScoreAnnouncement"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -129,6 +140,7 @@
       {{ "menu_scoreannounce" | translate }}
     </a>
     <a
+      *ngIf="showDashboard"
       routerLink="/Dashboard"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"

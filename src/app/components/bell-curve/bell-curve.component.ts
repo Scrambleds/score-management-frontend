@@ -398,31 +398,32 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
     });
   }
 
-  loadDashboardStats = (): void => {
-    this.DashboardService.getDashboardStats({}).subscribe((response: any) => {
-      if (response.isSuccess) {
-        const data = response.objectResponse;
+  // loadDashboardStats = (): void => {
+  //   this.DashboardService.getDashboardStats({}).subscribe((response: any) => {
+  //     if (response.isSuccess) {
+  //       const data = response.objectResponse;
 
-        this.avgScore = data[0].final_score.avgFinalScore;
-        this.minScore = data[0].final_score.minFinalScore;
-        this.maxScore = data[0].final_score.maxFinalScore;
-        this.stdDev = data[0].final_score.stdFinalScore;
-        this.studentCount = data[0].final_score.numberOfStudents;
+  //       this.avgScore = data[0].final_score.avgFinalScore;
+  //       this.minScore = data[0].final_score.minFinalScore;
+  //       this.maxScore = data[0].final_score.maxFinalScore;
+  //       this.stdDev = data[0].final_score.stdFinalScore;
+  //       this.studentCount = data[0].final_score.numberOfStudents;
 
-        const scoreRanges = this.calculateScoreRanges(data, this.scoreType);
-        this.doughnutChartData.datasets[0].data = [
-          scoreRanges['0-39'] || 0,
-          scoreRanges['40-49'] || 0,
-          scoreRanges['50-59'] || 0,
-          scoreRanges['60-69'] || 0,
-          scoreRanges['70-79'] || 0,
-          scoreRanges['80+'] || 0,
-        ];
+  //       const scoreRanges = this.calculateScoreRanges(data, this.scoreType);
+  //       this.doughnutChartData.datasets[0].data = [
+  //         scoreRanges['0-39'] || 0,
+  //         scoreRanges['40-49'] || 0,
+  //         scoreRanges['50-59'] || 0,
+  //         scoreRanges['60-69'] || 0,
+  //         scoreRanges['70-79'] || 0,
+  //         scoreRanges['80+'] || 0,
+  //       ];
 
-        this.updateBellCurve();
+  //       this.updateBellCurve();
 
-        this.refreshDashboard();
-      }
-    });
-  };
+  //       this.refreshDashboard();
+  //     }
+  //   });
+  // };
+  
 }

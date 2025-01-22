@@ -64,8 +64,8 @@
 }
 
 label {
-    margin-right: 10px;
-    font-weight: bold;
+  margin-right: 10px;
+  font-weight: bold;
   text-wrap: nowrap;
 }
 
@@ -114,6 +114,7 @@ ng-select {
         flex-basis: 100%; /* 1 item per row */
         flex-direction: column; /* Stack label on top of input */
         align-items: flex-start; /* Align items to the start */
+        max-width: 100%;
     }
 
     .select-group {

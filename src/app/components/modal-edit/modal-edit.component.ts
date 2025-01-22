@@ -38,6 +38,7 @@ export class ModalEditComponent {
   @Input() prefixData: Array<{ id: string; title: string }> = [];
   @Input() selectedRowData: any;
   systemParams: any;
+  role: any;
   // prefixData: any[] = [];W
   // roleDatas: any[] = [];
 
@@ -60,7 +61,7 @@ export class ModalEditComponent {
     private UserService: UserService,
     private UserManageService: UserManageService,
     private Router: Router,
-    private translate: TranslationService
+    private translate: TranslationService,
   ) {
     this.form = this.fb.group({
       row_id: [null],
@@ -124,6 +125,7 @@ export class ModalEditComponent {
       firstname: this.selectedRowData.firstname,
       lastname: this.selectedRowData.lastname,
       active_status: this.selectedRowData.active_status,
+      username: this.selectedRowData.username,
     });
   }
 
@@ -153,6 +155,7 @@ export class ModalEditComponent {
         firstname: this.selectedRowData.firstname,
         lastname: this.selectedRowData.lastname,
         active_status: this.selectedRowData.active_status,
+        username: this.selectedRowData.username,
       });
     }
   }
@@ -243,6 +246,7 @@ export class ModalEditComponent {
         this.form.value.password === this.form.value.confirm_password)
     ) {
       const UserInfo = this.UserService.username;
+      const UserNameInfo = this.selectedRowData.username;
 
       const Success_title = this.translate.getTranslation('sweet_alert_success');
       const Success_text = this.translate.getTranslation('sweet_alert_edit');
@@ -254,6 +258,18 @@ export class ModalEditComponent {
       this.userEditService.editUser(userData).subscribe((response: any) => {
         console.log("Response from API:", response);
         this.submit.emit(this.form.getRawValue()); 
+        // console.log("Form role: ",this.form.value.role)
+        // this.role = this.UserService.roleDescriptionTH;
+        console.log("USER OWN EDIT!!!:", UserInfo)
+        // console.log("ROLE EDIT!!!:",this.role)
+        console.log("USER YOU EDIT!",UserNameInfo);
+
+        if(UserInfo == UserNameInfo){
+          console.log("YOU EDIT YOUR OWN INFO...LOCALSTORAGE CLEAR!!!");
+          localStorage.clear();
+        } else{
+          console.log("YOU EDIT OTHER USER DATA!!!");
+        }
   
         Swal.fire({
           // title: 'สำเร็จ',
@@ -265,10 +281,13 @@ export class ModalEditComponent {
           confirmButtonColor: '#007bff'
         }).then(() => {
           // เมื่อกด "ตกลง" ใน Swal, ปิด modal
+
+          
+
           if (this.modalInstance) {
             this.modalInstance.hide();
           }
-
+        
         window.location.reload();
       });
       

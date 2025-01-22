@@ -60,7 +60,11 @@
                 </label>
                 <ng-select [items]="roleData" bindLabel="byte_desc_th" bindValue="byte_desc_th" 
                 [placeholder]="'placeholder_select' | translate"
-                  formControlName="role" [searchable]="true"></ng-select>
+                  formControlName="role" [searchable]="true">
+                  <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                    {{ item | translateDropdown }}
+                  </ng-template>
+                </ng-select>
                 <div *ngIf="form.get('role')?.touched && form.get('role')?.invalid" class="text-danger ps-2">
                   <!-- กรุณากรอกข้อมูล -->
                    {{ "alert_enterData" | translate }}
@@ -75,7 +79,11 @@
                 </label>
                 <ng-select [items]="prefixData" bindLabel="byte_desc_th" bindValue="byte_desc_th" 
                 [placeholder]="'placeholder_select' | translate"
-                  formControlName="prefix" [searchable]="true"></ng-select>
+                  formControlName="prefix" [searchable]="true">
+                  <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                    {{ item | translateDropdown }}
+                  </ng-template>
+                </ng-select>
                 <div *ngIf="form.get('prefix')?.touched && form.get('prefix')?.invalid"
                   class="text-danger ps-2">
                   <!-- กรุณากรอกข้อมูล -->
@@ -196,7 +204,11 @@
                 </label>
                 <ng-select [items]="statusData" bindLabel="byte_desc_en" bindValue="byte_desc_en" 
                 [placeholder]="'placeholder_select' | translate"
-                  formControlName="active_status" [searchable]="true"></ng-select>
+                  formControlName="active_status" [searchable]="true">
+                  <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                    {{ item | translateDropdown }}
+                  </ng-template>
+                </ng-select>
                 <div *ngIf="form.get('active_status')?.touched && form.get('active_status')?.invalid"
                   class="text-danger ps-2">
                   <!-- กรุณากรอกข้อมูล -->

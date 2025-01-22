@@ -16,6 +16,7 @@ import { BellCurveComponent } from '../bell-curve/bell-curve.component';
 import { ExcelExportService } from '../../services/excel-export/excel-export';
 import { format } from 'date-fns';
 import { UploadScoreService } from '../../services/upload-score/upload-score.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-search-dashboard',
@@ -88,31 +89,18 @@ loadMajor() {
     this.form.valueChanges.subscribe((values) => {
       if (this.areRequiredFieldsValid()) {
         console.log('All required fields are valid, calling onSubmit');
-        this.onSubmit(); // เรียก API เฉพาะเมื่อฟิลด์ครบ
+        this.onSubmit();
+        this.bellcurve?.refreshDashboard();
       } else {
         console.log('Required fields are not valid yet');
       }
     });
 
-    this.form.valueChanges.subscribe((values) => {
-      console.log('Form changed: ', values);
-      this.onSubmit();
-      this.bellcurve?.refreshDashboard();
-    });    
-  }
-
-  getMinHeight() {
-    let isAnyFieldInvalid = false;
-  
-    // ตรวจสอบฟิลด์ทั้งหมดในฟอร์ม
-    Object.keys(this.form.controls).forEach(controlName => {
-      const control = this.form.get(controlName);
-      if (control?.touched && control?.invalid) {
-        isAnyFieldInvalid = true;
-      }
-    });
-  
-    return isAnyFieldInvalid ? '90px' : '30px';
+    // this.form.valueChanges.subscribe((values) => {
+    //   console.log('Form changed: ', values);
+    //   // this.onSubmit();
+    //   this.bellcurve?.refreshDashboard();
+    // });
   }
 
   resetScores(data: any): any {

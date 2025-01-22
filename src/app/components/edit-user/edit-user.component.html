@@ -98,6 +98,9 @@
                           bindValue="byte_desc_th"
                           placeholder="กรุณาเลือก"
                           [clearable]="true">
+                          <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                            {{ item | translateDropdown }}
+                          </ng-template>
                         </ng-select>
                         <div *ngIf="form.get('role')?.touched && form.get('role')?.invalid"
                         class="text-danger ps-2">
@@ -119,6 +122,9 @@
                           bindValue="byte_desc_en"
                           placeholder="กรุณาเลือก"
                           [clearable]="true"> 
+                          <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                            {{ item | translateDropdown }}
+                          </ng-template>
                         </ng-select>
                         <div *ngIf="form.get('active_status')?.touched && form.get('active_status')?.invalid"
                         class="text-danger ps-2">

@@ -12,6 +12,7 @@ import { ScoreAnnouncementComponent } from './route/score-announcement/score-ann
 import { SearchScoreComponent } from './route/search-score/search-score.component';
 import { UploadScoreComponent } from './route/upload-score/upload-score.component';
 import { UserManageComponent } from './route/user-manage/user-manage.component';
+import { Page404Component } from './components/page-404/page-404.component';
 
 const routes: Routes = [
   {
@@ -38,19 +39,19 @@ const routes: Routes = [
       {
         path: 'MasterData',
         component: MasterDataComponent,
-        data: { messageKey: 'menu_masterdata' },
+        data: { messageKey: 'menu_masterdata', allowedRoles: ['1'] },
         canActivate: [AuthGuard],
       },
       {
         path: 'UserManagement',
         component: UserManageComponent,
-        data: { messageKey: 'menu_usermanage' },
+        data: { messageKey: 'menu_usermanage', allowedRoles: ['1'] },
         canActivate: [AuthGuard],
       },
       {
         path: 'UserManagement/AddUser',
         component: AddUserRoute,
-        data: { messageKey: 'menu_usermanage' },
+        data: { messageKey: 'menu_usermanage', allowedRoles: ['1'] },
         canActivate: [AuthGuard],
       },
       {
@@ -83,6 +84,8 @@ const routes: Routes = [
         data: { messageKey: 'change_pwd_title' },
         canActivate: [AuthGuard],
       },
+      { path: 'NotFound', component: Page404Component, data: { messageKey: 'Page 404' }, },
+      { path: '**', redirectTo: '/NotFound' },
     ],
   },
   {

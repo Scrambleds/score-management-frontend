@@ -22,6 +22,8 @@ import { EditUserComponent } from '../edit-user/edit-user.component';
 // import { RowNode } from 'ag-grid-community';
 import { GridApi, GridOptions, RowNode } from 'ag-grid-community';
 import { TranslationService } from '../../core/services/translation.service';
+import { environment } from '../../../environments/environment';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-add-user',
@@ -32,15 +34,16 @@ import { TranslationService } from '../../core/services/translation.service';
 export class AddUserComponent implements OnInit {
   gridApi!: GridApi;
   gridColumnApi: any;
-  
+
   // @ViewChild('onReset', { static: false }) editUserComponent!: EditUserComponent;
-  @ViewChild('editUserComponent', { static: false }) editUserComponent!: EditUserComponent;
+  @ViewChild('editUserComponent', { static: false })
+  editUserComponent!: EditUserComponent;
   gridOptions: GridOptions = {
     // domLayout: 'autoHeight',
     // pagination: true,
     // paginationPageSize: 10,
     // suppressRowClickSelection: true
-  };  
+  };
   roleData: any[] = [];
   prefixData: any[] = [];
   statusData: any[] = [];
@@ -61,6 +64,7 @@ export class AddUserComponent implements OnInit {
   originalData: any[] = [];
   filteredData: any[] = [];
   isFileUploaded = false;
+  translations: any;
   requiredFields = [
     'email',
     'teacher_code',
@@ -79,6 +83,7 @@ export class AddUserComponent implements OnInit {
   form: FormGroup; // Declare form
 
   constructor(
+    private http: HttpClient,
     private router: Router,
     private fb: FormBuilder,
     private searchService: SearchService,
@@ -86,11 +91,14 @@ export class AddUserComponent implements OnInit {
     private UserService: UserService,
     private masterDataService: masterDataService,
     private SelectBoxService: SelectBoxService,
-    private translate: TranslationService,
+    private translate: TranslationService
   ) {
-    this.form = this.fb.group({
-    });
+    this.form = this.fb.group({});
   }
+
+  translateDropdown(value: string): string {
+    return this.translations[value] || value;
+  }  
 
   onGridReady(params: any) {
     this.gridApi = params.api;
@@ -113,7 +121,7 @@ export class AddUserComponent implements OnInit {
       console.log('Method in EditUserComponent called!');
     }
   }
-  
+
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -121,53 +129,71 @@ export class AddUserComponent implements OnInit {
     }
   }
 
-  onLoading = (): void =>{
-    this.onSomeAction()
-    console.log("On change!");
+  LoadPrefix = () => {
+    this.SelectBoxService.getSystemParamPrefix
   }
 
+  LoadRole = () => {
+    this.SelectBoxService.getSystemParamRole
+  }
+
+  onLoading = (): void => {
+    this.onSomeAction();
+    console.log('On change!');
+  };
+
   ngOnInit() {
+    const role = 'role';
+    const prefix = 'prefix';
+    const status = 'active_status';
 
-        const role = 'role';
-        const prefix = 'prefix';
-        const status = 'active_status';
+    this.translate.getTranslations().subscribe((translations) => {
+      this.translations = translations; // เก็บคำแปลไว้
+      this.loadGridData(this.originalData); // สร้าง columnDefs เมื่อคำแปลโหลดเสร็จ
+    });
 
-        forkJoin({
-          roleData: this.SelectBoxService.getSystemParamRole(role),
-          prefixData: this.SelectBoxService.getSystemParamPrefix(prefix),
-          statusData: this.SelectBoxService.getSystemParamStatus(status),
-        }).subscribe({
-          next: (results: any) => {
-            console.log('Received role data: ', results.roleData);
-            console.log('Received prefix data: ', results.prefixData);
-            console.log('Received status data: ', results.statusData);
-      
-            // เก็บข้อมูลที่ได้รับจาก API ลงในตัวแปรที่แตกต่างกัน
-            if (results.roleData && results.roleData.objectResponse) {
-              this.roleData = results.roleData.objectResponse.filter(
-                (item: any) => item.byte_code && item.byte_desc_th
-              );
-            }
-      
-            if (results.prefixData && results.prefixData.objectResponse) {
-              this.prefixData = results.prefixData.objectResponse.filter(
-                (item: any) => item.byte_code && item.byte_desc_th
-              );
-            }
-      
-            if (results.statusData && results.statusData.objectResponse) {
-              this.statusData = results.statusData.objectResponse.filter(
-                (item: any) => item.byte_code && item.byte_desc_en
-              );
-            }
-      
-            this.masterDataService.setMasterData(this.roleData, this.prefixData, this.statusData);
-          },
-          error: (err: any) => {
-            console.log('Error fetching master data: ', err);
-          },
-        });
+    // this.LoadPrefix();
+    // this.LoadRole();
 
+    forkJoin({
+      roleData: this.SelectBoxService.getSystemParamRole(role),
+      prefixData: this.SelectBoxService.getSystemParamPrefix(prefix),
+      statusData: this.SelectBoxService.getSystemParamStatus(status),
+    }).subscribe({
+      next: (results: any) => {
+        console.log('Received role data: ', results.roleData);
+        console.log('Received prefix data: ', results.prefixData);
+        console.log('Received status data: ', results.statusData);
+
+        // เก็บข้อมูลที่ได้รับจาก API ลงในตัวแปรที่แตกต่างกัน
+        if (results.roleData && results.roleData.objectResponse) {
+          this.roleData = results.roleData.objectResponse.filter(
+            (item: any) => item.byte_code && item.byte_desc_th
+          );
+        }
+
+        if (results.prefixData && results.prefixData.objectResponse) {
+          this.prefixData = results.prefixData.objectResponse.filter(
+            (item: any) => item.byte_code && item.byte_desc_th
+          );
+        }
+
+        if (results.statusData && results.statusData.objectResponse) {
+          this.statusData = results.statusData.objectResponse.filter(
+            (item: any) => item.byte_code && item.byte_desc_en
+          );
+        }
+
+        this.masterDataService.setMasterData(
+          this.roleData,
+          this.prefixData,
+          this.statusData
+        );
+      },
+      error: (err: any) => {
+        console.log('Error fetching master data: ', err);
+      },
+    });
 
     this.masterDataService.getRoleDataObservable().subscribe((data) => {
       this.roleData = data;
@@ -271,57 +297,57 @@ export class AddUserComponent implements OnInit {
       reader.onload = (e: any) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
-  
+
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         // ใช้ header: 1 เพื่อให้แถวแรกเป็น header
-              const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-              console.log(jsonData); // ตรวจสอบข้อมูลที่ได้
-  
-              const mappedData = this.mapJsonData(jsonData); 
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        console.log(jsonData); // ตรวจสอบข้อมูลที่ได้
+
+        const mappedData = this.mapJsonData(jsonData);
         // if (this.validateFields(jsonData)) {
-          console.log("MAPDATA: ",mappedData);
-          const modifiedData = this.processData(mappedData);
-          console.log("modifiedData: ",modifiedData);
-          this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
-          // this.rowData = []; 
-          // this.originalData = []; 
-  
-          // this.generateColumnDefs(modifiedData);
-          this.isFileUploaded = true;
-          this.isUploaded.emit(true);
-        // } 
+        console.log('MAPDATA: ', mappedData);
+        const modifiedData = this.processData(mappedData);
+        console.log('modifiedData: ', modifiedData);
+        this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
+        // this.rowData = [];
+        // this.originalData = [];
+
+        // this.generateColumnDefs(modifiedData);
+        this.isFileUploaded = true;
+        this.isUploaded.emit(true);
+        // }
       };
       reader.readAsArrayBuffer(file);
     }
   }
-  
-   processFile(file: File) {
+
+  processFile(file: File) {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
-  
+
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         // ใช้ header: 1 เพื่อให้แถวแรกเป็น header
-              const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-              console.log(jsonData); // ตรวจสอบข้อมูลที่ได้
-  
-              const mappedData = this.mapJsonData(jsonData); 
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        console.log(jsonData); // ตรวจสอบข้อมูลที่ได้
+
+        const mappedData = this.mapJsonData(jsonData);
         // if (this.validateFields(jsonData)) {
-          console.log("MAPDATA: ",mappedData);
-          const modifiedData = this.processData(mappedData);
-          console.log("modifiedData: ",modifiedData);
-          this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
-          // this.rowData = []; 
-          // this.originalData = []; 
-  
-          // this.generateColumnDefs(modifiedData);
-          this.isFileUploaded = true;
-          this.isUploaded.emit(true);
-        // } 
+        console.log('MAPDATA: ', mappedData);
+        const modifiedData = this.processData(mappedData);
+        console.log('modifiedData: ', modifiedData);
+        this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
+        // this.rowData = [];
+        // this.originalData = [];
+
+        // this.generateColumnDefs(modifiedData);
+        this.isFileUploaded = true;
+        this.isUploaded.emit(true);
+        // }
       };
       reader.readAsArrayBuffer(file);
     }
@@ -352,36 +378,19 @@ export class AddUserComponent implements OnInit {
   }
   processData(data: any[]): any[] {
     return data.map((row, index) => {
-      // const [firstName, lastName] = (row['ชื่อ-นามสกุล'] || '').split(' '); // แยกชื่อและนามสกุล
-      // const totalScore =
-      //   (row['คะแนนระหว่างเรียน'] || 0) +
-      //   (row['คะแนนกลางภาค'] || 0) +
-      //   (row['คะแนนปลายภาค'] || 0); // คำนวณคะแนนรวม
-
-      // // จัดเรียงข้อมูลตามลำดับที่กำหนด
+      // จัดเรียงข้อมูลตามลำดับที่กำหนด
       return {
-        row_id: index + 1 ,
+        row_id: index + 1,
         email: row['อีเมล'] || row['email'] || null,
         teacher_code: row['รหัสอาจารย์'] || row['teacher_code'] || null,
         prefix: row['คำนำหน้า'] || row['prefix'] || null,
         firstname: row['ชื่อ'] || row['firstname'] || null,
         lastname: row['นามสกุล'] || row['lastname'] || null,
         role: row['หน้าที่'] || row['role'] || null,
-        manage: null
+        manage: null,
       };
     });
   }
-  // processData(data: any[]): any[] {
-  //   return data.map((row, index) => ({
-      // row_id: index,
-      // email: row['อีเมล'] || row['email'] || null,
-      // teacher_code: row['รหัสอาจารย์'] || row['teacher_code'] || null,
-      // prefix: row['คำนำหน้า'] || row['prefix'] || null,
-      // firstname: row['ชื่อ'] || row['firstname'] || null,
-      // lastname: row['นามสกุล'] || row['lastname'] || null,
-      // role: row['หน้าที่'] || row['role'] || null,
-  //   }));
-  // }
 
   loadGridData(data: any[]) {
     if (data.length > 0) {
@@ -389,33 +398,7 @@ export class AddUserComponent implements OnInit {
       this.rowData = data;
       this.originalData = data;
       this.columnDefs = this.generateColumnDefs(data);
-      // this.columnDefs.push({
-      //   headerName: '',
-      //   field: 'action',
-      //   width: 100,
-      //   cellRenderer: (params: any) => {
-      //     const rowId = params.data.row_id; // Use row_id to identify the row
-          
-      //     // Create container for delete button
-      //     const container = document.createElement('div');
-      //     container.innerHTML = `
-      //       <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-      //         <button style="background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;">
-      //           <i class="bi bi-trash3" style="color: #d33; font-size: 1.2rem;"></i>
-      //         </button>
-      //       </div>
-      //     `;
-          
-      //     // Add event listener for delete
-      //     container.querySelector('button')?.addEventListener('click', () => {
-      //       this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
-      //     });
-
-      //     return container;
-      //   },
-      //   suppressHeaderMenuButton: true,
-      // });
-      console.log("LOAD DATA: ",this.rowData);
+      console.log('LOAD DATA: ', this.rowData);
     }
   }
 
@@ -423,329 +406,145 @@ export class AddUserComponent implements OnInit {
   refreshHeaderNames() {
     if (this.originalData && this.originalData.length > 0) {
       this.columnDefs = this.generateColumnDefs(this.originalData);
-      // this.columnDefs.push({
-      //   headerName: '',
-      //   field: 'action',
-      //   width: 100,
-      //   cellRenderer: (params: any) => {
-      //     const rowId = params.data.row_id; // Use row_id to identify the row
-          
-      //     // Create container for delete button
-      //     const container = document.createElement('div');
-      //     container.innerHTML = `
-      //       <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-      //         <button style="background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;">
-      //           <i class="bi bi-trash3" style="color: #d33; font-size: 1.2rem;"></i>
-      //         </button>
-      //       </div>
-      //     `;
-          
-      //     // Add event listener for delete
-      //     container.querySelector('button')?.addEventListener('click', () => {
-      //       this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
-      //     });
-
-      //     return container;
-      //   },
-      //   suppressHeaderMenuButton: true,
-      // });
     }
   }
 
-  // generateColumnDefs(data: any[]) {
-  //   if (data.length > 0) {
-  //     console.log('Original data: ', data);
-
-  //     this.columnDefs = [
-  //       {
-  //         headerName: 'ลำดับที่ซ่อน (ใช้ลบ)',
-  //         field: 'hiddenIndex',
-  //         hide: true, // ซ่อนคอลัมน์จาก UI
-  //       },
-        // {
-        //   headerName: 'uploadscore_tableFieldSeatNo',
-        //   valueGetter: (params: any) => params.node.rowIndex + 1, // ใช้ index ของ row
-        //   minWidth: 70,
-        //   flex: 0.3,
-        // },
-  //       ...Object.keys(data[0]).map((key) => {
-  //         let customWidth = 100;
-  //         let flexValue = 1;
-  //         let cellClass = '';
-  //         let headerName = '';
-  //         let cellEditor = null;
-  //         let fieldNameKey = '';
-
-  //       switch (key) {
-  //         case 'row_id':
-  //           headerName = 'uploadscore_tableFieldSeatNo';
-  //           customWidth = 70;
-  //           flexValue = 0.3;
-  //           return {
-  //             field: key,
-  //             fieldNameKey: 'uploadscore_tableFieldSeatNo',
-  //             hide: true, // ซ่อนคอลัมน์นี้จาก UI
-  //           };
-  //         case 'email':
-  //           fieldNameKey = 'user_manage_email';
-  //           customWidth = 70;
-  //           flexValue = 1.7;
-  //           break;
-  //         case 'teacher_code':
-  //           fieldNameKey = 'user_manage_teachercode';
-  //           customWidth = 70;
-  //           flexValue = 0.8;
-  //           break;
-  //         case 'prefix':
-  //           fieldNameKey = 'user_manage_prefix';
-  //           customWidth = 70;
-  //           flexValue = 0.6;
-  //           cellEditor = 'agSelectCellEditor';
-  //           break;
-  //         case 'firstname':
-  //           fieldNameKey = 'user_manage_name';
-  //           customWidth = 70;
-  //           flexValue = 1.2;
-  //           break;
-  //         case 'lastname':
-  //           fieldNameKey = 'user_manage_surname';
-  //           customWidth = 70;
-  //           flexValue = 1.2;
-  //           break;
-  //         case 'role':
-  //           fieldNameKey = 'user_manage_role';
-  //           customWidth = 70;
-  //           flexValue = 0.8;
-  //           cellClass = 'text-end';
-  //           cellEditor = 'agSelectCellEditor';
-  //           break;
-  //         // case 'active_status':
-  //         //   headerName = 'สถานะการใช้งาน';
-  //         //   customWidth = 70;
-  //         //   flexValue = 0.8;
-  //         //   cellClass = 'text-end';
-  //         //   break;
-  //         default:
-  //           customWidth = 160;
-  //           fieldNameKey = key;
-  //       }
-
-  //       const translatedHeader =
-  //       this.translate.getTranslation(fieldNameKey);
-
-  //       return {
-  //         field: key,
-  //         headerName: translatedHeader || key,
-  //         // editable: true,
-  //         flex: flexValue,
-  //         minWidth: customWidth,
-  //         cellRenderer: (params: any) => {
-  //           const value = params.value?.toString().trim();
-  //           if (value === '' || value === null || value === undefined) {
-  //             return '<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>';
-  //           } else if (value === '-') {
-  //             return '<span style="color: red; font-weight: bold;">-</span>';
-  //           }
-  //           return params.value;
-  //         },
-  //         // Apply select-box for prefix and role only
-  //         cellEditorParams: key === 'prefix' ? {
-  //           values: this.prefixData.map(item => item.byte_desc_th),
-  //         } : key === 'role' ? {
-  //           values: this.roleData.map(item => item.byte_desc_th),
-  //         } : null,
-  //         cellEditor: cellEditor, // Apply select-box editor
-  //       };
-  //     }),
-  //   ];
-
-  //     this.columnDefs.push({
-  //       headerName: '',
-  //       field: 'action',
-  //       width: 100,
-  //       cellRenderer: (params: any) => {
-  //         const rowId = params.data.row_id; // Use row_id to identify the row
-          
-  //         // Create container for delete button
-  //         const container = document.createElement('div');
-  //         container.innerHTML = `
-  //           <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-  //             <button style="background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;">
-  //               <i class="bi bi-trash3" style="color: #d33; font-size: 1.2rem;"></i>
-  //             </button>
-  //           </div>
-  //         `;
-          
-  //         // Add event listener for delete
-  //         container.querySelector('button')?.addEventListener('click', () => {
-  //           this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
-  //         });
-
-  //         return container;
-  //       },
-  //       suppressHeaderMenuButton: true,
-  //     });
-      
-  //     // Processed Data
-  //     // const processedData = data.map((row) => {
-  //     //   const updatedRow: any = {};
-  //     //   Object.keys(row).forEach((key) => {
-  //     //     updatedRow[key] =
-  //     //       row[key]?.toString().trim() === '' ? null : row[key];
-  //     //   });
-  //     //   return updatedRow;
-  //     // });
-
-  //     this.rowData = [...data];
-  //     this.originalData = [...data];
-      
-  //     console.log("Data load: ", this.rowData);
-  //   } else {
-  //     console.log('No data to load');
-  //   }
-  // }
-
   generateColumnDefs(data: any[]) {
-    console.log("GENERATE COLUMN",data)
+    console.log('GENERATE COLUMN', data);
     if (data.length === 0) {
       return [];
     }
 
     return [
-    // {
-    //   headerName: 'uploadscore_tableFieldSeatNo',
-    //   valueGetter: (params: any) => params.node.rowIndex + 1, // ใช้ index ของ row
-    //   minWidth: 70,
-    //   flex: 0.3,
-    // },
-    ...
-    Object.keys(data[0]).map((key) => {
-      let customWidth = 100;
-      let flexValue = 1;
-      let cellClass = '';
-      let fieldNameKey = '';
+      ...Object.keys(data[0]).map((key) => {
+        let customWidth = 100;
+        let flexValue = 1;
+        let cellClass = '';
+        let fieldNameKey = '';
 
-      switch (key) {
-        case 'row_id':
-          fieldNameKey = 'uploadscore_tableFieldSeatNo';
-          customWidth = 70;
-          flexValue = 0.3;
-          // return {
-          //   field: key,
-          //   fieldNameKey: 'uploadscore_tableFieldSeatNo',
-          //   // hide: true, // ซ่อนคอลัมน์นี้จาก UI
-          // };
-          break;
-        case 'email':
-          fieldNameKey = 'user_manage_email';
-          customWidth = 70;
-          flexValue = 1.7;
-          break;
-        case 'teacher_code':
-          fieldNameKey = 'user_manage_teachercode';
-          customWidth = 70;
-          flexValue = 0.8;
-          break;
-        case 'prefix':
-          fieldNameKey = 'user_manage_prefix';
-          customWidth = 70;
-          flexValue = 0.6;
-          cellClass = 'agSelectCellEditor';
-          break;
-        case 'firstname':
-          fieldNameKey = 'user_manage_name';
-          customWidth = 70;
-          flexValue = 1.2;
-          break;
-        case 'lastname':
-          fieldNameKey = 'user_manage_surname';
-          customWidth = 70;
-          flexValue = 1.2;
-          break;
-        case 'role':
-          fieldNameKey = 'user_manage_role';
-          customWidth = 70;
-          flexValue = 0.8;
-          cellClass = 'text-end';
-          cellClass = 'agSelectCellEditor';
-          break;
-        // case 'active_status':
-        //   headerName = 'สถานะการใช้งาน';
-        //   customWidth = 70;
-        //   flexValue = 0.8;
-        //   cellClass = 'text-end';
-        //   break;
-        case 'manage':
-          return {
-            headerName: '',
-            field: 'action',
-            width: 100,
-            cellRenderer: (params: any) => {
-              const rowId = params.data.row_id; // Use row_id to identify the row
-              
-              // Create container for delete button
-              const container = document.createElement('div');
-              container.innerHTML = `
+        switch (key) {
+          case 'row_id':
+            fieldNameKey = 'uploadscore_tableFieldSeatNo';
+            customWidth = 70;
+            flexValue = 0.3;
+            break;
+          case 'email':
+            fieldNameKey = 'user_manage_email';
+            customWidth = 70;
+            flexValue = 1.7;
+            break;
+          case 'teacher_code':
+            fieldNameKey = 'user_manage_teachercode';
+            customWidth = 70;
+            flexValue = 0.8;
+            break;
+          case 'prefix':
+            fieldNameKey = 'user_manage_prefix';
+            customWidth = 70;
+            flexValue = 0.6;
+            cellClass = 'agSelectCellEditor';
+            break;
+          case 'firstname':
+            fieldNameKey = 'user_manage_name';
+            customWidth = 70;
+            flexValue = 1.2;
+            break;
+          case 'lastname':
+            fieldNameKey = 'user_manage_surname';
+            customWidth = 70;
+            flexValue = 1.2;
+            break;
+          case 'role':
+            fieldNameKey = 'user_manage_role';
+            customWidth = 70;
+            flexValue = 0.8;
+            cellClass = 'text-end';
+            cellClass = 'agSelectCellEditor';
+            break;
+          case 'manage':
+            return {
+              headerName: '',
+              field: 'action',
+              width: 100,
+              cellRenderer: (params: any) => {
+                const rowId = params.data.row_id;
+
+                // Create container for delete button
+                const container = document.createElement('div');
+                container.innerHTML = `
                 <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
                   <button style="background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center;">
                     <i class="bi bi-trash3" style="color: #d33; font-size: 1.2rem;"></i>
                   </button>
                 </div>
               `;
-              
-              // Add event listener for delete
-              container.querySelector('button')?.addEventListener('click', () => {
-                this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
-              });
-    
-              return container;
-            },
-            suppressHeaderMenuButton: true,
-          }
-        default:
-          customWidth = 160;
-          fieldNameKey = key;
-      }
 
-      const translatedHeader =
-        this.translate.getTranslation(fieldNameKey);
+                // Add event listener for delete
+                container
+                  .querySelector('button')
+                  ?.addEventListener('click', () => {
+                    this.onDeleteRow(rowId); // Pass row_id to onDeleteRow method
+                  });
 
-      return {
-        field: key,
-        headerName: translatedHeader || key,
-        flex: flexValue,
-        minWidth: customWidth,
-        cellClass: cellClass,
-        cellRenderer: (params: any) => {
-          const value = params.value?.toString().trim();
-          if (value === '' || value === null || value === undefined) {
-            return '<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>';
-          } else if (value === '-') {
-            return '<span style="color: red; font-weight: bold;">-</span>';
-          }
-          return params.value;
+                return container;
+              },
+              suppressHeaderMenuButton: true,
+            };
+          default:
+            customWidth = 160;
+            fieldNameKey = key;
+        }
+
+        const translatedHeader = this.translate.getTranslation(fieldNameKey);
+
+        return {
+          field: key,
+          headerName: translatedHeader || key,
+          flex: flexValue,
+          minWidth: customWidth,
+          cellClass: cellClass,
+          cellRenderer: (params: any) => this.customCellRenderer(params.value),
+          valueFormatter:
+          key === 'prefix' || key === 'role'
+            ? (params: any) => this.translateDropdown(params.value)
+            : undefined,
+        cellEditorParams: {
+          values:
+            key === 'prefix'
+              ? this.prefixData.map((item) =>
+                  this.translateDropdown(item.byte_desc_th)
+                )
+              : key === 'role'
+              ? this.roleData.map((item) =>
+                  this.translateDropdown(item.byte_desc_th)
+                )
+              : [],
         },
-        // Apply select-box for prefix and role only
-        cellEditorParams: key === 'prefix' ? {
-          values: this.prefixData.map(item => item.byte_desc_th),
-        } : key === 'role' ? {
-          values: this.roleData.map(item => item.byte_desc_th),
-        } : null,
-        cellEditor: cellClass, // Apply select-box editor
-      };
-    }
-  )];
+        cellEditor:
+        key === 'prefix' || key === 'role' ? 'agSelectCellEditor' : undefined,
+    };
+  }),
+];
+}
 
+  private customCellRenderer(value: any): string {
+    if (value === null || value === undefined || value.toString().trim() === '') {
+      return `<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>`;
+    } else if (value === '-') {
+      return `<span style="color: red; font-weight: bold;">-</span>`;
+    }
+    return value;
   }
+  
 
   onDeleteRow(rowId: number) {
-    const title =  this.translate.getTranslation('add_user_question_1');
-    const text =  this.translate.getTranslation('add_user_question_2');
+    const title = this.translate.getTranslation('add_user_question_1');
+    const text = this.translate.getTranslation('add_user_question_2');
     const delete_button = this.translate.getTranslation('add_user_delete');
     const cancel_button = this.translate.getTranslation('btn_cancel');
 
-    console.log(this.originalData)
-    const rowIndex = this.originalData.findIndex(row => row.row_id === rowId);
+    console.log(this.originalData);
+    const rowIndex = this.originalData.findIndex((row) => row.row_id === rowId);
     console.log(rowIndex);
     console.log(rowId);
     if (rowIndex !== -1) {
@@ -764,18 +563,18 @@ export class AddUserComponent implements OnInit {
         cancelButtonText: cancel_button,
       }).then((result) => {
         if (result.isConfirmed) {
-      
           if (this.gridApi) {
-
             this.originalData.splice(rowIndex, 1);
-            
+
             this.gridApi.applyTransaction({
-              remove: this.originalData.filter(row => row.row_id === rowIndex)
+              remove: this.originalData.filter(
+                (row) => row.row_id === rowIndex
+              ),
             });
             this.rowData = [...this.originalData];
-            this.gridApi.setGridOption("rowData", this.rowData);
+            this.gridApi.setGridOption('rowData', this.rowData);
             this.gridApi.refreshCells({ force: true });
-          }          
+          }
 
           console.log('Row rowData', this.rowData);
           console.log('Row originalData', this.originalData);
@@ -785,24 +584,27 @@ export class AddUserComponent implements OnInit {
         }
       });
     } else {
-      console.log("Row not found to delete.");
+      console.log('Row not found to delete.');
     }
   }
 
   onSaveData() {
     const currentLang = localStorage.getItem('language') || 'en';
-  
+
     // ตรวจสอบว่ามีข้อมูลในตารางหรือไม่
     if (!this.rowData || this.rowData.length === 0) {
       Swal.fire({
         title: currentLang === 'th' ? 'ไม่มีข้อมูล' : 'No data',
-        text: currentLang === 'th' ? 'กรุณาอัปโหลดข้อมูลก่อนบันทึก' : 'Please upload data before saving',
+        text:
+          currentLang === 'th'
+            ? 'กรุณาอัปโหลดข้อมูลก่อนบันทึก'
+            : 'Please upload data before saving',
         icon: 'error',
         confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
       });
       return;
     }
-  
+
     // ตรวจสอบฟิลด์ที่ว่างเปล่าในแต่ละแถว
     const missingFieldsGrouped = this.rowData
       .map((row, index) => {
@@ -813,27 +615,29 @@ export class AddUserComponent implements OnInit {
             row[field].toString().trim().toUpperCase() === 'NULL'
         );
         return missingFields.length > 0
-          ? `${currentLang === 'th' ? 'แถวที่' : 'Row'} ${index + 1}: ${missingFields.join(', ')}`
+          ? `${currentLang === 'th' ? 'แถวที่' : 'Row'} ${
+              index + 1
+            }: ${missingFields.join(', ')}`
           : null;
       })
       .filter((item) => item !== null);
-  
+
     // หากมีฟิลด์ที่ว่างเปล่า แสดงการแจ้งเตือน
     if (missingFieldsGrouped.length > 0) {
       Swal.fire({
         title: currentLang === 'th' ? 'ข้อมูลไม่ครบถ้วน' : 'Incomplete Data',
-        html: `${currentLang === 'th' ? 'พบฟิลด์ที่ยังไม่ได้กรอก:' : 'Missing fields:'}<br>${missingFieldsGrouped.join(
-          '<br>'
-        )}`,
+        html: `${
+          currentLang === 'th' ? 'พบฟิลด์ที่ยังไม่ได้กรอก:' : 'Missing fields:'
+        }<br>${missingFieldsGrouped.join('<br>')}`,
         icon: 'warning',
         confirmButtonColor: '#0d6efd',
         confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
       });
       return;
     }
-  
+
     const UserInfo = this.UserService.username;
-    
+
     // กำหนดข้อมูลที่ต้องการส่ง
     const dataToSend = this.rowData.map((row) => {
       const { create_date, ...filteredRow } = row;
@@ -849,8 +653,10 @@ export class AddUserComponent implements OnInit {
     const Fail_title = this.translate.getTranslation('sweet_alert_fail_title');
     const Fail_text = this.translate.getTranslation('sweet_alert_fail_text');
     const email_duplicated = this.translate.getTranslation('email_duplicated');
-    const teacherCode_duplicated = this.translate.getTranslation('add_user_duplicated_teachercode')
-    
+    const teacherCode_duplicated = this.translate.getTranslation(
+      'add_user_duplicated_teachercode'
+    );
+
     // ส่งข้อมูลไปยัง API
     this.addUserService.insertUser(dataToSend).subscribe(
       (response) => {
@@ -866,19 +672,22 @@ export class AddUserComponent implements OnInit {
       },
       (error) => {
         console.error('Error occurred while inserting user data: ', error);
-  
+
         if (error && error.errors) {
           const errorMessages = error.errors;
-          const errorMessage_code = error.message
-  
-          if (errorMessages.length > 0 && errorMessage_code == 'มีอีเมลบางรายการที่ใช้งานแล้ว') {
-            console.log(errorMessages)
-            console.log("My error email: ", errorMessage_code)
+          const errorMessage_code = error.message;
+
+          if (
+            errorMessages.length > 0 &&
+            errorMessage_code == 'มีอีเมลบางรายการที่ใช้งานแล้ว'
+          ) {
+            console.log(errorMessages);
+            console.log('My error email: ', errorMessage_code);
             // const errorMessage = errorMessages
             // .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
             //   .join('<br>');
             const duplicatedEmail = errorMessages.join('<br>');
-            
+
             Swal.fire({
               title: Fail_title,
               html: `${email_duplicated}<br>${duplicatedEmail}`,
@@ -889,27 +698,30 @@ export class AddUserComponent implements OnInit {
             return;
           }
 
-        if (errorMessages.length > 0 && errorMessage_code == 'มีรหัสอาจารย์ถูกใช้งานแล้ว') {
-          console.log(errorMessages)
-          console.log("My error teacher_code: ", errorMessage_code)
-          // const errorMessage = errorMessages
-          // .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
-          // .join('<br>');
+          if (
+            errorMessages.length > 0 &&
+            errorMessage_code == 'มีรหัสอาจารย์ถูกใช้งานแล้ว'
+          ) {
+            console.log(errorMessages);
+            console.log('My error teacher_code: ', errorMessage_code);
+            // const errorMessage = errorMessages
+            // .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
+            // .join('<br>');
 
-          const duplicatedCodes = errorMessages.join('<br>');
-          
-          Swal.fire({
-            title: Fail_title,
-            // html: `${teacherCode_duplicated}<br>${errorMessage}`,
-            html: `${teacherCode_duplicated}<br>${duplicatedCodes}`, 
-            icon: 'error',
-            confirmButtonColor: '#0d6efd',
-            confirmButtonText: Submit_Button,
-          });
-          return;
+            const duplicatedCodes = errorMessages.join('<br>');
+
+            Swal.fire({
+              title: Fail_title,
+              // html: `${teacherCode_duplicated}<br>${errorMessage}`,
+              html: `${teacherCode_duplicated}<br>${duplicatedCodes}`,
+              icon: 'error',
+              confirmButtonColor: '#0d6efd',
+              confirmButtonText: Submit_Button,
+            });
+            return;
+          }
         }
-      }
-  
+
         Swal.fire({
           title: Fail_title,
           text: Fail_text,
@@ -920,16 +732,14 @@ export class AddUserComponent implements OnInit {
       }
     );
   }
-  
+
   onDelete() {
-    const title =  this.translate.getTranslation('add_user_question_1');
-    const text =  this.translate.getTranslation('add_user_question_2');
+    const title = this.translate.getTranslation('add_user_question_1');
+    const text = this.translate.getTranslation('add_user_question_2');
     const delete_button = this.translate.getTranslation('add_user_delete');
     const cancel_button = this.translate.getTranslation('btn_cancel');
 
     Swal.fire({
-      // title: 'ต้องการลบข้อมูลใช่หรือไม่',
-      // text: 'หลังจากลบข้อมูลแล้วจะไม่สามารถกลับมาแก้ไขได้',
       title: title,
       text: text,
       icon: 'warning',
@@ -954,53 +764,59 @@ export class AddUserComponent implements OnInit {
     });
   }
 
-validateFields(data: any[]): boolean {
-  if (!data || data.length === 0 || !data[0]) {
-    const Failed_title = this.translate.getTranslation('add_user_failed_title');
-    const Failed_text = this.translate.getTranslation('add_user_failed_text');
-    const submit = this.translate.getTranslation('btn_ok');
+  validateFields(data: any[]): boolean {
+    if (!data || data.length === 0 || !data[0]) {
+      const Failed_title = this.translate.getTranslation(
+        'add_user_failed_title'
+      );
+      const Failed_text = this.translate.getTranslation('add_user_failed_text');
+      const submit = this.translate.getTranslation('btn_ok');
 
-    Swal.fire({
-      title: Failed_title,
-      html: `${Failed_text}`,
-      icon: 'error',
-      confirmButtonText: submit,
-      confirmButtonColor: '#0d6efd',
-    });
-    return false;
-  }
+      Swal.fire({
+        title: Failed_title,
+        html: `${Failed_text}`,
+        icon: 'error',
+        confirmButtonText: submit,
+        confirmButtonColor: '#0d6efd',
+      });
+      return false;
+    }
 
-  const Ok_button = this.translate.getTranslation('btn_ok');
-  const Invalid_header = this.translate.getTranslation('add_user_invalid_header');
-  const Validate_excel = this.translate.getTranslation('add_user_validate_excel');
-
-  const requiredFields = [
-    'อีเมล', // ถ้าไม่จำเป็นสามารถเอาออกได้
-    'รหัสอาจารย์',
-    'คำนำหน้า',
-    'ชื่อ',
-    'นามสกุล',
-    'หน้าที่',
-  ];
-
-  const fileFields = Object.keys(data[0]).map(field => field.trim());
-
-    const missingFields = requiredFields.filter(
-      (field) => !fileFields.some(f => f.trim() === field.trim())
+    const Ok_button = this.translate.getTranslation('btn_ok');
+    const Invalid_header = this.translate.getTranslation(
+      'add_user_invalid_header'
+    );
+    const Validate_excel = this.translate.getTranslation(
+      'add_user_validate_excel'
     );
 
-  // ถ้ามีคอลัมน์ที่ขาดหายไป ให้แสดงข้อความเตือน
-  if (missingFields.length > 0) {
-    Swal.fire({
-      title: Invalid_header,
-      html: `${Validate_excel}:<br>${missingFields.join('<br>')}`,
-      icon: 'warning',
-      confirmButtonText: Ok_button,
-      confirmButtonColor: '#0d6efd',
-    });
-    return false;
-  }
+    const requiredFields = [
+      'อีเมล', // ถ้าไม่จำเป็นสามารถเอาออกได้
+      'รหัสอาจารย์',
+      'คำนำหน้า',
+      'ชื่อ',
+      'นามสกุล',
+      'หน้าที่',
+    ];
 
-  return true;
-}
+    const fileFields = Object.keys(data[0]).map((field) => field.trim());
+
+    const missingFields = requiredFields.filter(
+      (field) => !fileFields.some((f) => f.trim() === field.trim())
+    );
+
+    // ถ้ามีคอลัมน์ที่ขาดหายไป ให้แสดงข้อความเตือน
+    if (missingFields.length > 0) {
+      Swal.fire({
+        title: Invalid_header,
+        html: `${Validate_excel}:<br>${missingFields.join('<br>')}`,
+        icon: 'warning',
+        confirmButtonText: Ok_button,
+        confirmButtonColor: '#0d6efd',
+      });
+      return false;
+    }
+
+    return true;
+  }
 }

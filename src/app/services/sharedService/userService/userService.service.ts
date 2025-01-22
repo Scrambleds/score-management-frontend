@@ -12,6 +12,14 @@ export class UserService {
     this.loadUserInfo();
   }
 
+  updateRole(role: string): void {
+    const userInfo = this.userInfoSubject.getValue();
+    if (userInfo) {
+      userInfo.role = role;
+      this.userInfoSubject.next(userInfo);
+    }
+  }  
+
   private loadUserInfo(): void {
     const userInfoJson = localStorage.getItem('userInfo');
     const userInfo = userInfoJson ? JSON.parse(userInfoJson) : null;

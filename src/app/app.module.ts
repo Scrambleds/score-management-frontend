@@ -66,6 +66,8 @@ import { BellCurveComponent } from './components/bell-curve/bell-curve.component
 import { NgChartsModule } from 'ng2-charts';
 import { SearchDashboardComponent } from './components/search-dashboard/search-dashboard.component';
 import { ChangePasswordComponent } from './route/change-password/change-password.component';
+import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
+import { Page404Component } from './components/page-404/page-404.component';
 
 @NgModule({
   declarations: [
@@ -105,6 +107,7 @@ import { ChangePasswordComponent } from './route/change-password/change-password
     BellCurveComponent,
     SearchDashboardComponent,
     ChangePasswordComponent,
+    Page404Component,
   ],
   imports: [
     BrowserModule,
@@ -125,6 +128,8 @@ import { ChangePasswordComponent } from './route/change-password/change-password
     NgChartsModule
   ],
   providers: [
+    { provide: JWT_OPTIONS, useValue: {} },
+    JwtHelperService,
     CacheService,
     provideHttpClient(withInterceptorsFromDi()),
     {
