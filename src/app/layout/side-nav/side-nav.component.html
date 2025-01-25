@@ -28,7 +28,7 @@
       *ngIf="showUserManagement"
       routerLink="/UserManagement"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
+      [routerLinkActiveOptions]="{ exact: false }"
       ><i class="bi bi-person-fill"></i>
       <!-- จัดการผู้ใช้งาน -->
       {{ "menu_usermanage" | translate }}
@@ -100,17 +100,17 @@
       {{ "menu_masterdata" | translate }}
     </a>
     <a
-     *ngIf="showUserManagement"
+      *ngIf="showUserManagement"
       routerLink="/UserManagement"
       routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
+      [routerLinkActiveOptions]="{ exact: false }"
       (click)="closeNav()"
       ><i class="bi bi-person-fill"></i>
       <!-- จัดการผู้ใช้งาน -->
       {{ "menu_usermanage" | translate }}
     </a>
     <a
-     *ngIf="showUploadScore"
+      *ngIf="showUploadScore"
       routerLink="/UploadScore"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -120,7 +120,7 @@
       {{ "menu_uploadscore" | translate }}
     </a>
     <a
-     *ngIf="showSearchScore"
+      *ngIf="showSearchScore"
       routerLink="/SearchScore"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
@@ -130,7 +130,7 @@
       {{ "menu_searchscore" | translate }}
     </a>
     <a
-     *ngIf="showScoreAnnouncement"
+      *ngIf="showScoreAnnouncement"
       routerLink="/ScoreAnnouncement"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"

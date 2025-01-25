@@ -44,15 +44,18 @@ const routes: Routes = [
       },
       {
         path: 'UserManagement',
-        component: UserManageComponent,
         data: { messageKey: 'menu_usermanage', allowedRoles: ['1'] },
         canActivate: [AuthGuard],
-      },
-      {
-        path: 'UserManagement/AddUser',
-        component: AddUserRoute,
-        data: { messageKey: 'menu_usermanage', allowedRoles: ['1'] },
-        canActivate: [AuthGuard],
+        children: [
+          {
+            path: '',
+            component: UserManageComponent, // ใช้ path หลักแสดง UserManageComponent
+          },
+          {
+            path: 'AddUser', // path ย่อย
+            component: AddUserRoute,
+          },
+        ],
       },
       {
         path: 'UploadScore',
@@ -84,7 +87,11 @@ const routes: Routes = [
         data: { messageKey: 'change_pwd_title' },
         canActivate: [AuthGuard],
       },
-      { path: 'NotFound', component: Page404Component, data: { messageKey: 'Page 404' }, },
+      {
+        path: 'NotFound',
+        component: Page404Component,
+        data: { messageKey: 'Page 404' },
+      },
       { path: '**', redirectTo: '/NotFound' },
     ],
   },
