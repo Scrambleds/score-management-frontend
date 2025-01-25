@@ -1,17 +1,17 @@
 <div class="dashboard">
-  <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4" style="display: flex; justify-content: center;">
+  <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 gx-4" style="display: flex; justify-content: center;">
 
     <!-- คะแนนเฉลี่ย -->
     <div class="col-12">
       <div class="card p-4">
         <div class="col-12 d-flex justify-content-start">
-          <p class="opacity-55" style="color: #5B5B5B;">คะแนนเฉลี่ย</p>
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_avg_score' | translate }}</p>
         </div>
         <div class="col-12 d-flex justify-content-center mb-3">
           <h1 class="fw-bold">{{ avgScore! }}</h1>
         </div>
         <div class="col-12 d-flex justify-content-center">
-          <p class="opacity-55" style="color: #5B5B5B;">คะแนนเฉลี่ยของแต่ละรายวิชา</p>
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_avg_description' | translate }}</p>
         </div>
       </div>
     </div>
@@ -20,13 +20,13 @@
     <div class="col-12">
       <div class="card p-4">
         <div class="col-12 d-flex justify-content-start">
-          <p class="opacity-55" style="color: #5B5B5B;">คะแนนต่ำสุด</p>
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_min_score' | translate }}</p>
         </div>
         <div class="col-12 d-flex justify-content-center mb-3">
           <h1 class="fw-bold">{{ minScore! }}</h1>
         </div>
         <div class="col-12 d-flex justify-content-center">
-          <p class="opacity-55" style="color: #5B5B5B;">คะแนนต่ำสุดของแต่ละรายวิชา</p>
+          <p class="opacity-55" style="color: #5B5B5B;"> {{ 'dashboard_min_description' | translate}}</p>
         </div>
       </div>
     </div>
@@ -35,13 +35,13 @@
     <div class="col-12">
       <div class="card p-4">
         <div class="col-12 d-flex justify-content-start">
-          <p class="opacity-55" style="color: #5B5B5B;">คะแนนสูงสุด</p>
+          <p class="opacity-55" style="color: #5B5B5B;"> {{ 'dashboard_max_score' | translate }}</p>
         </div>
         <div class="col-12 d-flex justify-content-center mb-3">
           <h1 class="fw-bold">{{ maxScore! }}</h1>
         </div>
         <div class="col-12 d-flex justify-content-center">
-          <p class="opacity-55" style="color: #5B5B5B;">คะแนนสูงสุดของแต่ละรายวิชา</p>
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_max_description' | translate }}</p>
         </div>
       </div>
     </div>
@@ -50,13 +50,13 @@
     <div class="col-12">
       <div class="card p-4">
         <div class="col-12 d-flex justify-content-start">
-          <p class="opacity-55" style="color: #5B5B5B;">ค่าเบี่ยงเบนมาตรฐาน</p>
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_std_score' | translate }}</p>
         </div>
         <div class="col-12 d-flex justify-content-center mb-3">
           <h1 class="fw-bold">{{ stdDev! }}</h1>
         </div>
         <div class="col-12 d-flex justify-content-center">
-          <p class="opacity-55" style="color: #5B5B5B;">ค่าเบี่ยงเบนมาตรฐานของแต่ละรายวิชา</p>
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_std_description' | translate }}</p>
         </div>
       </div>
     </div>
@@ -65,13 +65,13 @@
     <div class="col-12">
       <div class="card p-4">
         <div class="col-12 d-flex justify-content-start">
-          <p class="opacity-55" style="color: #5B5B5B;">จำนวนนิสิต</p>
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_number_student' | translate }}</p>
         </div>
         <div class="col-12 d-flex justify-content-center mb-3">
           <h1 class="fw-bold">{{ studentCount! }}</h1>
         </div>
         <div class="col-12 d-flex justify-content-center">
-          <p class="opacity-55" style="color: #5B5B5B;">จำนวนนิสิตของแต่ละรายวิชา</p>
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_stu_description' | translate }}</p>
         </div>
       </div>
     </div>
@@ -83,7 +83,7 @@
   <div class="col-12 col-md-6 col-lg-6 d-flex justify-content-start">
     <div class="card bell-curve-card">
       <div class="card-body">
-        <h5 class="card-title ps-4 mt-4 fw-bold mb-5">ช่วงสัดส่วนคะแนนของนิสิตที่ได้รับคะแนน</h5>
+        <h5 class="card-title ps-4 mt-4 fw-bold mb-5">{{ 'dashboard_range' | translate }}</h5>
         <div class="col-12 d-flex justify-content-center align-items-center">
           <!-- <div style="max-width: 80.5rem; width: 100%;"> -->
           <!-- <canvas baseChart
@@ -103,7 +103,7 @@
   <div class="col-12 col-md-6 col-lg-6 d-flex justify-content-start">
     <div class="card bell-curve-card">
       <div class="card-body">
-        <h5 class="card-title ps-4 mt-4 fw-bold mb-5">การแจกแจงคะแนนนิสิต</h5>
+        <h5 class="card-title ps-4 mt-4 fw-bold mb-5">{{ 'dashboard_distribution_score' | translate }}</h5>
         <div class="col-12 d-flex justify-content-start align-items-center" style="height: 400px;">
           <!-- <canvas #bChart baseChart [data]="bellCurveData" [labels]="bellCurveLabels" [type]="'line'">
         </canvas> -->
