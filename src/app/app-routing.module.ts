@@ -13,6 +13,7 @@ import { SearchScoreComponent } from './route/search-score/search-score.componen
 import { UploadScoreComponent } from './route/upload-score/upload-score.component';
 import { UserManageComponent } from './route/user-manage/user-manage.component';
 import { Page404Component } from './components/page-404/page-404.component';
+import { ErrorLayoutComponent } from './layout/error-layout/error-layout.component';
 
 const routes: Routes = [
   {
@@ -87,13 +88,24 @@ const routes: Routes = [
         data: { messageKey: 'change_pwd_title' },
         canActivate: [AuthGuard],
       },
-      {
-        path: 'NotFound',
-        component: Page404Component,
-        data: { messageKey: 'Page 404' },
-      },
-      { path: '**', redirectTo: '/NotFound' },
+      // { path: 'NotFound', component: Page404Component, data: { messageKey: 'Page 404' }, },
+      // { path: '**', redirectTo: '/NotFound' },
     ],
+  },
+  {
+    path: 'NotFound',
+    component: ErrorLayoutComponent,
+    children: [
+      {
+        path: '**',
+        component: Page404Component,
+        data: { messageKey: 'error_title' },
+      },
+    ],
+  },
+  {
+    path: '**',
+    redirectTo: '/NotFound',
   },
   {
     path: '**', // สำหรับเส้นทางที่ไม่พบให้ไปที่หน้า Login

@@ -68,6 +68,7 @@ import { SearchDashboardComponent } from './components/search-dashboard/search-d
 import { ChangePasswordComponent } from './route/change-password/change-password.component';
 import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
 import { Page404Component } from './components/page-404/page-404.component';
+import { ErrorLayoutComponent } from './layout/error-layout/error-layout.component';
 
 @NgModule({
   declarations: [
@@ -108,6 +109,7 @@ import { Page404Component } from './components/page-404/page-404.component';
     SearchDashboardComponent,
     ChangePasswordComponent,
     Page404Component,
+    ErrorLayoutComponent,
   ],
   imports: [
     BrowserModule,
