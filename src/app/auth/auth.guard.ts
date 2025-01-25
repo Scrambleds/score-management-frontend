@@ -64,11 +64,13 @@ export class AuthGuard implements CanActivate {
     return null;
   }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    const token = localStorage.getItem('token');
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean {
+    const token = localStorage.getItem('token') || false;
     const tokenExpiration = localStorage.getItem('tokenExpiration');
     const userInfo = localStorage.getItem('userInfo');
-
     // ตรวจสอบ token ว่ามีอยู่และยังไม่หมดอายุ
     if (!token || this.jwtHelper.isTokenExpired(token)) {
       this.router.navigate(['/Login']);
@@ -81,7 +83,7 @@ export class AuthGuard implements CanActivate {
     const allowedRoles = route.data['allowedRoles'] as Array<number>;
 
     if (allowedRoles && !allowedRoles.includes(userRole)) {
-      this.router.navigate(['/Login']);
+      this.router.navigate(['/NotFound']);
       return false;
     }
 

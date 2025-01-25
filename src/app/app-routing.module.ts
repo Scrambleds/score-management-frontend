@@ -98,6 +98,7 @@ const routes: Routes = [
     children: [
       {
         path: '**',
+        canActivate: [AuthGuard],
         component: Page404Component,
         data: { messageKey: 'error_title' },
       },
@@ -106,10 +107,6 @@ const routes: Routes = [
   {
     path: '**',
     redirectTo: '/NotFound',
-  },
-  {
-    path: '**', // สำหรับเส้นทางที่ไม่พบให้ไปที่หน้า Login
-    redirectTo: '/Login',
   },
 ];
 
