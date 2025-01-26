@@ -218,6 +218,9 @@ export class SearchFormScoreComponent implements OnInit {
   }
 
   customSearchFn(term: string, item: any): boolean {
-    return this.translationService.searchFn(term, item);
+    return this.translationService.searchFn(term, item, {
+      th: 'desc_th',
+      en: 'desc_en',
+    });
   }
 }

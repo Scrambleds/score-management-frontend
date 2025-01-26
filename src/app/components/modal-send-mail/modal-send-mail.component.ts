@@ -538,45 +538,45 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
     // };
 
     console.log('Email Payload:', payload); // แสดงค่าใน console
-    // this.scoreAnnouncementService.sendMail(payload).subscribe(
-    //   (response) => {
-    //     this.createTemplateForm.reset();
-    //     this.isTemplateDialogVisible = false;
-    //     console.log('Success', response);
-    //     if (response.isSuccess) {
-    //       Swal.fire({
-    //         title: 'ส่งอีเมลสำเร็จ',
-    //         icon: 'success',
-    //         confirmButtonColor: 'var(--primary-color)',
-    //         confirmButtonText: 'ตกลง',
-    //       }).then((result) => {
-    //         if (result.isConfirmed) {
-    //           // หากคลิก "ตกลง"
-    //           console.log('success : ', response.messageDesc);
-    //         }
-    //       });
-    //     } else {
-    //       Swal.fire({
-    //         title: 'เกิดข้อผิดพลาด',
-    //         text: response.message.messageDescription,
-    //         icon: 'error',
-    //         confirmButtonColor: 'var(--secondary-color)',
-    //         confirmButtonText: 'ปิด',
-    //       }).then((result) => {
-    //         if (result.isConfirmed) {
-    //           // หากคลิก "ตกลง"
-    //           console.log('error : ', response.messageDesc);
-    //         }
-    //       });
-    //     }
-    //   },
-    //   (error) => {
-    //     console.log('Error', error);
-    //   },
-    //   () => {
-    //     this.isCreateTemplateSubmited = false; // reset flg
-    //   }
-    // );
+    this.scoreAnnouncementService.sendMail(payload).subscribe(
+      (response) => {
+        this.createTemplateForm.reset();
+        this.isTemplateDialogVisible = false;
+        console.log('Success', response);
+        if (response.isSuccess) {
+          Swal.fire({
+            title: 'ส่งอีเมลสำเร็จ',
+            icon: 'success',
+            confirmButtonColor: 'var(--primary-color)',
+            confirmButtonText: 'ตกลง',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // หากคลิก "ตกลง"
+              console.log('success : ', response.messageDesc);
+            }
+          });
+        } else {
+          Swal.fire({
+            title: 'เกิดข้อผิดพลาด',
+            text: response.message.messageDescription,
+            icon: 'error',
+            confirmButtonColor: 'var(--secondary-color)',
+            confirmButtonText: 'ปิด',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // หากคลิก "ตกลง"
+              console.log('error : ', response.messageDesc);
+            }
+          });
+        }
+      },
+      (error) => {
+        console.log('Error', error);
+      },
+      () => {
+        this.isCreateTemplateSubmited = false; // reset flg
+      }
+    );
   }
 
   isTemplateDialogVisible = false;

@@ -88,10 +88,17 @@ export class TranslationService {
   }
 
   //for search Ng-select
-  searchFn(term: string, item: any): boolean {
+  searchFn(
+    term: string,
+    item: any,
+    fields: { th: string; en: string } = {
+      th: 'byte_desc_th',
+      en: 'byte_desc_en',
+    }
+  ): boolean {
     term = term.toLowerCase();
     const lang = this.getCurrentLanguage();
-    const field = lang === 'th' ? 'byte_desc_th' : 'byte_desc_en';
+    const field = lang === 'th' ? fields['th'] : fields['en'];
     return item[field]?.toLowerCase().includes(term);
   }
 }
