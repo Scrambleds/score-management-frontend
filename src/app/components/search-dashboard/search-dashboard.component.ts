@@ -17,6 +17,7 @@ import { ExcelExportService } from '../../services/excel-export/excel-export';
 import { format } from 'date-fns';
 import { UploadScoreService } from '../../services/upload-score/upload-score.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-search-dashboard',
@@ -37,7 +38,7 @@ export class SearchDashboardComponent implements OnInit {
   SubjectList: any[] = [];
 
   constructor(private fb: FormBuilder, private selectBoxService: SelectBoxService, private UploadScoreService: UploadScoreService,
-              private DashboardService: DashboardService, private cdr: ChangeDetectorRef,
+              private DashboardService: DashboardService, private cdr: ChangeDetectorRef, private searchTranslateService: TranslationService,
               private ExcelExportService: ExcelExportService) {}
 
 loadMajor() {
@@ -59,12 +60,16 @@ customSearchFn(term: string, item: any): boolean {
   );
 }
 
+// customSearchFn_SearchLan(term: string, item: any): boolean {
+//   term = term.toLowerCase();
+//   return (
+//     item.byte_desc_th.toLowerCase().includes(term) ||
+//     item.byte_desc_en.toLowerCase().includes(term)
+//   );
+// }
+
 customSearchFn_SearchLan(term: string, item: any): boolean {
-  term = term.toLowerCase();
-  return (
-    item.byte_desc_th.toLowerCase().includes(term) ||
-    item.byte_desc_en.toLowerCase().includes(term)
-  );
+  return this.searchTranslateService.searchFn(term, item);
 }
 
   ngOnInit() {

@@ -58,7 +58,7 @@
                   <!-- หน้าที่ -->
                   {{ "user_manage_role" | translate }}
                 </label>
-                <ng-select [items]="roleData" bindLabel="byte_desc_th" bindValue="byte_desc_th" 
+                <ng-select [items]="roleData" bindLabel="byte_desc_th" bindValue="byte_desc_th" [searchFn]="customSearchFn_SearchLan.bind(this)"
                 [placeholder]="'placeholder_select' | translate"
                   formControlName="role" [searchable]="true">
                   <ng-template ng-option-tmp ng-label-tmp let-item="item">
@@ -77,7 +77,7 @@
                   <!-- คำนำหน้าชื่อ -->
                   {{ "user_manage_prefix" | translate }}
                 </label>
-                <ng-select [items]="prefixData" bindLabel="byte_desc_th" bindValue="byte_desc_th" 
+                <ng-select [items]="prefixData" bindLabel="byte_desc_th" bindValue="byte_desc_th" [searchFn]="customSearchFn_SearchLan.bind(this)"
                 [placeholder]="'placeholder_select' | translate"
                   formControlName="prefix" [searchable]="true">
                   <ng-template ng-option-tmp ng-label-tmp let-item="item">
@@ -202,7 +202,7 @@
                   <!-- สถานะการใช้งาน -->
                    {{ "user_manage_status" | translate }}
                 </label>
-                <ng-select [items]="statusData" bindLabel="byte_desc_en" bindValue="byte_desc_en" 
+                <ng-select [items]="statusData" bindLabel="byte_desc_en" bindValue="byte_desc_en" [searchFn]="customSearchFn_SearchLan.bind(this)"
                 [placeholder]="'placeholder_select' | translate"
                   formControlName="active_status" [searchable]="true">
                   <ng-template ng-option-tmp ng-label-tmp let-item="item">

@@ -48,7 +48,7 @@
               <div class="col-12 col-md-6 col-lg-4">
                 <label for="active_status" class="form-label ps-2" [appRequiredMarker]="form.get('active_status')">{{ "user_manage_status" | translate }} </label>
                 <ng-select [items]="statusData" bindLabel="byte_desc_th" bindValue="byte_desc_th"
-                  [placeholder]="'placeholder_select' | translate" formControlName="active_status"
+                  [placeholder]="'placeholder_select' | translate" formControlName="active_status" [searchFn]="customSearchFn_SearchLan.bind(this)"
                   [searchable]="true">
                   <ng-template ng-option-tmp ng-label-tmp let-item="item">
                     {{ item | translateDropdown }}

@@ -36,7 +36,7 @@
           <label class="fw-bold mb-0 ps-2"
             [appRequiredMarker]="form.get('academic_year')">{{ "academic_year" | translate }}</label>
           <div class="select-group">
-            <ng-select class="w-100" name="academic_year" formControlName="academic_year" [items]="academicYearList" [searchFn]="customSearchFn_SearchLan"
+            <ng-select class="w-100" name="academic_year" formControlName="academic_year" [items]="academicYearList" [searchFn]="customSearchFn_SearchLan.bind(this)"
               bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate"
               [searchable]="true" [clearable]="true">
               <ng-template ng-option-tmp ng-label-tmp let-item="item">
@@ -55,8 +55,8 @@
           <label class="fw-bold mb-0 ps-2" [appRequiredMarker]="form.get('semester')">
             {{ "semester" | translate}}</label>
           <div class="select-group">
-            <ng-select class="w-100" name="semester" formControlName="semester" [items]="semesterList" [searchFn]="customSearchFn_SearchLan"
-              bindValue="byte_desc_th" [placeholder]="'placeholder_select' | translate" [searchable]="true"
+            <ng-select class="w-100" name="semester" formControlName="semester" [items]="semesterList" [searchFn]="customSearchFn_SearchLan.bind(this)"
+              bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate" [searchable]="true"
               [clearable]="true">
               <ng-template ng-option-tmp ng-label-tmp let-item="item">
                 {{ item | translateDropdown }}
@@ -92,8 +92,8 @@
             [appRequiredMarker]="form.get('score_type')">{{ "dashboard_scoretype" | translate }}
           </label>
           <div class="select-group">
-            <ng-select class="w-100" name="score_type" formControlName="score_type" [items]="scoreTypeList" [searchFn]="customSearchFn_SearchLan"
-              bindValue="byte_desc_th" [placeholder]="'placeholder_select' | translate" [searchable]="true"
+            <ng-select class="w-100" name="score_type" formControlName="score_type" [items]="scoreTypeList" [searchFn]="customSearchFn_SearchLan.bind(this)"
+              bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate" [searchable]="true"
               [clearable]="true">
               <ng-template ng-option-tmp ng-label-tmp let-item="item">
                 {{ item | translateDropdown }}

@@ -220,6 +220,10 @@ export class ModalEditComponent {
     }
   }
 
+  customSearchFn_SearchLan(term: string, item: any): boolean {
+    return this.translate.searchFn(term, item);
+  }
+
   onShowModal() {
     this.show = true;
   }
