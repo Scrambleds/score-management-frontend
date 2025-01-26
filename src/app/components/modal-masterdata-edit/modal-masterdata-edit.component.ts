@@ -44,6 +44,10 @@ export class ModalMasterdataEditComponent implements AfterViewInit, OnChanges {
     private translate: TranslationService
   ) {}
 
+  customSearchFn_SearchLan(term: string, item: any): boolean {
+    return this.translate.searchFn(term, item);
+  }
+
   ngOnInit() {
     this.form = this.fb.group({
       byte_reference: [

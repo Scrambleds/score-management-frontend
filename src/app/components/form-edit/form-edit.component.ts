@@ -8,6 +8,7 @@ import { HttpResponseBase } from '@angular/common/http';
 import { SelectBoxService } from '../../services/select-box/select-box.service';
 import { masterDataService } from '../../services/sharedService/masterDataService/masterDataService';
 import { forkJoin } from 'rxjs';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-form-edit',
@@ -38,7 +39,8 @@ export class FormEditComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private router: Router,
     private SelectBoxService: SelectBoxService,
-    private masterDataService: masterDataService
+    private masterDataService: masterDataService,
+    private searchTranslateService: TranslationService,
   ) {
     this.form = this.fb.group({
       teacher_code: ['', Validators.required],
@@ -51,6 +53,10 @@ export class FormEditComponent implements OnInit, AfterViewInit {
 
   onAddUserClick() {
     this.router.navigate(['UserManagement/AddUser']);
+  }
+
+  customSearchFn_SearchLan(term: string, item: any): boolean {
+    return this.searchTranslateService.searchFn(term, item);
   }
 
   // รับข้อมูลจาก searchService

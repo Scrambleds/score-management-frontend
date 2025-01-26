@@ -97,7 +97,8 @@
                           bindLabel="byte_desc_th"
                           bindValue="byte_desc_th"
                           placeholder="กรุณาเลือก"
-                          [clearable]="true">
+                          [clearable]="true"
+                          [searchFn]="customSearchFn_SearchLan.bind(this)">
                           <ng-template ng-option-tmp ng-label-tmp let-item="item">
                             {{ item | translateDropdown }}
                           </ng-template>
@@ -121,7 +122,8 @@
                           bindLabel="byte_desc_en"
                           bindValue="byte_desc_en"
                           placeholder="กรุณาเลือก"
-                          [clearable]="true"> 
+                          [clearable]="true"
+                          [searchFn]="customSearchFn_SearchLan.bind(this)"> 
                           <ng-template ng-option-tmp ng-label-tmp let-item="item">
                             {{ item | translateDropdown }}
                           </ng-template>

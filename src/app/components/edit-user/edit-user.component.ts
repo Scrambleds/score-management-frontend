@@ -4,6 +4,7 @@ import { SearchService } from '../../services/search-service/seach.service'
 import { Router } from '@angular/router';
 import { UserManageService } from '../../services/user-manage/user-manage.service';
 import { masterDataService } from '../../services/sharedService/masterDataService/masterDataService';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-edit-user',
@@ -33,7 +34,8 @@ export class EditUserComponent {
     private fb: FormBuilder, 
     private router: Router, 
     private searchService: SearchService,
-    private masterDataService: masterDataService){
+    private masterDataService: masterDataService,
+    private translate: TranslationService){
     // กำหนดโครงสร้างฟอร์มและ Validation
     this.form = this.fb.group({
       teacher_code: [null],
@@ -48,6 +50,10 @@ export class EditUserComponent {
 private splitFullname(fullname: string): { prefix: string, firstname: string, lastname: string } {
   const [prefix = '', firstname = '', ...rest] = fullname.split(' ').filter(Boolean);
   return { prefix, firstname, lastname: rest.join(' ') };
+}
+
+customSearchFn_SearchLan(term: string, item: any): boolean {
+  return this.translate.searchFn(term, item);
 }
 
 ngOnInit() {
