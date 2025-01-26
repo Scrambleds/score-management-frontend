@@ -12,6 +12,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { ContantService } from '../../../shared/service/contants-service.service';
 import { Observable, of } from 'rxjs';
+import { TranslationService } from '../../../core/services/translation.service';
 
 @Component({
   selector: 'search-form-score',
@@ -70,12 +71,13 @@ export class SearchFormScoreComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private contantLovService: ContantService,
+    private translationService: TranslationService
   ) {
     // สร้างฟอร์ม
     this.form = this.fb.group({
       subjectSearch: ['', Validators.required],
       studentSearch: [{ value: '', disabled: true }],
-      section: [ null, Validators.required],
+      section: [null, Validators.required],
       semester: [null, Validators.required],
       academic_year: [null, Validators.required],
     });
@@ -213,5 +215,9 @@ export class SearchFormScoreComponent implements OnInit {
 
   onReset() {
     this.form.reset();
+  }
+
+  customSearchFn(term: string, item: any): boolean {
+    return this.translationService.searchFn(term, item);
   }
 }

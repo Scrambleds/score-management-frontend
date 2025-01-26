@@ -14,6 +14,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 import { SelectBoxService } from '../../services/select-box/select-box.service';
 import { BehaviorSubject } from 'rxjs';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-upload-score-header',
@@ -61,7 +62,8 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private uploadScoreService: UploadScoreService,
-    private selectBoxService: SelectBoxService
+    private selectBoxService: SelectBoxService,
+    private translationService: TranslationService
   ) {
     this.form = this.fb.group({
       subjectCode: [
@@ -309,5 +311,9 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
     } else {
       console.log('ฟอร์มไม่ถูกต้อง ข้อผิดพลาด: ', this.form.errors);
     }
+  }
+
+  customSearchFn(term: string, item: any): boolean {
+    return this.translationService.searchFn(term, item);
   }
 }

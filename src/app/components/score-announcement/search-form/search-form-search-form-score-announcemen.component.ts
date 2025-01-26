@@ -24,6 +24,7 @@ import { ContantService } from '../../../shared/service/contants-service.service
 import { Observable, of } from 'rxjs';
 import { ModalSendMailComponent } from '../../modal-send-mail/modal-send-mail.component';
 import { SelectBoxService } from '../../../services/select-box/select-box.service';
+import { TranslationService } from '../../../core/services/translation.service';
 
 @Component({
   selector: 'search-form-score-announcemen',
@@ -86,16 +87,17 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private contantLovService: ContantService,
-    private selectBoxService: SelectBoxService
+    private selectBoxService: SelectBoxService,
+    private translationService: TranslationService
   ) {
     // สร้างฟอร์ม
     this.form = this.fb.group({
       subjectSearch: ['', Validators.required],
       studentSearch: [{ value: '' }],
-      semester: [ null , Validators.required],
-      section: [ null , Validators.required],
+      semester: [null, Validators.required],
+      section: [null, Validators.required],
       sendStatus: [{ value: null }],
-      academic_year: [ null , Validators.required],
+      academic_year: [null, Validators.required],
     });
 
     this.contantLovService
@@ -289,5 +291,9 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     console.log('current Subject : ', subjectData);
     this.currentSubject.emit(subjectData);
     // this.modal?.updateCurrentSubject(subjectData);
+  }
+
+  customSearchFn(term: string, item: any): boolean {
+    return this.translationService.searchFn(term, item);
   }
 }

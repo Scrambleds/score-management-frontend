@@ -86,4 +86,12 @@ export class TranslationService {
     }
     return translation;
   }
+
+  //for search Ng-select
+  searchFn(term: string, item: any): boolean {
+    term = term.toLowerCase();
+    const lang = this.getCurrentLanguage();
+    const field = lang === 'th' ? 'byte_desc_th' : 'byte_desc_en';
+    return item[field]?.toLowerCase().includes(term);
+  }
 }

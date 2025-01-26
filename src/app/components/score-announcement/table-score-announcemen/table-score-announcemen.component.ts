@@ -274,7 +274,7 @@ export class TableScoreAnnouncementComponent {
       {
         headerName: this.translationService.getTranslation('status') || 'สถานะ',
         field: 'send_status_code_desc_th',
-        flex: 0.8,
+        flex: 1.1,
         minWidth: 80,
         cellRenderer: (params: any) => {
           const sendStatus = params.value || '';
@@ -293,17 +293,24 @@ export class TableScoreAnnouncementComponent {
             default:
               backgroundColor = '#e0e0e0'; // สีเทา
           }
-      
+
+          // return `
+          //   <div style="position: relative; background-color: ${backgroundColor}; padding: 5px; border-radius: 4px;">
+          //     <span title="${sendDesc}" style="cursor: pointer; color: #ffffff;">
+          //       ${sendStatus}
+          //     </span>
+          //   </div>
+          // `;
           return `
-            <div style="position: relative; background-color: ${backgroundColor}; padding: 5px; border-radius: 4px;">
-              <span title="${sendDesc}" style="cursor: pointer; color: #ffffff;">
+            <div class="h-100" style="display: flex; align-items: center;">
+              <div title="${sendDesc}" style="cursor: pointer; color: #ffffff; background: ${backgroundColor}" class="badge">
                 ${sendStatus}
-              </span>
+              </div>
             </div>
           `;
         },
       },
-      
+
       {
         headerName:
           this.translationService.getTranslation('send_score_table_title') ||

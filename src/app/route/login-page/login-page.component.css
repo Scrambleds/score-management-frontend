@@ -1,6 +1,6 @@
 /* Backgrounds */
 .custom-bg {
-  background-image: url("/assets/background/bg_login.png");
+  background-image: url("../../../assets/background/bg_login.png");
 }
 
 .custom-card {
@@ -99,13 +99,13 @@ body.login-page .custom-card {
 /* iPad Pro and medium desktop screens (min-width: 1024px and max-width: 1439px) */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .custom-card {
-    background-image: url("/assets/other/scenery/md-screen.png");
+    background-image: url("../../../assets/other/scenery/md-screen.png");
     background-size: 50% 100%;
   }
 }
 @media (min-width: 1366px) {
   .custom-card {
-    background-image: url("/assets/other/scenery/lg-screen.png");
+    background-image: url("../../../assets/other/scenery/lg-screen.png");
     background-size: 50% 100%;
   }
 }

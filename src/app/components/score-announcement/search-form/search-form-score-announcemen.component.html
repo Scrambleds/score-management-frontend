@@ -60,6 +60,7 @@
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             [items]="academic_yearLovItem"
+            [searchFn]="customSearchFn.bind(this)"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
@@ -88,6 +89,7 @@
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             [items]="semesterLovItem"
+            [searchFn]="customSearchFn.bind(this)"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
@@ -136,6 +138,7 @@
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             [items]="sectionLovItem"
+            [searchFn]="customSearchFn.bind(this)"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
@@ -145,7 +148,7 @@
             *ngIf="form.get('section')?.touched && form.get('section')?.invalid"
             class="text-danger ps-2"
           >
-            {{ "alert_enterData" | translate }} {{"section"|translate}}
+            {{ "alert_enterData" | translate }} {{ "section" | translate }}
           </div>
         </div>
         <div class="col-12 col-sm-4 col-md-3 col-lg-2">
@@ -159,6 +162,7 @@
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             [items]="statuses"
+            [searchFn]="customSearchFn.bind(this)"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item"
               >{{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
