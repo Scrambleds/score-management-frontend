@@ -12,7 +12,7 @@ import { response } from 'express';
 import { masterDataService } from '../../services/sharedService/masterDataService/masterDataService';
 import { SelectBoxService } from '../../services/select-box/select-box.service';
 import { forkJoin } from 'rxjs';
-import { SearchMasterdataServiceTsComponent } from '../../components/search-masterdata.service.ts/search-masterdata.service.ts.component'
+import { SearchMasterdataServiceTsComponent } from '../../services/search-masterdata.service/search-masterdata.service.ts.component';
 import { Subscription } from 'rxjs';
 
 interface ByteDetail {

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { SearchMasterdataServiceTsComponent } from '../../components/search-masterdata.service.ts/search-masterdata.service.ts.component'
+import { SearchMasterdataServiceTsComponent } from '../../services/search-masterdata.service/search-masterdata.service.ts.component';
 
 @Component({
   selector: 'app-search-master-data',
