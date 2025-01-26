@@ -54,6 +54,7 @@
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             [items]="academic_yearLovItem"
+            [searchFn]="customSearchFn.bind(this)"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown : { th: "desc_th", en: "desc_en" } }}
@@ -72,15 +73,18 @@
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             [items]="semesterLovItem"
+            [searchFn]="customSearchFn.bind(this)"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown : { th: "desc_th", en: "desc_en" } }}
             </ng-template>
           </ng-select>
-        </div><div class="col-12 col-sm-12 col-lg-2 col-md-2 col-xl-1 col-xxl-1">
-          <label for="section" class="fw-bold mb-2 d-flex flex-warp">{{
-            "section" | translate
-          }}<p class="text-danger mb-0 ms-1">*</p></label>
+        </div>
+        <div class="col-12 col-sm-12 col-lg-2 col-md-2 col-xl-1 col-xxl-1">
+          <label for="section" class="fw-bold mb-2 d-flex flex-warp"
+            >{{ "section" | translate }}
+            <p class="text-danger mb-0 ms-1">*</p></label
+          >
           <ng-select
             name="section"
             formControlName="section"
@@ -88,6 +92,7 @@
             [placeholder]="'placeholder_select' | translate"
             [clearable]="true"
             [items]="sectionLovItem"
+            [searchFn]="customSearchFn.bind(this)"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown : { th: "desc_th", en: "desc_en" } }}
@@ -127,7 +132,7 @@
             {{ "alert_enterData" | translate }}
           </div>
         </div>
-        
+
         <div
           class="col-12 col-sm-12 col-md-4 col-lg col-xl-2 col-xxl text-center text-xl-start mx-sm-1"
         >
@@ -187,7 +192,7 @@
         >
           {{
             form.get("subjectSearch")?.invalid ||
-            form.get("academic_year")?.invalid||
+            form.get("academic_year")?.invalid ||
             form.get("semester")?.invalid
               ? ", "
               : ""

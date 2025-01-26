@@ -604,4 +604,8 @@ export class UploadExcelContainerComponent implements OnInit {
       }
     });
   }
+
+  customSearchFn(term: string, item: any): boolean {
+    return this.translationService.searchFn(term, item);
+  }
 }

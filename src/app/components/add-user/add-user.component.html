@@ -16,7 +16,13 @@
       ></i>
       {{ "add_user_upload" | translate }}
     </label>
-    <input id="uploadfile" type="file" class="d-none" (change)="onFileSelected($event)"/>
+    <input
+      id="uploadfile"
+      type="file"
+      class="d-none"
+      accept=".xls,.xlsx"
+      (change)="onFileSelected($event)"
+    />
   </div>
 </div>
 
@@ -27,19 +33,18 @@
         <div
           class="d-flex justify-content-start align-items-start flex-column w-100"
         >
-            <div
-              class="d-flex align-items-center fw-bold text-start ms-3"
-              style="width: 25%; height: 68px"
-            >
+          <div
+            class="d-flex align-items-center fw-bold text-start ms-3"
+            style="width: 25%; height: 68px"
+          >
             <!-- ตารางข้อมูลผู้ใช้งาน -->
-             {{ "add_user_info" | translate }}
-            </div>
+            {{ "add_user_info" | translate }}
+          </div>
         </div>
       </div>
       <div
         class="col-12 col-md ms-auto d-flex justify-content-end align-items-end"
       >
-
         <div class="button-container mb-2 d-flex gap-2">
           <!-- 1. click save data -->
           <button class="btn btn-primary" (click)="onSaveData()">
@@ -48,7 +53,7 @@
               style="font-size: var(--icon-size); color: var(--white-color)"
             ></i>
             <!-- บันทึกข้อมูล -->
-             {{ "user_manage_save" | translate }}
+            {{ "user_manage_save" | translate }}
           </button>
           <button class="btn btn-secondary" (click)="onDelete()">
             <i
@@ -56,15 +61,17 @@
               style="font-size: var(--icon-size); color: var(--white-color)"
             ></i>
             <!-- ลบข้อมูล -->
-             {{ "add_user_delete" | translate }}
+            {{ "add_user_delete" | translate }}
           </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="col-12 text-danger ps-3 mb-0"> {{ "add_user_caution" | translate }}</div>
+    <div class="col-12 text-danger ps-3 mb-0">
+      {{ "add_user_caution" | translate }}
+    </div>
     <!-- ag-Grid -->
-    <ag-grid-angular 
+    <ag-grid-angular
       *ngIf="isFileUploaded"
       style="width: 100%; height: 30.375rem"
       class="ag-theme-quartz"

@@ -20,6 +20,7 @@
       id="uploadfile"
       type="file"
       class="d-none"
+      accept=".xls,.xlsx"
       (change)="onFileSelected($event)"
     />
   </div>
@@ -82,6 +83,7 @@
                 [placeholder]="'placeholder_select' | translate"
                 [clearable]="true"
                 (change)="onSelectChange($event, 'majorCode')"
+                [searchFn]="customSearchFn.bind(this)"
               >
                 <ng-template ng-option-tmp ng-label-tmp let-item="item">
                   {{ item | translateDropdown }}
