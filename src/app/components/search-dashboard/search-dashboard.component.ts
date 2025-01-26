@@ -42,9 +42,29 @@ export class SearchDashboardComponent implements OnInit {
 
 loadMajor() {
   this.UploadScoreService.getSubject().subscribe((resp) => {
-    console.log(resp);
-    this.SubjectList = resp;
+    // ตรวจสอบว่า resp มีข้อมูลที่ต้องการ
+    if (resp && Array.isArray(resp)) {
+      this.SubjectList = resp;
+    } else {
+      console.error('Invalid data format for SubjectList:', resp);
+    }
   });
+}
+
+customSearchFn(term: string, item: any): boolean {
+  term = term.toLowerCase();
+  return (
+    item.subjectCode.toLowerCase().includes(term) ||
+    item.subjectName.toLowerCase().includes(term)
+  );
+}
+
+customSearchFn_SearchLan(term: string, item: any): boolean {
+  term = term.toLowerCase();
+  return (
+    item.byte_desc_th.toLowerCase().includes(term) ||
+    item.byte_desc_en.toLowerCase().includes(term)
+  );
 }
 
   ngOnInit() {
