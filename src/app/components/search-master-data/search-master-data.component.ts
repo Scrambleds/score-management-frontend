@@ -18,11 +18,14 @@ export class SearchMasterDataComponent {
     });
   }
 
+  onInputChange(value: string): void {
+    this.searchService.setSearchTerm(value.trim()); // ส่งค่าทันทีขณะพิมพ์
+  }
+
   onSubmit(): void {
     const searchValue = this.searchForm.value.searchInput.trim();
     this.searchService.setSearchTerm(searchValue); // ส่งค่าค้นหาไปยัง Service
   }
-
   onReset(): void {
     this.searchForm.reset();
     this.searchService.setSearchTerm(''); // ล้างค่าค้นหา
