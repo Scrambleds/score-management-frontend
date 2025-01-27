@@ -90,10 +90,12 @@ export class UploadExcelContainerComponent implements OnInit {
     'ชื่อ-นามสกุล',
     'รหัสสาขา',
     'อีเมล',
-    'คะแนนระหว่างเรียน',
-    'คะแนนกลางภาค',
-    'คะแนนปลายภาค',
+    // 'คะแนนระหว่างเรียน',
+    // 'คะแนนกลางภาค',
+    // 'คะแนนปลายภาค',
   ]; // ฟีลด์ที่ต้องการ
+
+  optionalFields = ['คะแนนระหว่างเรียน', 'คะแนนกลางภาค', 'คะแนนปลายภาค'];
 
   constructor(
     private fb: FormBuilder,
@@ -217,9 +219,9 @@ export class UploadExcelContainerComponent implements OnInit {
         'ชื่อ-นามสกุล': rowData['ชื่อ-นามสกุล'] || '',
         รหัสสาขา: rowData['รหัสสาขา'] || '',
         อีเมล: rowData['อีเมล'] || '',
-        คะแนนระหว่างเรียน: rowData['คะแนนระหว่างเรียน'] || 0,
-        คะแนนกลางภาค: rowData['คะแนนกลางภาค'] || 0,
-        คะแนนปลายภาค: rowData['คะแนนปลายภาค'] || 0,
+        คะแนนระหว่างเรียน: rowData['คะแนนระหว่างเรียน'] || null,
+        คะแนนกลางภาค: rowData['คะแนนกลางภาค'] || null,
+        คะแนนปลายภาค: rowData['คะแนนปลายภาค'] || null,
       };
     });
   }
@@ -228,24 +230,39 @@ export class UploadExcelContainerComponent implements OnInit {
     const headers = jsonData[0] || []; // แถวแรกของไฟล์ใช้เป็น header (field names)
     const dataRows = jsonData.slice(1); // ข้อมูลหลัง header
     let errorMessages: string[] = [];
-    const fail_title = this.translationService.getTranslation(
+    const fail_title = this.translationService.transform(
       'sweet_alert_fail_title'
     );
-    const btnCloselTitle = this.translationService.getTranslation('btn_close');
-    const noDataText = this.translationService.getTranslation(
+    const btnCloselTitle = this.translationService.transform('btn_close');
+    const noDataText = this.translationService.transform(
       'uploadscore_error_noData'
     );
-    const missingFieldText = this.translationService.getTranslation(
+    const missingFieldText = this.translationService.transform(
       'uploadscore_error_missingField'
+    );
+    const requiredOptionalFieldText = this.translationService.transform(
+      'uploadscore_error_requiredOptionalFields'
     );
 
     // ตรวจสอบ headers ว่ามีฟีลด์ที่ต้องการครบหรือไม่
     const missingFields = this.requiredFields.filter(
+      // (field) => !headers.includes(field)
       (field) => !headers.includes(field)
+    );
+
+    // ตรวจสอบว่ามีฟีลด์ optional อย่างน้อย 1 ฟีลด์
+    const hasAtLeastOneScoreField = this.optionalFields.some((field) =>
+      headers.includes(field)
     );
 
     if (missingFields.length > 0) {
       errorMessages.push(`${missingFieldText} ${missingFields.join(', ')}`); //`ฟีลด์ที่ขาดหายไปใน header: ${missingFields.join(', ')}`
+    }
+
+    if (!hasAtLeastOneScoreField) {
+      errorMessages.push(
+        `${requiredOptionalFieldText} (${this.optionalFields.join(', ')})`
+      );
     }
 
     // ตรวจสอบกรณีไม่มีข้อมูลใน dataRows
@@ -268,6 +285,18 @@ export class UploadExcelContainerComponent implements OnInit {
             errorMessages.push(`${missingValueText}`); //`ฟีลด์ "${field}" ในแถวที่ ${rowIndex + 1} เป็นค่าว่าง`
           }
         });
+        // // เติมค่า 0 ในฟิลด์ optionalFields ที่ไม่มีข้อมูล
+        // this.optionalFields.forEach((field) => {
+        //   const fieldIndex = headers.indexOf(field);
+        //   if (
+        //     fieldIndex >= 0 &&
+        //     (row[fieldIndex] == null ||
+        //       row[fieldIndex] == undefined ||
+        //       row[fieldIndex] === '')
+        //   ) {
+        //     row[fieldIndex] = null; // เติมค่า 0 ให้ฟิลด์ที่ไม่มีข้อมูล
+        //   }
+        // });
       }
     }
 
@@ -304,9 +333,9 @@ export class UploadExcelContainerComponent implements OnInit {
         นามสกุล: lastName || '',
         รหัสสาขา: row['รหัสสาขา'],
         อีเมล: row['อีเมล'],
-        คะแนนระหว่างเรียน: row['คะแนนระหว่างเรียน'] || 0,
-        คะแนนกลางภาค: row['คะแนนกลางภาค'] || 0,
-        คะแนนปลายภาค: row['คะแนนปลายภาค'] || 0,
+        คะแนนระหว่างเรียน: row['คะแนนระหว่างเรียน'],
+        คะแนนกลางภาค: row['คะแนนกลางภาค'],
+        คะแนนปลายภาค: row['คะแนนปลายภาค'],
         คะแนนรวม: totalScore,
       };
     });
@@ -326,6 +355,7 @@ export class UploadExcelContainerComponent implements OnInit {
       let flexValue = 1;
       let cellClass = '';
       let fieldNameKey = '';
+      let cellRenderer: any = null; // เพิ่ม cellRenderer สำหรับ custom rendering
 
       switch (key) {
         case 'ลำดับ':
@@ -368,18 +398,30 @@ export class UploadExcelContainerComponent implements OnInit {
           flexValue = 1.4;
           cellClass = 'text-end';
           fieldNameKey = 'uploadscore_tableFieldAccScore';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.ScoreNullCellRenderer(value);
+          };
           break;
         case 'คะแนนกลางภาค':
           customWidth = 134;
           flexValue = 1.5;
           cellClass = 'text-end';
           fieldNameKey = 'uploadscore_tableFieldMidScore';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.ScoreNullCellRenderer(value);
+          };
           break;
         case 'คะแนนปลายภาค':
           customWidth = 134;
           flexValue = 1.5;
           cellClass = 'text-end';
           fieldNameKey = 'uploadscore_tableFieldFinScore';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.ScoreNullCellRenderer(value);
+          };
           break;
         case 'คะแนนรวม':
           customWidth = 126.6;
@@ -401,8 +443,20 @@ export class UploadExcelContainerComponent implements OnInit {
         flex: flexValue,
         minWidth: customWidth,
         cellClass: cellClass,
+        cellRenderer: cellRenderer, // เพิ่ม cellRenderer
       };
     });
+  }
+
+  private ScoreNullCellRenderer(value: any): string {
+    if (
+      value === null ||
+      value === undefined ||
+      value.toString().trim() === ''
+    ) {
+      return `<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>`;
+    }
+    return value;
   }
 
   // ฟังก์ชันสำหรับโหลดข้อมูลใน grid
