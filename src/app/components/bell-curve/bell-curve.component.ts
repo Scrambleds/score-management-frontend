@@ -242,7 +242,7 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
             y: {
               title: {
                 display: true,
-                text: 'ความน่าจะเป็น',
+                text: 'จำนวนนิสิต (คน)',
               },
             },
           },
@@ -425,5 +425,4 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   //     }
   //   });
   // };
-  
 }
