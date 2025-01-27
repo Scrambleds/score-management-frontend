@@ -153,16 +153,32 @@ export class MasterDataComponents implements OnInit {
     this.filteredData = [...this.allMasterData];
   }
 
+  // filterMasterData(searchTerm: string): void {
+  //   if (!searchTerm) {
+  //     this.filteredData = [...this.allMasterData]; // รีเซ็ตเมื่อไม่มีการค้นหา
+  //   } else {
+  //     this.filteredData = this.allMasterData.filter(item =>
+  //       item.byte_reference.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //   }
+  //   console.log('Filtered Data:', this.filteredData); // ตรวจสอบค่าที่อัปเดต
+  // }
+
   filterMasterData(searchTerm: string): void {
     if (!searchTerm) {
-      this.filteredData = [...this.allMasterData]; // รีเซ็ตเมื่อไม่มีการค้นหา
+      this.filteredData = [...this.allMasterData];
     } else {
       this.filteredData = this.allMasterData.filter(item =>
-        item.byte_reference.toLowerCase().includes(searchTerm.toLowerCase())
+        item.byte_reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.byteDetail.some(detail =>
+          detail.byte_desc_th.toLowerCase().includes(searchTerm.toLowerCase()) || 
+          detail.byte_desc_en.toLowerCase().includes(searchTerm.toLowerCase())
+        )
       );
     }
-    console.log('Filtered Data:', this.filteredData); // ตรวจสอบค่าที่อัปเดต
-  }
+    console.log('Filtered Data:', this.filteredData);
+  }  
+  
   
   getMasterData(): void {
     this.MasterDataService.getMasterData().subscribe(
