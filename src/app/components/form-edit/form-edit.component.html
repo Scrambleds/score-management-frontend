@@ -1,4 +1,4 @@
-<div class="card custom-card mb- animate__animated animate__fadeIn">
+<div *ngIf="filteredData.length > 0; else noDataMessage" class="card custom-card mb- animate__animated animate__fadeIn">
   <div class="card-body p-2">
     <form
       [formGroup]="form"
@@ -6,58 +6,56 @@
       class="d-flex justify-content-between align-items-center mb-2 ms-2 px-2"
       style="margin-top: 0.625rem"
     >
-      <p
-        class="text-title fw-bold mb-0 d-flex justify-content-between align-items-center"
-      >
+      <p class="text-title fw-bold mb-0 d-flex justify-content-between align-items-center">
         {{ "user_management" | translate }}
       </p>
       <button type="submit" class="btn btn-primary" (click)="onAddUserClick()">
         <i class="bi bi-person-fill-add"></i>
-        <!-- เพิ่มบัญชีผู้ใช้ -->
-         {{ "user_manage_adduser" | translate }}
+        {{ "user_manage_adduser" | translate }}
       </button>
     </form>
 
     <div *ngFor="let value of filteredData" class="card custom-card mb-3 p-4">
-      <!-- <div class="container"> -->
       <div class="d-flex justify-content-between flex-wrap flex-row">
-        <!-- <div class="row w-100"> -->
-            <div class="col-6 col-sm-2 col-md-2 text-start ">
-              {{ value.email }}
-            </div>
-            <div class="col-6 col-sm-2 col-md-2 text-start ">
-              {{ value.teacher_code }}
-            </div>
-        <!-- </div> -->
-        <!-- <div class="row w-100"> -->
-            <div class="col-6 col-sm-4 col-md-2 text-start">
-              {{ value.prefix }} {{ value.firstname }} {{ value.lastname }}
-                <!-- {{ value.fullname }} -->
-            </div>
-            <div class="col-6 col-sm-2 col-md-2 text-start ">{{ getRoleTitle(value.role) }}</div>
-          <!-- </div> -->
-        <!-- <div class="row w-100"> -->
-            <div class="d-flex flex-row col-12 col-sm-1 col-md-2" >
-              <div class="col-6 col-sm-11 text-start">{{ getStatusTitle(value.active_status) }}</div>
-            <div
-              class="d-flex justify-content-start align-items-center"
-            >
-              <a>
-                <button
-                  type="button"
-                  class="btn btn-text-blue min-w-1.25rem p-0"
-                  (click)="openModal(value)"
-                >
+        <div class="col-6 col-sm-2 col-md-2 text-start ">
+          {{ value.email }}
+        </div>
+        <div class="col-6 col-sm-2 col-md-2 text-start ">
+          {{ value.teacher_code }}
+        </div>
+        <div class="col-6 col-sm-4 col-md-2 text-start">
+          {{ value.prefix }} {{ value.firstname }} {{ value.lastname }}
+        </div>
+        <div class="col-6 col-sm-2 col-md-2 text-start ">{{ getRoleTitle(value.role) }}</div>
+        <div class="d-flex flex-row col-12 col-sm-1 col-md-2">
+          <div class="col-6 col-sm-11 text-start">{{ getStatusTitle(value.active_status) }}</div>
+          <div class="d-flex justify-content-start align-items-center">
+            <a>
+              <button
+                type="button"
+                class="btn btn-text-blue min-w-1.25rem p-0"
+                (click)="openModal(value)"
+              >
                 <i class="bi bi-pencil-square" style="color: #0d00ff; font-size: 1.2rem;"></i>
-                </button>
-              </a>
-            </div>
-            <!-- </div> -->
-        <!-- </div> -->
+              </button>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<ng-template #noDataMessage>
+  <div class="row justify-content-center my-4">
+    <div class="col-12 text-center">
+      <div class="alert alert-warning text-body fw-bold p-3" style="font-size: 1.2rem; border-radius: 0.5rem;">
+        <i class="bi bi-exclamation-circle-fill" style="color: #ffcc00;"></i> 
+        {{ "notfound_adduser" | translate }}
+      </div>
+    </div>
+  </div>
+</ng-template>
 
 <app-modal-edit
   [show]="isModalVisible"
@@ -69,4 +67,3 @@
   (submit)="handleModalSubmit($event)"
 >
 </app-modal-edit>
-<!-- </div> -->

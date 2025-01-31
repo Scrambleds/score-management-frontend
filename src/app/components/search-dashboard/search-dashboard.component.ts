@@ -18,6 +18,7 @@ import { format } from 'date-fns';
 import { UploadScoreService } from '../../services/upload-score/upload-score.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TranslationService } from '../../core/services/translation.service';
+import { UserService } from '../../services/sharedService/userService/userService.service';
 
 @Component({
   selector: 'app-search-dashboard',
@@ -36,20 +37,76 @@ export class SearchDashboardComponent implements OnInit {
   scoreTypeList: any[] = [];
   dashboardData: any;
   SubjectList: any[] = [];
+  teacherCode: any;
+  Role: any;
 
   constructor(private fb: FormBuilder, private selectBoxService: SelectBoxService, private UploadScoreService: UploadScoreService,
               private DashboardService: DashboardService, private cdr: ChangeDetectorRef, private searchTranslateService: TranslationService,
-              private ExcelExportService: ExcelExportService) {}
+              private ExcelExportService: ExcelExportService, private UserService: UserService) {}
+
+// loadMajor() {
+//   this.UploadScoreService.getSubject().subscribe((resp) => {
+//     // ตรวจสอบว่า resp มีข้อมูลที่ต้องการ
+//     if (resp && Array.isArray(resp)) {
+//       this.SubjectList = resp;
+//     } else {
+//       console.error('Invalid data format for SubjectList:', resp);
+//     }
+//   });
+// }
+
+// loadMajor() {
+//   const role = this.UserService.role;
+//   const teacher_code = this.UserService.teacherCode;
+
+//   if(role === "อาจารย์"){
+//     console.log("MyteacherCode", teacher_code);
+//     this.selectBoxService.getSubjectDashboard(teacher_code).subscribe((resp) => {
+//       if (resp && Array.isArray(resp)) {
+//         this.SubjectList = resp;
+//       } else {
+//         console.error('Invalid data format for SubjectList:', resp);
+//       }
+//     });
+//   }
+//   else{
+//     const teacher_code = '';
+//     console.log("MyteacherCode", teacher_code);
+//     this.selectBoxService.getSubjectDashboard(teacher_code).subscribe((resp) => {
+//       if (resp && Array.isArray(resp)) {
+//         this.SubjectList = resp;
+//       } else {
+//         console.error('Invalid data format for SubjectList:', resp);
+//       }
+//     });
+//   }
+// }
 
 loadMajor() {
-  this.UploadScoreService.getSubject().subscribe((resp) => {
-    // ตรวจสอบว่า resp มีข้อมูลที่ต้องการ
-    if (resp && Array.isArray(resp)) {
-      this.SubjectList = resp;
-    } else {
-      console.error('Invalid data format for SubjectList:', resp);
-    }
-  });
+  const role = this.UserService.role;
+  const teacher_code = this.UserService.teacherCode;
+
+  if (Number(role) == 2) {
+    console.log("roledashboard", role);
+    console.log("MyteacherCode", teacher_code);
+    this.selectBoxService.getSubjectDashboard(teacher_code).subscribe((resp) => {
+      if (resp && Array.isArray(resp)) {
+        this.SubjectList = resp;
+      } else {
+        console.error('Invalid data format for SubjectList:', resp);
+      }
+    });
+  } else {
+    const teacher_code = '';
+    console.log("MyteacherCode", teacher_code);
+    this.selectBoxService.getSubjectDashboard(teacher_code).subscribe((resp) => {
+      if (resp && Array.isArray(resp)) {
+        this.SubjectList = resp;
+      } else {
+        console.error('Invalid data format for SubjectList:', resp);
+      }
+    });
+  }
 }
 
 customSearchFn(term: string, item: any): boolean {
@@ -73,12 +130,16 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
 }
 
   ngOnInit() {
+    const role = this.UserService.role
+    const teacher_code = this.UserService.teacherCode
+    console.log(role)
+    console.log("MyteacherCode", teacher_code)
     this.form = this.fb.group({
       subject_id: [null , Validators.required],
       academic_year: [null  , Validators.required],
       semester: [null , Validators.required],
       section: [null , Validators.required],
-      score_type: [null],
+      score_type: [null, Validators.required],
     });
 
     this.resetAndDisableFields(['academic_year', 'semester', 'section', 'score_type']);
@@ -154,8 +215,8 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
   }
   
   areRequiredFieldsValid(): boolean {
-    const { subject_id, academic_year, semester, section } = this.form.value;
-    return subject_id !== null && academic_year !== null && semester !== null && section !== null;
+    const { subject_id, academic_year, semester, section, score_type } = this.form.value;
+    return subject_id !== null && academic_year !== null && semester !== null && section !== null && score_type !== null;
   }
 
   disableFields(fields: string[]) {
@@ -244,6 +305,12 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
       }
     });
   };
+
+  LoadSubjectDashboard(): void{
+    this.selectBoxService.getSubjectDashboard().subscribe((resp) => {
+      this.sectionList = resp;
+    });
+  }
 
   loadSection(): void {
     this.selectBoxService.getSystemParamSection().subscribe((resp) => {
