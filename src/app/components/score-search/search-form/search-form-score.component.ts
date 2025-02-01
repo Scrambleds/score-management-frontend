@@ -31,7 +31,7 @@ export class SearchFormScoreComponent implements OnInit {
   @ViewChild('subjectCode', { read: ElementRef }) subjectCodeRef?: ElementRef;
   @ViewChild('subjectDetailForm', { static: false })
   subjectDetailForm?: FormGroup;
-
+  subjectList: any[] = [];
   filteredSuggestions: any[] = [];
   showSuggestions = true;
   filteredSubjects: { subjectCode: string; subjectName: string }[] = [];
@@ -75,13 +75,14 @@ export class SearchFormScoreComponent implements OnInit {
   ) {
     // สร้างฟอร์ม
     this.form = this.fb.group({
-      subjectSearch: ['', Validators.required],
+      subjectSearch: [null, Validators.required],
       studentSearch: [{ value: '', disabled: true }],
       section: [null, Validators.required],
       semester: [null, Validators.required],
       academic_year: [null, Validators.required],
     });
-
+    this.toggleFields(this.form.value);
+    this.loadSubjects();
     // ดึงข้อมูลจาก API และเก็บไว้ในตัวแปร
     this.contantLovService
       .getLovContant('GetLovSendStatus')
@@ -101,13 +102,9 @@ export class SearchFormScoreComponent implements OnInit {
       });
 
     // เรียก toggleFields เพื่อให้ตั้งค่าเริ่มต้นของฟอร์ม
-    this.toggleFields(this.form.value);
   }
 
   ngOnInit(): void {
-    // ฟังก์ชันสำหรับแสดง Auto-complete เมื่อมีการกรอกข้อมูลใน subjectSearch
-    this.showAutocomplete();
-
     // ฟังการเปลี่ยนแปลงของฟอร์ม
     this.form.valueChanges
       .pipe(
@@ -117,7 +114,15 @@ export class SearchFormScoreComponent implements OnInit {
         this.toggleFields(value);
       });
   }
-
+  loadSubjects() {
+    this.contantLovService
+      .getDataByCondition('api/LovContant/GetLovSubject', {})
+      .subscribe((data: any) => {
+        this.subjectList = (data.objectResponse || []).map((subject: any) => ({
+          subjectSearch: `${subject.subject_id} ${subject.subject_name}`,
+        }));
+      });
+  }
   // ฟังก์ชันที่ตรวจสอบค่าของฟอร์มเพื่อเปิด/ปิดฟิลด์
   toggleFields(value: {
     subjectSearch?: string | null;
@@ -125,22 +130,15 @@ export class SearchFormScoreComponent implements OnInit {
     semester?: string | null;
   }) {
     if (
-      value.subjectSearch &&
-      value.subjectSearch.trim() !== '' &&
-      value.academic_year &&
-      value.academic_year.trim() !== '' &&
-      value.semester &&
-      value.semester.trim() !== ''
+      String(value.subjectSearch || '').trim() &&
+      String(value.academic_year || '').trim() &&
+      String(value.semester || '').trim()
     ) {
-      // เปิดฟิลด์เมื่อ subjectSearch, academic_year, semester มีค่าครบ
       this.form.get('studentSearch')?.enable();
-      this.form.get('sendStatus')?.enable();
     } else {
       // ปิดฟิลด์และรีเซ็ตค่าหากไม่มีค่า
       this.form.get('studentSearch')?.disable();
       this.form.get('studentSearch')?.reset('');
-      this.form.get('sendStatus')?.disable();
-      this.form.get('sendStatus')?.reset(null);
     }
   }
 
@@ -158,23 +156,23 @@ export class SearchFormScoreComponent implements OnInit {
     }, 200); // เพิ่มดีเลย์เพื่อป้องกันการคลิกหาย
   }
 
-  showAutocomplete() {
-    this.form
-      .get('subjectSearch')
-      ?.valueChanges.pipe(
-        debounceTime(300), // เพิ่มดีเลย์เพื่อลดจำนวนคำขอ API
-        switchMap((searchText: string) => {
-          if (!searchText) return of([]); // คืนค่าเป็นอาเรย์ว่างหากไม่มีคำค้นหา
-          return this.contantLovService.getDataByCondition(
-            'api/ScoreAnnoucement/GetSubjectByCondition',
-            { subjectSearch: searchText }
-          );
-        })
-      )
-      .subscribe((response: any) => {
-        this.filteredSuggestions = response.objectResponse || [];
-      });
-  }
+  // showAutocomplete() {
+  //   this.form
+  //     .get('subjectSearch')
+  //     ?.valueChanges.pipe(
+  //       debounceTime(300), // เพิ่มดีเลย์เพื่อลดจำนวนคำขอ API
+  //       switchMap((searchText: string) => {
+  //         if (!searchText) return of([]); // คืนค่าเป็นอาเรย์ว่างหากไม่มีคำค้นหา
+  //         return this.contantLovService.getDataByCondition(
+  //           'api/ScoreAnnoucement/GetSubjectByCondition',
+  //           { subjectSearch: searchText }
+  //         );
+  //       })
+  //     )
+  //     .subscribe((response: any) => {
+  //       this.filteredSuggestions = response.objectResponse || [];
+  //     });
+  // }
   onSubmit(): void {
     if (this.form.valid) {
       const userInfo = localStorage.getItem('userInfo');
@@ -199,7 +197,7 @@ export class SearchFormScoreComponent implements OnInit {
       }
       const requestData = {
         teacher_code,
-        subjectSearch: this.form.value.subjectSearch ?? '',
+        subjectSearch: this.form.value.subjectSearch.subjectSearch ?? '',
         studentSearch: this.form.value.studentSearch ?? '',
         semester: this.form.value.semester ?? '',
         section: this.form.value.section ?? '',

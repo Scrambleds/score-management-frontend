@@ -77,7 +77,8 @@ export class ModalEditComponent {
       prefix: [null, Validators.required],
       firstname: [null, Validators.required],
       lastname: [null, Validators.required],
-      password: [null, [passwordStrengthValidator()]],
+      // password: [null, [passwordStrengthValidator()]],
+      password: [null],
       active_status: [null, Validators.required],
     });
 
