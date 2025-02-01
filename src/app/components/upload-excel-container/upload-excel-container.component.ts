@@ -52,9 +52,6 @@ export class UploadExcelContainerComponent implements OnInit {
   @ViewChild(UploadScoreHeaderComponent, { static: false })
   subjectDetailComponent?: UploadScoreHeaderComponent;
 
-  //pipe
-  private translatePipe: TranslatePipe;
-
   //lang
   currentLanguage!: string;
   private translationSubscription!: Subscription;
@@ -111,7 +108,6 @@ export class UploadExcelContainerComponent implements OnInit {
       majorCode: [{ value: null, disabled: false }],
     });
     this.loadMajor();
-    this.translatePipe = new TranslatePipe(this.translationService);
   }
 
   ngOnInit(): void {
@@ -428,6 +424,10 @@ export class UploadExcelContainerComponent implements OnInit {
           flexValue = 1.3;
           cellClass = 'text-end';
           fieldNameKey = 'uploadscore_tableFieldTotalScore';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.ScoreNullCellRenderer(value);
+          };
           break;
         default:
           customWidth = 160;
@@ -456,7 +456,7 @@ export class UploadExcelContainerComponent implements OnInit {
     ) {
       return `<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>`;
     }
-    return value;
+    return value.toFixed(2);
   }
 
   // ฟังก์ชันสำหรับโหลดข้อมูลใน grid
