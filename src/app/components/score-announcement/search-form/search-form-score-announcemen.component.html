@@ -15,7 +15,7 @@
           >
           <div class="input-group-autocomplete mb-2">
             <div class="input-group-autocomplete mb-2">
-              <input
+              <!-- <input
                 #subjectCode
                 id="subjectSearch"
                 class="form-control"
@@ -32,7 +32,18 @@
                 >
                   {{ suggestion.subject_id }} {{ suggestion.subject_name }}
                 </li>
-              </ul>
+              </ul> -->
+              <ng-select
+            name="subjectSearch"
+            formControlName="subjectSearch"
+            [clearable]="true"
+            id="subjectSearch"
+            [items]="subjectList"
+            [placeholder]="'placeholder_select' | translate"
+            bindLabel="subjectSearch"
+            [searchable]="true"
+          >
+          </ng-select>
             </div>
           </div>
           <div

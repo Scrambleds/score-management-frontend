@@ -46,6 +46,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
   @ViewChild('subjectDetailForm', { static: false })
   subjectDetailForm?: FormGroup;
   @ViewChild(ModalSendMailComponent) modal?: ModalSendMailComponent;
+  subjectList: any[] = [];
 
   filteredSuggestions: any[] = [];
   showSuggestions = true;
@@ -90,9 +91,10 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     private selectBoxService: SelectBoxService,
     private translationService: TranslationService
   ) {
+    this.loadSubjects();
     // สร้างฟอร์ม
     this.form = this.fb.group({
-      subjectSearch: ['', Validators.required],
+      subjectSearch: [null, Validators.required],
       studentSearch: [{ value: '' }],
       semester: [null, Validators.required],
       section: [null, Validators.required],
@@ -123,10 +125,18 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     // เรียก toggleFields เพื่อให้ตั้งค่าเริ่มต้นของฟอร์ม
     this.toggleFields(this.form.value);
   }
-
+  loadSubjects() {
+    this.contantLovService
+      .getDataByCondition('api/LovContant/GetLovSubject', {})
+      .subscribe((data: any) => {
+        this.subjectList = (data.objectResponse || []).map((subject: any) => ({
+          subjectSearch: `${subject.subject_id} ${subject.subject_name}`,
+        }));
+      });
+  }
   ngOnInit(): void {
     // ฟังก์ชันสำหรับแสดง Auto-complete เมื่อมีการกรอกข้อมูลใน subjectSearch
-    this.showAutocomplete();
+    // this.showAutocomplete();
 
     // ฟังการเปลี่ยนแปลงของฟอร์ม
     this.form.valueChanges
@@ -145,20 +155,18 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     section?: string | null;
   }) {
     if (
-      value.subjectSearch &&
-      value.subjectSearch.trim() !== '' &&
-      value.academic_year !== null &&
-      value.semester !== null &&
-      value.section !== null
+      String(value.subjectSearch || '').trim() &&
+      String(value.academic_year || '').trim() &&
+      String(value.semester || '').trim() &&
+      String(value.section || '').trim()
     ) {
       // เปิดฟิลด์เมื่อ subjectSearch, academic_year, semester มีค่าครบ
       this.form.get('studentSearch')?.enable();
-      // this.form.get('section')?.enable();
       this.form.get('sendStatus')?.enable();
     } else {
       // ปิดฟิลด์และรีเซ็ตค่าหากไม่มีค่า
       this.form.get('studentSearch')?.disable();
-      this.form.get('studentSearch')?.reset('');
+      this.form.get('studentSearch')?.reset(null);
       // this.form.get('section')?.disable();
       // this.form.get('section')?.reset(null);
       this.form.get('sendStatus')?.disable();
@@ -187,23 +195,23 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     }, 200); // เพิ่มดีเลย์เพื่อป้องกันการคลิกหาย
   }
 
-  showAutocomplete() {
-    this.form
-      .get('subjectSearch')
-      ?.valueChanges.pipe(
-        debounceTime(300), // เพิ่มดีเลย์เพื่อลดจำนวนคำขอ API
-        switchMap((searchText: string) => {
-          if (!searchText) return of([]); // คืนค่าเป็นอาเรย์ว่างหากไม่มีคำค้นหา
-          return this.contantLovService.getDataByCondition(
-            'api/ScoreAnnoucement/GetSubjectByCondition',
-            { subjectSearch: searchText }
-          );
-        })
-      )
-      .subscribe((response: any) => {
-        this.filteredSuggestions = response.objectResponse || [];
-      });
-  }
+  // showAutocomplete() {
+  //   this.form
+  //     .get('subjectSearch')
+  //     ?.valueChanges.pipe(
+  //       debounceTime(300), // เพิ่มดีเลย์เพื่อลดจำนวนคำขอ API
+  //       switchMap((searchText: string) => {
+  //         if (!searchText) return of([]); // คืนค่าเป็นอาเรย์ว่างหากไม่มีคำค้นหา
+  //         return this.contantLovService.getDataByCondition(
+  //           'api/ScoreAnnoucement/GetSubjectByCondition',
+  //           { subjectSearch: searchText }
+  //         );
+  //       })
+  //     )
+  //     .subscribe((response: any) => {
+  //       this.filteredSuggestions = response.objectResponse || [];
+  //     });
+  // }
 
   onSubmit(): void {
     this.form.markAllAsTouched();
@@ -235,7 +243,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       const requestData = {
         teacher_code,
         role,
-        subjectSearch: this.form.value.subjectSearch ?? '',
+        subjectSearch: this.form.value.subjectSearch.subjectSearch ?? '',
         studentSearch: this.form.value.studentSearch ?? '',
         semester: this.form.value.semester ?? null,
         section: this.form.value.section ?? '',
