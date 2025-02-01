@@ -125,6 +125,7 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
       if (isNotEmpty) {
         this.inputFormToggle(true);
       } else {
+        this.form.get('subjectName')?.disable();
         this.inputFormToggle(false);
       }
     });
@@ -256,6 +257,7 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
       this.form
         .get('subjectCode')!
         .setValue(item.subjectCode, { emitEvent: false });
+      this.inputFormToggle(true);
       this.selectedSubjectCode = item.subjectCode;
       this.isSubjectNameReadonly = true;
       // this.filteredSubjects = [];
