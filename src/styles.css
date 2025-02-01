@@ -89,3 +89,11 @@ html {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Remove auto-fill and clear buttons in inputs */
+input::-ms-reveal,
+input::-ms-clear,
+input::-webkit-credentials-auto-fill-button,
+input::-webkit-contacts-auto-fill-button {
+  display: none;
+}
