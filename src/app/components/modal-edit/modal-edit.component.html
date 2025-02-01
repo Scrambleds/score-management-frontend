@@ -143,6 +143,7 @@
                     class="form-control" 
                     formControlName="password"
                     autocomplete="current-password"
+
                     [ngClass]="{'is-valid': form.get('password')?.valid && form.get('password')?.dirty && form.get('password')?.value.length > 0}"
                     [placeholder]="'placeholder_text' | translate"/>
                   
@@ -152,11 +153,11 @@
                   </button>
                 </div>
           
-                <div *ngIf="form.get('password')?.invalid && form.get('password')?.dirty" class="text-danger ps-2">
+                <!-- <div *ngIf="form.get('password')?.invalid && form.get('password')?.dirty" class="text-danger ps-2">
                   <div *ngIf="form.get('password')?.hasError('errorMessage')">
                     {{ form.get('password')?.getError('errorMessage') | translate }}
                   </div>
-                </div>
+                </div> -->
               </div>
 
               <div *ngIf="form.contains('confirm_password')" class="col-6 col-md-4">
