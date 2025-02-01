@@ -11,6 +11,7 @@ import { FormBuilder } from '@angular/forms';
 })
 export class SearchScoreComponent {
   gridData: any[] = [];
+  lastSearchPayload: any = null;
   payload = {
     teacher_code: null,
     subjectSearch: '',
@@ -23,9 +24,12 @@ export class SearchScoreComponent {
   };
 
   constructor(private scoreService: SearchScoreService) {}
-
-  ngOnInit(): void {
+  reloadData() {
+    if (this.lastSearchPayload) {
+      this.onSearchSubmit(this.lastSearchPayload); // ค้นหาข้อมูลเดิมอีกครั้ง
+    }
   }
+  ngOnInit(): void {}
 
   loadInitialData(): void {
     const userInfo = localStorage.getItem('userInfo');
@@ -36,7 +40,7 @@ export class SearchScoreComponent {
       this.payload.role = parsedUserInfo.role;
       this.payload.teacher_code = parsedUserInfo.teacher_code;
     }
-    
+
     this.scoreService.getScoreAnnouncementByCondition(this.payload).subscribe(
       (response) => {
         this.gridData = response.objectResponse?.length
@@ -51,6 +55,7 @@ export class SearchScoreComponent {
   }
 
   onSearchSubmit(requestData: any): void {
+    this.lastSearchPayload = requestData;
     this.scoreService.getScoreAnnouncementByCondition(requestData).subscribe(
       (response) => {
         this.gridData = response.objectResponse?.length

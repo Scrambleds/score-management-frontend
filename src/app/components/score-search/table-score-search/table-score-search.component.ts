@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ScoreAnnouncementService } from '../../../services/score-announcement/score-announcement.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import Swal from 'sweetalert2';
+import { SearchScoreService } from '../../../services/search-score/search-score.service';
 
 @Component({
   selector: 'table-score',
@@ -23,7 +24,7 @@ export class TableScoreSearchComponent {
 
   constructor(
     private translationService: TranslationService,
-    private scoreAnnouncementService: ScoreAnnouncementService
+    private scoreService: SearchScoreService
   ) {
     this.generateColumnDefs();
   }
@@ -188,7 +189,7 @@ export class TableScoreSearchComponent {
               if (result.isConfirmed) {
                 const payload = { sys_subject_no, student_id };
 
-                this.scoreAnnouncementService
+                this.scoreService
                   .deleteScoreByCondition(payload)
                   .subscribe({
                     next: (response) => {

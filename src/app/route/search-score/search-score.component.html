@@ -3,5 +3,5 @@
     (searchSubmit)="onSearchSubmit($event)"
     (resetForm)="onResetForm()"
   />
-  <table-score [gridData]="gridData" />
+  <table-score [gridData]="gridData" (refreshGrid)="reloadData()"/>
 </div>
