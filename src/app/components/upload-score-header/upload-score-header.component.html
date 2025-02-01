@@ -1,4 +1,4 @@
-<div class="custom-card">
+<div #uploadScoreHeader class="custom-card">
   <div class="card-body">
     <div class="fw-bold">{{ "uploadscore_header_title" | translate }}</div>
     <div class="text-danger">{{ "uploadscore_header_remark" | translate }}</div>
@@ -53,7 +53,15 @@
             [appRequiredMarker]="form.get('subjectName')"
             >{{ "subject_name" | translate }}
           </label>
-          <app-autocomplete
+          <input
+            #subjectName
+            type="text"
+            class="form-control"
+            formControlName="subjectName"
+            [placeholder]="'placeholder_text' | translate"
+            autocomplete="off"
+          />
+          <!-- <app-autocomplete
             id="subjectName"
             [name]="'subjectName'"
             formControlName="subjectName"
@@ -70,7 +78,7 @@
 
           <ng-template #customFormat let-item>
             {{ item.subjectCode }} - {{ item.subjectName }}
-          </ng-template>
+          </ng-template> -->
           <!-- (select)="
           !isSubjectNameReadonly &&
             selectSubject($event.subjectCode, $event.subjectName)

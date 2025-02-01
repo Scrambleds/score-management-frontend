@@ -76,6 +76,13 @@ html {
   background-color: var(--disabled-color) !important;
   opacity: 1;
 }
+.ng-select.ng-select-multiple.ng-select-disabled
+  > .ng-select-container
+  .ng-value-container
+  .ng-value {
+  background-color: var(--disabled-color) !important;
+  border: 1px solid var(--disabled-color) !important;
+}
 
 /* swal2 */
 .swal2-title {

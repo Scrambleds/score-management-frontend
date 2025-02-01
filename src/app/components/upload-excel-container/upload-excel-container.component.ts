@@ -49,12 +49,9 @@ export class UploadExcelContainerComponent implements OnInit {
   @Output() isUploaded = new EventEmitter<boolean>(); // ส่งค่ากลับไปยัง Parent
 
   //view child
-  @ViewChild(UploadScoreHeaderComponent, { static: false })
-  subjectDetailComponent?: UploadScoreHeaderComponent;
 
   //lang
   currentLanguage!: string;
-  private translationSubscription!: Subscription;
 
   @Output() submitRequest = new EventEmitter<void>();
   @Output() sendDataToApi = new EventEmitter<any>(); // Emit final data to send to API
