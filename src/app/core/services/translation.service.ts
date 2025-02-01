@@ -19,15 +19,14 @@ export class TranslationService {
   }
 
   private setInitialLanguage(): void {
-    let lang = this.currentLang;
-
     // ถ้าเป็นการเรียกใน browser และมีการเก็บภาษาใน localStorage
     if (this.isBrowser()) {
       const savedLang = localStorage.getItem('language');
-      lang = savedLang || this.currentLang; // ใช้ภาษาที่เก็บไว้ ถ้าไม่มีใช้ภาษาเริ่มต้น
+      if (savedLang) {
+        this.currentLang = savedLang;
+      }
     }
-
-    this.loadTranslations(lang);
+    this.loadTranslations(this.currentLang);
   }
 
   loadTranslations(language: string): void {
