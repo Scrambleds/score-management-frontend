@@ -10,7 +10,7 @@
         class="d-flex justify-content-center gap-2 gap-xl-3 align-items-end mbsm-2"
       >
         <!-- Subject Code -->
-        <div class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-3">
           <label
             for="subjectSearch"
             class="fw-bold d-flex flex-wrap mb-2 flex-wrap"
@@ -18,7 +18,7 @@
             <p class="text-danger mb-0 ms-1">*</p></label
           >
           <div class="input-group-autocomplete">
-            <input
+            <!-- <input
               #subjectCode
               id="subjectSearch"
               class="form-control"
@@ -35,8 +35,18 @@
               >
                 {{ suggestion.subject_id }} {{ suggestion.subject_name }}
               </li>
-            </ul>
-          </div>
+            </ul> -->
+            <ng-select
+            name="subjectSearch"
+            formControlName="subjectSearch"
+            [clearable]="true"
+            id="subjectSearch"
+            [items]="subjectList"
+            [placeholder]="'placeholder_select' | translate"
+            bindLabel="subjectSearch"
+            [searchable]="true"
+          >
+          </ng-select></div>
         </div>
 
         <!-- Subject Name -->
@@ -111,7 +121,7 @@
         <div
           class="d-none d-md-block d-lg-none d-xl-none d-xxl-none col-md-2"
         ></div>
-        <div class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 col-xxl-3">
           <label for="studentSearch" class="fw-bold mb-2"
             >{{ "student_name" | translate }} /
             {{ "student_id" | translate }}</label
@@ -122,15 +132,6 @@
             formControlName="studentSearch"
             [placeholder]="'placeholder_text' | translate"
           />
-          <div
-            *ngIf="
-              form.get('academicYearCode')?.touched &&
-              form.get('academicYearCode')?.invalid
-            "
-            class="text-danger ps-2"
-          >
-            {{ "alert_enterData" | translate }}
-          </div>
         </div>
 
         <div

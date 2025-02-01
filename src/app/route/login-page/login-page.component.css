@@ -92,7 +92,7 @@ body.login-page .custom-card {
 @media (max-width: 1600px) {
   .custom-card {
     width: 80%;
-    height: 95%;
+    height: auto;
   }
 }
 
