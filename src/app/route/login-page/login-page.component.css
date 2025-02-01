@@ -172,14 +172,6 @@ body.login-page .custom-card {
   padding: 6px 12px;
 }
 
-/* Remove auto-fill and clear buttons in inputs */
-input::-ms-reveal,
-input::-ms-clear,
-input::-webkit-credentials-auto-fill-button,
-input::-webkit-contacts-auto-fill-button {
-  display: none;
-}
-
 /* Dropdown */
 .dropdown-item:not(.disabled).active,
 .dropdown-item:not(.disabled):active {
