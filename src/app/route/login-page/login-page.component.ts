@@ -51,13 +51,13 @@ export class LoginPageComponent {
     }
     // const token = localStorage.getItem('token');
     // const tokenExpiration = localStorage.getItem('tokenExpiration');
-    const redirectUrl =
-      this.activatedRoute.snapshot.queryParams['redirectUrl'] || '/Dashboard'; // Use activatedRoute
+    // const redirectUrl =
+    //   this.activatedRoute.snapshot.queryParams['redirectUrl'] || '/Dashboard'; // Use activatedRoute
 
-    if (token && tokenExpiration && new Date() < new Date(tokenExpiration)) {
-      const redirectPath = localStorage.getItem('redirectPath') || '/Dashboard';
-      this.router.navigate([redirectPath]); // Redirect to a specific path if token is valid
-    }
+    // if (token && tokenExpiration && new Date() < new Date(tokenExpiration)) {
+    //   const redirectPath = localStorage.getItem('redirectPath') || '/Dashboard';
+    //   this.router.navigate([redirectPath]); // Redirect to a specific path if token is valid
+    // }
   }
 
   // usernameInput: string = ''; // เก็บค่าที่ผู้ใช้พิมพ์

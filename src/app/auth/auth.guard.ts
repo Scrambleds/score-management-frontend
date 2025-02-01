@@ -88,7 +88,8 @@ export class AuthGuard implements CanActivate {
     }
 
     if (token && tokenExpiration && new Date() < new Date(tokenExpiration)) {
-      localStorage.setItem('redirectPath', state.url);
+      // localStorage.setItem('redirectPath', state.url);
+      // this.router.navigate([state.url]);
       return true;
     } else {
       localStorage.clear();

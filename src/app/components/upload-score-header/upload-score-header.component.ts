@@ -24,9 +24,7 @@ import { TranslationService } from '../../core/services/translation.service';
   templateUrl: './upload-score-header.component.html',
   styleUrls: ['./upload-score-header.component.css'],
 })
-export class UploadScoreHeaderComponent
-  implements OnInit, AfterViewInit, OnChanges
-{
+export class UploadScoreHeaderComponent implements OnInit, OnChanges {
   @Input() titleName: string = 'No title';
   @Input() buttonName: string = 'No title';
 
@@ -81,6 +79,8 @@ export class UploadScoreHeaderComponent
   }
 
   ngOnInit() {
+    this.form.get('subjectCode')?.disable();
+    this.form.get('subjectName')?.disable();
     this.inputFormToggle(false);
     this.loadSection();
     this.loadSemester();
@@ -90,10 +90,17 @@ export class UploadScoreHeaderComponent
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isUploaded'] && !changes['isUploaded'].firstChange) {
       console.log('isUploaded changed:', this.isUploaded);
-      this.inputFormToggle(this.isUploaded);
+      if (this.isUploaded) {
+        this.checkSubjectCode();
+      } else {
+        this.form.get('subjectCode')?.disable();
+        this.form.get('subjectName')?.disable();
+        this.inputFormToggle(false);
+        this.clearForm();
+      }
     }
   }
-  ngAfterViewInit() {
+  checkSubjectCode() {
     // ตรวจสอบว่ามี ViewChild หรือไม่
     if (!this.subjectCodeRef) {
       console.error('subjectCodeRef is not defined.');
@@ -116,15 +123,9 @@ export class UploadScoreHeaderComponent
       console.log('Is Input Not Empty:', isNotEmpty);
       // ปรับปรุงการเปิด/ปิด ng-select จาก form control
       if (isNotEmpty) {
-        this.form.get('academicYearCode')?.enable();
-        this.form.get('semesterCode')?.enable();
-        this.form.get('sectionCode')?.enable();
-        this.form.get('teacher')?.enable();
+        this.inputFormToggle(true);
       } else {
-        this.form.get('academicYearCode')?.disable();
-        this.form.get('semesterCode')?.disable();
-        this.form.get('sectionCode')?.disable();
-        this.form.get('teacher')?.disable();
+        this.inputFormToggle(false);
       }
     });
   }
@@ -313,6 +314,12 @@ export class UploadScoreHeaderComponent
   customSearchFn(term: string, item: any): boolean {
     return this.translationService.searchFn(term, item);
   }
+  customSearchTeacherFn(term: string, item: any): boolean {
+    return this.translationService.searchFn(term, item, {
+      th: 'teacherName',
+      en: 'teacherName',
+    });
+  }
 
   inputFormToggle(isClear: boolean) {
     if (!isClear) {
@@ -320,15 +327,15 @@ export class UploadScoreHeaderComponent
       // this.form.get('semesterCode')?.setValue();
       // this.form.get('sectionCode')?.setValue();
       // this.form.get('teacher')?.setValue();
-      this.form.get('subjectCode')?.disable();
-      this.form.get('subjectName')?.disable();
+      // this.form.get('subjectCode')?.disable();
+      // this.form.get('subjectName')?.disable();
       this.form.get('academicYearCode')?.disable();
       this.form.get('semesterCode')?.disable();
       this.form.get('sectionCode')?.disable();
       this.form.get('teacher')?.disable();
     } else {
-      this.form.get('subjectCode')?.enable();
-      this.form.get('subjectName')?.enable();
+      // this.form.get('subjectCode')?.enable();
+      // this.form.get('subjectName')?.enable();
       this.form.get('academicYearCode')?.enable();
       this.form.get('semesterCode')?.enable();
       this.form.get('sectionCode')?.enable();

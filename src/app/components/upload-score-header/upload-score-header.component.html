@@ -102,6 +102,7 @@
             [clearable]="true"
             (change)="onSelectChange($event, 'academicYearCode')"
             [searchFn]="customSearchFn.bind(this)"
+            selectOnTab="true"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown }}
@@ -135,6 +136,7 @@
             [clearable]="true"
             (change)="onSelectChange($event, 'semesterCode')"
             [searchFn]="customSearchFn.bind(this)"
+            selectOnTab="true"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown }}
@@ -168,6 +170,7 @@
             [clearable]="true"
             (change)="onSelectChange($event, 'sectionCode')"
             [searchFn]="customSearchFn.bind(this)"
+            selectOnTab="true"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item | translateDropdown }}
@@ -201,7 +204,8 @@
             [clearable]="true"
             [multiple]="true"
             (change)="onSelectChange($event, 'teacher')"
-            [searchFn]="customSearchFn.bind(this)"
+            [searchFn]="customSearchTeacherFn.bind(this)"
+            selectOnTab="true"
           >
             <ng-template ng-option-tmp ng-label-tmp let-item="item">
               {{ item.teacherName }}
