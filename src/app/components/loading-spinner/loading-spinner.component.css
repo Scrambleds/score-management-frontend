@@ -1,0 +1,28 @@
+/* ให้ spinner อยู่กลางหน้าจอ */
+.spinner-container {
+    position: fixed;  /* ให้แสดงบนสุด */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* พื้นหลังมืด */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* ให้แสดงอยู่บนสุด */
+  }
+  
+  .spinner {
+    border: 0.25rem solid rgba(0, 0, 0, 0.1);
+    border-left-color: #3e3e3e;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }

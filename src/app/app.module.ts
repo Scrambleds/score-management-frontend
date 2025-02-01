@@ -69,6 +69,7 @@ import { ChangePasswordComponent } from './route/change-password/change-password
 import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
 import { Page404Component } from './components/page-404/page-404.component';
 import { ErrorLayoutComponent } from './layout/error-layout/error-layout.component';
+import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 
 @NgModule({
   declarations: [
@@ -110,6 +111,7 @@ import { ErrorLayoutComponent } from './layout/error-layout/error-layout.compone
     ChangePasswordComponent,
     Page404Component,
     ErrorLayoutComponent,
+    LoadingSpinnerComponent,
   ],
   imports: [
     BrowserModule,
