@@ -7,6 +7,8 @@ import {
   Output,
   ViewChild,
   EventEmitter,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { UploadScoreService } from '../../services/upload-score/upload-score.service';
@@ -22,7 +24,9 @@ import { TranslationService } from '../../core/services/translation.service';
   templateUrl: './upload-score-header.component.html',
   styleUrls: ['./upload-score-header.component.css'],
 })
-export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
+export class UploadScoreHeaderComponent
+  implements OnInit, AfterViewInit, OnChanges
+{
   @Input() titleName: string = 'No title';
   @Input() buttonName: string = 'No title';
 
@@ -30,12 +34,8 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
 
   //viewChild
   @ViewChild('subjectCode', { read: ElementRef }) subjectCodeRef?: ElementRef;
-  // @ViewChild('subjectDetailForm', { static: false })
-  // subjectDetailFormRef?: NgForm;
-  @ViewChild('subjectDetailForm', { static: false })
-  subjectDetailForm?: FormGroup;
+  @ViewChild('subjectName', { read: ElementRef }) subjectNameRef?: ElementRef;
 
-  // @ViewChild('myForm') myForm!: NgForm;
   @Output() formSubmitted = new EventEmitter<FormGroup>(); // Emit form data when submitted
 
   public form: FormGroup;
@@ -66,18 +66,12 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
     private translationService: TranslationService
   ) {
     this.form = this.fb.group({
-      subjectCode: [
-        { value: '', disabled: !this.isUploaded },
-        Validators.required,
-      ],
-      subjectName: [
-        { value: '', disabled: !this.isUploaded },
-        Validators.required,
-      ],
-      academicYearCode: [{ value: null, disabled: true }, Validators.required],
-      semesterCode: [{ value: null, disabled: true }, Validators.required],
-      sectionCode: [{ value: null, disabled: true }, Validators.required],
-      teacher: [{ value: null, disabled: true }, Validators.required],
+      subjectCode: ['', Validators.required],
+      subjectName: ['', Validators.required],
+      academicYearCode: [{ value: null }, Validators.required],
+      semesterCode: [{ value: null }, Validators.required],
+      sectionCode: [{ value: null }, Validators.required],
+      teacher: [{ value: null }, Validators.required],
     });
 
     // ตรวจจับการเปลี่ยนแปลงของฟอร์ม
@@ -87,19 +81,24 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.inputFormToggle(false);
     this.loadSection();
     this.loadSemester();
     this.loadAcademicYear();
     this.loadTeacher();
   }
-
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['isUploaded'] && !changes['isUploaded'].firstChange) {
+      console.log('isUploaded changed:', this.isUploaded);
+      this.inputFormToggle(this.isUploaded);
+    }
+  }
   ngAfterViewInit() {
     // ตรวจสอบว่ามี ViewChild หรือไม่
     if (!this.subjectCodeRef) {
       console.error('subjectCodeRef is not defined.');
       return;
     }
-
     // เข้าถึง input element
     const inputElement =
       this.subjectCodeRef.nativeElement.querySelector('input');
@@ -107,18 +106,14 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
       console.error('Input element not found inside subjectCodeRef.');
       return;
     }
-
     console.log('ngAfterViewInit: Input Element:', inputElement);
-
     // เพิ่ม Event Listener เพื่อฟังการเปลี่ยนแปลงค่า
     inputElement.addEventListener('input', (event: Event) => {
       const value = (event.target as HTMLInputElement).value.trim();
       console.log('Input Value:', value);
-
       // อัปเดตสถานะของตัวแปรที่ใช้ควบคุม ng-select
       const isNotEmpty = value.length > 0;
       console.log('Is Input Not Empty:', isNotEmpty);
-
       // ปรับปรุงการเปิด/ปิด ng-select จาก form control
       if (isNotEmpty) {
         this.form.get('academicYearCode')?.enable();
@@ -186,11 +181,13 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
           this.isSubjectNameReadonly = false;
           this.form.get('subjectCode')!.setValue(term, { emitEvent: false });
           this.form.get('subjectName')!.reset();
+          this.form.get('subjectName')?.disable();
         }
       } else if (this.filteredSubjects.length === 0) {
         console.log('filteredSubjects = 0');
         this.form.get('subjectCode')!.setValue(term, { emitEvent: false });
         this.form.get('subjectName')!.reset();
+        this.form.get('subjectName')?.enable();
         this.isSubjectNameReadonly = false;
       } else {
         console.log('filteredSubjects = else');
@@ -315,5 +312,49 @@ export class UploadScoreHeaderComponent implements OnInit, AfterViewInit {
 
   customSearchFn(term: string, item: any): boolean {
     return this.translationService.searchFn(term, item);
+  }
+
+  inputFormToggle(isClear: boolean) {
+    if (!isClear) {
+      // this.form.get('academicYearCode')?.setValue();
+      // this.form.get('semesterCode')?.setValue();
+      // this.form.get('sectionCode')?.setValue();
+      // this.form.get('teacher')?.setValue();
+      this.form.get('subjectCode')?.disable();
+      this.form.get('subjectName')?.disable();
+      this.form.get('academicYearCode')?.disable();
+      this.form.get('semesterCode')?.disable();
+      this.form.get('sectionCode')?.disable();
+      this.form.get('teacher')?.disable();
+    } else {
+      this.form.get('subjectCode')?.enable();
+      this.form.get('subjectName')?.enable();
+      this.form.get('academicYearCode')?.enable();
+      this.form.get('semesterCode')?.enable();
+      this.form.get('sectionCode')?.enable();
+      this.form.get('teacher')?.enable();
+    }
+  }
+
+  clearForm() {
+    // this.inputFormToggle(true);
+    console.log('clear form');
+    this.form.reset({
+      subjectCode: '',
+      subjectName: '',
+      academicYearCode: null,
+      semesterCode: null,
+      sectionCode: null,
+      teacher: null,
+    });
+
+    // // ถ้าต้องการรีเซ็ตค่าต่าง ๆ ที่เกี่ยวข้อง เช่น การปิด/เปิดฟอร์ม field
+    // this.isAutocompleteVisible = false;
+    // this.isSubjectNameReadonly = false;
+    // this.isSubmit = true;
+
+    // this.isAcademicYearDisabled = true;
+    // this.isSemesterDisabled = true;
+    // this.isSectionCodeDisabled = true;
   }
 }
