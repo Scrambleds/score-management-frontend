@@ -1,5 +1,13 @@
 import { Component, signal, effect, OnInit } from '@angular/core';
-import { Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
+import {
+  Router,
+  NavigationStart,
+  NavigationEnd,
+  NavigationCancel,
+  NavigationError,
+} from '@angular/router';
+import { Spinkit } from 'ng-http-loader';
+import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-root',
@@ -7,8 +15,10 @@ import { Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationErr
   styleUrls: ['./app.component.css'],
   standalone: false,
 })
-
 export class AppComponent implements OnInit {
+  public spinkit = Spinkit;
+  public customSpinner = LoadingSpinnerComponent;
+
   searchCriteria: any = {};
   isOpen: boolean = false;
   isLoginPage: boolean = false;
@@ -17,7 +27,6 @@ export class AppComponent implements OnInit {
   isLoading = signal(false);
 
   constructor(private router: Router) {
-
     // effect เพื่อจัดการการแสดง/ซ่อน spinner
 
     effect(() => {
@@ -38,10 +47,10 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   this.isLoading.set(true); // เริ่มการโหลด
+    this.isLoading.set(true); // เริ่มการโหลด
     setTimeout(() => {
       this.isLoading.set(false); // หยุดการโหลดหลังจาก 2 วินาที
-    }, 2000); // จำลองเวลาโหลด 2 วินาที
+    }, 600); // จำลองเวลาโหลด 2 วินาที
   }
 
   onSearch(criteria: any) {

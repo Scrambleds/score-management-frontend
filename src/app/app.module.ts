@@ -39,6 +39,7 @@ import {
   HttpClientModule,
   provideHttpClient,
   withInterceptorsFromDi,
+  withInterceptors,
 } from '@angular/common/http';
 import { TranslatePipe } from './shared/pipes/translate.pipe';
 import { UploadScoreHeaderComponent } from './components/upload-score-header/upload-score-header.component';
@@ -70,6 +71,8 @@ import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
 import { Page404Component } from './components/page-404/page-404.component';
 import { ErrorLayoutComponent } from './layout/error-layout/error-layout.component';
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
+import { NgHttpLoaderComponent } from 'ng-http-loader';
+import { pendingRequestsInterceptor$ } from 'ng-http-loader';
 
 @NgModule({
   declarations: [
@@ -129,13 +132,17 @@ import { LoadingSpinnerComponent } from './components/loading-spinner/loading-sp
     NgSelectComponent,
     MatSelectModule,
     RequiredMarkerDirective,
-    NgChartsModule
+    NgChartsModule,
+    NgHttpLoaderComponent,
   ],
   providers: [
     { provide: JWT_OPTIONS, useValue: {} },
     JwtHelperService,
     CacheService,
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(
+      withInterceptorsFromDi(),
+      withInterceptors([pendingRequestsInterceptor$])
+    ),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: CachingInterceptor,

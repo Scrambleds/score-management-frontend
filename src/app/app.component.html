@@ -1,4 +1,7 @@
-<!-- <app-loading-spinner id="loading-spinner"></app-loading-spinner> -->
-
-<app-loading-spinner *ngIf="isLoading()"></app-loading-spinner>
+<ng-http-loader
+  [backdrop]="true"
+  [minDuration]="600"
+  [entryComponent]="customSpinner"
+>
+</ng-http-loader>
 <router-outlet></router-outlet>
