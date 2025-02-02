@@ -32,6 +32,7 @@ import {
   createGrid,
 } from 'ag-grid-community';
 import { Subscription } from 'rxjs';
+import { CacheService } from '../../core/services/cache.service';
 
 @Component({
   selector: 'app-upload-excel-container',
@@ -96,7 +97,8 @@ export class UploadExcelContainerComponent implements OnInit {
     private uploadScoreService: UploadScoreService,
     private userService: UserService,
     private selectBoxService: SelectBoxService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private cacheService: CacheService
   ) {
     this.form = this.fb.group({
       // subjectNo: [''],
@@ -112,21 +114,6 @@ export class UploadExcelContainerComponent implements OnInit {
     this.translationService.getTranslations().subscribe(() => {
       this.refreshHeaderNames(); // รีเฟรชชื่อคอลัมน์เมื่อเปลี่ยนภาษา
     });
-    // this.langSubscription = this.languageService
-    //   .getCurrentLanguageObservable()
-    //   .subscribe((lang) => {
-    //     this.currentLanguage = lang;
-    //     console.log('Current Language:', lang);
-    //     this.refreshHeaderNames(); // อัปเดต UI
-    //   });
-    // if (typeof window !== 'undefined') {
-    //   let currentLanguage = localStorage.getItem('language') || 'en';
-    //   const newLanguage = localStorage.getItem('language');
-    //   if (newLanguage && newLanguage !== currentLanguage) {
-    //     currentLanguage = newLanguage;
-    //     this.refreshHeaderNames();
-    //   }
-    // }
   }
 
   //MasterData
@@ -582,6 +569,7 @@ export class UploadExcelContainerComponent implements OnInit {
       (response) => {
         console.log('Success', response);
         if (response.isSuccess) {
+          this.cacheService.clearCacheForUrl('/api/MasterData/Subject');
           Swal.fire({
             title: successTitle,
             icon: 'success',

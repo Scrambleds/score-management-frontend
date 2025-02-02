@@ -356,14 +356,5 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
       sectionCode: null,
       teacher: null,
     });
-
-    // // ถ้าต้องการรีเซ็ตค่าต่าง ๆ ที่เกี่ยวข้อง เช่น การปิด/เปิดฟอร์ม field
-    // this.isAutocompleteVisible = false;
-    // this.isSubjectNameReadonly = false;
-    // this.isSubmit = true;
-
-    // this.isAcademicYearDisabled = true;
-    // this.isSemesterDisabled = true;
-    // this.isSectionCodeDisabled = true;
   }
 }

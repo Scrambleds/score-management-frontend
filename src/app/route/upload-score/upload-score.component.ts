@@ -14,6 +14,7 @@ export class UploadScoreComponent {
   @ViewChild('scoreHeader') scoreHeader!: UploadScoreHeaderComponent;
   @ViewChild('scoreContent')
   scoreContent!: UploadExcelContainerComponent;
+
   private formData: any;
   //for send form state to child component
   isButtonDisabled = true;
@@ -38,5 +39,9 @@ export class UploadScoreComponent {
 
   onFormStatusChange(isValid: boolean) {
     this.isButtonDisabled = !isValid; // ปุ่มจะถูก disabled เมื่อฟอร์มไม่ valid
+  }
+
+  onSubmitSuccess() {
+    // this.headerComponent?.
   }
 }

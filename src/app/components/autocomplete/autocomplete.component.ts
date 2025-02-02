@@ -129,6 +129,8 @@ export class AutocompleteComponent implements ControlValueAccessor {
           : 'bottom';
 
       containerElement.classList.add(this.dropdownPosition);
+      // ตั้งค่า min-width เท่ากับ input
+      containerElement.style.minWidth = `${inputRect.width}px`;
       if (!this.widthAuto) {
         containerElement.style.width = `${inputRect.width}px`;
       }
