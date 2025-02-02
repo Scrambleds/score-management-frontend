@@ -18,6 +18,7 @@ import { LoadingSpinnerComponent } from './components/loading-spinner/loading-sp
 export class AppComponent implements OnInit {
   public spinkit = Spinkit;
   public customSpinner = LoadingSpinnerComponent;
+  ignoredUrls: string[] = ['/api/MasterData/Subject'];
 
   searchCriteria: any = {};
   isOpen: boolean = false;
