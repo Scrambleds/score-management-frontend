@@ -131,8 +131,10 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       .subscribe((data: any) => {
         this.subjectList = (data.objectResponse || []).map((subject: any) => ({
           subjectSearch: `${subject.subject_id} ${subject.subject_name}`,
+          subject_id: subject.subject_id,
         }));
       });
+    // console.log('check : ', this.subjectList);
   }
   ngOnInit(): void {
     // ฟังก์ชันสำหรับแสดง Auto-complete เมื่อมีการกรอกข้อมูลใน subjectSearch
@@ -239,7 +241,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       }
 
       // ตรวจสอบ sendStatus และกำหนดค่าเริ่มต้นหากไม่มีค่า
-
+      this.currentSubjectId = this.form.value.subject_id;
       const requestData = {
         teacher_code,
         role,
@@ -247,6 +249,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
         studentSearch: this.form.value.studentSearch ?? '',
         semester: this.form.value.semester ?? null,
         section: this.form.value.section ?? '',
+        subject_id: this.form.value.subjectSearch.subject_id ?? '',
         academic_year: this.form.value.academic_year ?? '',
         send_status_code: this.form.value.sendStatus ?? '',
       };
@@ -291,7 +294,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       semester: number;
       section: number;
     } = {
-      subject_id: this.currentSubjectId,
+      subject_id: this.form.value.subjectSearch.subject_id,
       academic_year: parseInt(this.form.value.academic_year),
       semester: parseInt(this.form.value.semester),
       section: parseInt(this.form.value.section),

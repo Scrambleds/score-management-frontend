@@ -18,6 +18,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { BehaviorSubject, switchMap } from 'rxjs';
 import { CacheService } from '../../core/services/cache.service';
+import { TranslationService } from '../../core/services/translation.service';
 // @ts-ignore
 const $: any = window['$'];
 
@@ -90,7 +91,8 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
     private el: ElementRef,
     private fb: FormBuilder,
     private cacheService: CacheService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private translationService: TranslationService
   ) {
     this.createTemplateForm = this.fb.group({
       nameTemplate: ['', Validators.required],
@@ -332,19 +334,33 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
   }
 
   setDefaultTemplate(templateKey: number): void {
+    const okBtnText = this.translationService.getTranslation('btn_ok');
+    const closeBtnText = this.translationService.getTranslation('btn_close');
     console.log(`setDefault template : ${templateKey}`);
     const payload = {
       template_id: templateKey,
       username: this.userService.username, // Replace with actual username
     };
+    let template = this.allTemplateList.find(
+      (t) => t.templateId === templateKey
+    );
     this.scoreAnnouncementService.setDefaultTemplate(payload).subscribe(
       (response) => {
         if (response.isSuccess) {
+          const successTitle = this.translationService.getTranslation(
+            'scoreannouncement_swalSetDefaultTemplateSuccess_title'
+          );
+          const successText = this.translationService.getTranslation(
+            'scoreannouncement_swalSetDefaultTemplateSuccess_text',
+            { templateName: template.templateName }
+          );
+
           Swal.fire({
-            title: 'บันทึกเทมเพลตพื้นฐานสำเร็จ',
+            title: successTitle,
+            text: successText,
             icon: 'success',
             confirmButtonColor: 'var(--primary-color)',
-            confirmButtonText: 'ตกลง',
+            confirmButtonText: okBtnText,
           }).then((result) => {
             if (result.isConfirmed) {
               // หากคลิก "ตกลง"
@@ -352,12 +368,16 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
             }
           });
         } else {
+          const failTitle = this.translationService.getTranslation(
+            'scoreannouncement_swalSetDefaultTemplateFail_title'
+          );
+
           Swal.fire({
-            title: 'เกิดข้อผิดพลาด',
+            title: failTitle,
             text: response.message.messageDescription,
             icon: 'error',
             confirmButtonColor: 'var(--secondary-color)',
-            confirmButtonText: 'ปิด',
+            confirmButtonText: closeBtnText,
           }).then((result) => {
             if (result.isConfirmed) {
               // หากคลิก "ตกลง"
@@ -368,6 +388,20 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
       },
       (error) => {
         console.error('Error creating template:', error);
+        const title = this.translationService.getTranslation(
+          'swalServerError_title'
+        );
+        const text = this.translationService.getTranslation(
+          'swalServerError_text'
+        );
+
+        Swal.fire({
+          title: title,
+          text: text,
+          icon: 'error',
+          confirmButtonColor: 'var(--secondary-color)',
+          confirmButtonText: closeBtnText,
+        });
       }
     );
   }
@@ -393,6 +427,9 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
 
   updateTemplate(templateKey: number) {
     console.log(`update Template : ${templateKey}`);
+    const okBtnText = this.translationService.getTranslation('btn_ok');
+    const closeBtnText = this.translationService.getTranslation('btn_close');
+    const cancleBtnText = this.translationService.getTranslation('btn_cancle');
     const payload = {
       template_id: templateKey, // Assuming templateKey maps to template_id
       subject: this.emailSubject,
@@ -402,19 +439,27 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
     let template = this.privateTemplateList.find(
       (t) => t.templateId === templateKey
     );
+    const warnTitle = this.translationService.getTranslation(
+      'scoreannouncement_swalWarningUpdateTemplate_title',
+      { templateName: template.templateName }
+    );
+    const warnText = this.translationService.getTranslation(
+      'scoreannouncement_swalWarningUpdateTemplate_text'
+    );
+
     Swal.fire({
-      title: `ต้องการเขียนทับเทมเพลต ${template.templateName} ใช่หรือไม่`,
-      text: 'หลังจากเขียนทับแล้วจะไม่สามารถกลับมาแก้ไขได้',
+      title: warnTitle,
+      text: warnText,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: 'var(--primary-color)',
-      confirmButtonText: 'ตกลง',
+      confirmButtonText: okBtnText,
       cancelButtonColor: 'var(--secondary-color)',
-      cancelButtonText: 'ยกเลิก',
+      cancelButtonText: cancleBtnText,
     }).then((result) => {
       if (result.isConfirmed) {
         // หากคลิก "ตกลง"
-        console.log('ข้อมูลถูกลบแล้ว');
+        console.log('ข้อมูลถูกแก้ไขแล้ว');
         this.scoreAnnouncementService.updateEmailTemplate(payload).subscribe(
           (response) => {
             if (response.isSuccess) {
@@ -422,13 +467,62 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
                 '/api/MasterData/EmailTemplate'
               );
               this.refreshTemplates();
+              const successTitle = this.translationService.getTranslation(
+                'scoreannouncement_swalUpdateTemplateSuccess_title'
+              );
+              const successText = this.translationService.getTranslation(
+                'scoreannouncement_swalUpdateTemplateSuccess_text',
+                { templateName: template.templateName }
+              );
+
+              Swal.fire({
+                title: successTitle,
+                text: successText,
+                icon: 'success',
+                confirmButtonColor: 'var(--primary-color)',
+                confirmButtonText: okBtnText,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // หากคลิก "ตกลง"
+                  console.log('success : ', response.messageDesc);
+                }
+              });
               console.log('Response : ', response);
             } else {
               console.log('fail Response : ', response);
+              const failTitle = this.translationService.getTranslation(
+                'scoreannouncement_swalUpdateTemplateFail_title'
+              );
+
+              Swal.fire({
+                title: failTitle,
+                text: response.message.messageDescription,
+                icon: 'error',
+                confirmButtonColor: 'var(--secondary-color)',
+                confirmButtonText: closeBtnText,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // หากคลิก "ตกลง"
+                  console.log('error : ', response.messageDesc);
+                }
+              });
             }
           },
           (error) => {
             console.error('Error updating template:', error);
+            const title = this.translationService.getTranslation(
+              'swalServerError_title'
+            );
+            const text = this.translationService.getTranslation(
+              'swalServerError_text'
+            );
+            Swal.fire({
+              title: title,
+              text: text,
+              icon: 'error',
+              confirmButtonColor: 'var(--secondary-color)',
+              confirmButtonText: closeBtnText,
+            });
           }
         );
       } else if (result.isDismissed) {
@@ -439,6 +533,11 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
   }
 
   deleteTemplate(templateKey: number) {
+    const okBtnText = this.translationService.getTranslation('btn_ok');
+    const closeBtnText = this.translationService.getTranslation('btn_close');
+    const deleteBtnText = this.translationService.getTranslation('btn_delete');
+    const cancleBtnText = this.translationService.getTranslation('btn_cancle');
+
     console.log(`deleteTemplate : ${templateKey}`);
     const payload = {
       template_id: templateKey, // Assuming templateKey maps to template_id
@@ -447,15 +546,22 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
     let template = this.privateTemplateList.find(
       (t) => t.templateId === templateKey
     );
+    const warnTitle = this.translationService.getTranslation(
+      'scoreannouncement_swalWarningDeleteTemplate_title',
+      { templateName: template.templateName }
+    );
+    const warnText = this.translationService.getTranslation(
+      'scoreannouncement_swalWarningDeleteTemplate_text'
+    );
     Swal.fire({
-      title: `ต้องการลบเทมเพลต ${template.templateName} ใช่หรือไม่`,
-      text: 'หลังจากลบข้อมูลแล้วจะไม่สามารถกลับมาแก้ไขได้',
+      title: warnTitle,
+      text: warnText,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: 'var(--danger-color)',
-      confirmButtonText: 'ลบ',
+      confirmButtonText: deleteBtnText,
       cancelButtonColor: 'var(--secondary-color)',
-      cancelButtonText: 'ยกเลิก',
+      cancelButtonText: cancleBtnText,
     }).then((result) => {
       if (result.isConfirmed) {
         // หากคลิก "ตกลง"
@@ -467,13 +573,59 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
                 '/api/MasterData/EmailTemplate'
               );
               this.refreshTemplates();
-              console.log('Response : ', response);
+              const successTitle = this.translationService.getTranslation(
+                'scoreannouncement_swalDeleteTemplateSuccess_title'
+              );
+              const successText = this.translationService.getTranslation(
+                'scoreannouncement_swalDeleteTemplateSuccess_text',
+                { templateName: template.templateName }
+              );
+              Swal.fire({
+                title: successTitle,
+                text: successText,
+                icon: 'success',
+                confirmButtonColor: 'var(--primary-color)',
+                confirmButtonText: okBtnText,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // หากคลิก "ตกลง"
+                  console.log('success : ', response.messageDesc);
+                }
+              });
             } else {
               console.log('fail Response : ', response);
+              const failTitle = this.translationService.getTranslation(
+                'scoreannouncement_swalDeleteTemplateFail_title'
+              );
+              Swal.fire({
+                title: failTitle,
+                text: response.message.messageDescription,
+                icon: 'error',
+                confirmButtonColor: 'var(--primary-color)',
+                confirmButtonText: closeBtnText,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // หากคลิก "ตกลง"
+                  console.log('success : ', response.messageDesc);
+                }
+              });
             }
           },
           (error) => {
             console.error('Error updating template:', error);
+            const title = this.translationService.getTranslation(
+              'swalServerError_title'
+            );
+            const text = this.translationService.getTranslation(
+              'swalServerError_text'
+            );
+            Swal.fire({
+              title: title,
+              text: text,
+              icon: 'error',
+              confirmButtonColor: 'var(--secondary-color)',
+              confirmButtonText: closeBtnText,
+            });
           }
         );
       } else if (result.isDismissed) {
@@ -509,6 +661,8 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
 
   // Method ที่ถูกเรียกเมื่อกดปุ่ม "ส่งอีเมล"
   sendEmail() {
+    const okBtnText = this.translationService.getTranslation('btn_ok');
+    const closeBtnText = this.translationService.getTranslation('btn_close');
     console.log('sendEmail: CurrentSubject => ', this.currentSubject);
     const payload = {
       subjectDetail: this.currentSubject,
@@ -520,22 +674,6 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
         contentEmail: this.messageText,
       },
     };
-    // const payload = {
-    //   subjectDetail: {
-    //     subject_id: '01418442-60',
-    //     subject_name: 'Web service and Web api I',
-    //     academic_year: '4',
-    //     semester: '1',
-    //     section: '1',
-    //   },
-    //   student_id: ['6430250229', '6430250261'],
-    //   //username teacher
-    //   username: this.userService.username,
-    //   emailDetail: {
-    //     subjectEmail: this.emailSubject,
-    //     contentEmail: this.messageText,
-    //   },
-    // };
 
     console.log('Email Payload:', payload); // แสดงค่าใน console
     this.scoreAnnouncementService.sendMail(payload).subscribe(
@@ -544,11 +682,19 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
         this.isTemplateDialogVisible = false;
         console.log('Success', response);
         if (response.isSuccess) {
+          const successTitle = this.translationService.getTranslation(
+            'scoreannouncement_swalSendMailSuccess_title'
+          );
+          const successText = this.translationService.getTranslation(
+            'scoreannouncement_swalSendMailSuccess_text',
+            { number: this.currentStudentData.length.toString() }
+          );
           Swal.fire({
-            title: 'ส่งอีเมลสำเร็จ',
+            title: successTitle,
+            text: successText,
             icon: 'success',
             confirmButtonColor: 'var(--primary-color)',
-            confirmButtonText: 'ตกลง',
+            confirmButtonText: okBtnText,
           }).then((result) => {
             if (result.isConfirmed) {
               // หากคลิก "ตกลง"
@@ -556,12 +702,15 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
             }
           });
         } else {
+          const failTitle = this.translationService.getTranslation(
+            'scoreannouncement_swalSendMailFail_title'
+          );
           Swal.fire({
-            title: 'เกิดข้อผิดพลาด',
-            text: response.message.messageDescription,
+            title: failTitle,
+            html: response.message.messageDescription.replace(/\n/g, '<br>'), // แปลง \n เป็น <br>
             icon: 'error',
             confirmButtonColor: 'var(--secondary-color)',
-            confirmButtonText: 'ปิด',
+            confirmButtonText: closeBtnText,
           }).then((result) => {
             if (result.isConfirmed) {
               // หากคลิก "ตกลง"
@@ -571,7 +720,19 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
         }
       },
       (error) => {
-        console.log('Error', error);
+        const title = this.translationService.getTranslation(
+          'swalServerError_title'
+        );
+        const text = this.translationService.getTranslation(
+          'swalServerError_text'
+        );
+        Swal.fire({
+          title: title,
+          text: text,
+          icon: 'error',
+          confirmButtonColor: 'var(--secondary-color)',
+          confirmButtonText: closeBtnText,
+        });
       },
       () => {
         this.isCreateTemplateSubmited = false; // reset flg
@@ -636,13 +797,17 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
     }
   }
 
-  onSave(): void {
+  onSaveCreateTemplate(): void {
     // Logic บันทึกข้อมูล
     if (this.isCreateTemplateSubmited) {
       return;
     }
+
     this.isCreateTemplateSubmited = true;
     if (this.createTemplateForm.valid) {
+      const closeBtnText = this.translationService.getTranslation('btn_close');
+      const okBtnText = this.translationService.getTranslation('btn_ok');
+
       const formData = this.createTemplateForm.value;
       console.log(formData);
       console.log('submit name template is: ', formData.nameTemplate);
@@ -658,11 +823,19 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
           this.isTemplateDialogVisible = false;
           console.log('Success', response);
           if (response.isSuccess) {
+            const successTitle = this.translationService.getTranslation(
+              'scoreannouncement_swalCreateTemplateSuccess_title'
+            );
+            const successText = this.translationService.getTranslation(
+              'scoreannouncement_swalSuccess_text',
+              { templateName: formData.nameTemplate }
+            );
             Swal.fire({
-              title: 'บันทึกข้อมูลสำเร็จ',
+              title: successTitle,
+              text: successText,
               icon: 'success',
               confirmButtonColor: 'var(--primary-color)',
-              confirmButtonText: 'ตกลง',
+              confirmButtonText: okBtnText,
             }).then((result) => {
               if (result.isConfirmed) {
                 // หากคลิก "ตกลง"
@@ -674,12 +847,15 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
               }
             });
           } else {
+            const failTitle = this.translationService.getTranslation(
+              'scoreannouncement_swalCreateTemplateFail_title'
+            );
             Swal.fire({
-              title: 'เกิดข้อผิดพลาด',
+              title: failTitle,
               text: response.message.messageDescription,
               icon: 'error',
               confirmButtonColor: 'var(--secondary-color)',
-              confirmButtonText: 'ปิด',
+              confirmButtonText: closeBtnText,
             }).then((result) => {
               if (result.isConfirmed) {
                 // หากคลิก "ตกลง"
@@ -690,6 +866,19 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
         },
         (error) => {
           console.log('Error', error);
+          const title = this.translationService.getTranslation(
+            'swalServerError_title'
+          );
+          const text = this.translationService.getTranslation(
+            'swalServerError_text'
+          );
+          Swal.fire({
+            title: title,
+            text: text,
+            icon: 'error',
+            confirmButtonColor: 'var(--secondary-color)',
+            confirmButtonText: closeBtnText,
+          });
         },
         () => {
           this.isCreateTemplateSubmited = false; // reset flg
