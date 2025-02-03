@@ -1,7 +1,7 @@
 <div class="route-container">
     <app-search-dashboard 
     (dashboardDataUpdated)="updateDashboardData($event)"
-    (cardRequest)="cardRequest($event)">
+    (cardRequested)="cardRequest($event)">
 </app-search-dashboard>
-    <app-bell-curve [dashboardData]="dashboardData"></app-bell-curve>
+    <app-bell-curve [dashboardData]="dashboardData" [cardValue]="cardValue"></app-bell-curve>
 </div>

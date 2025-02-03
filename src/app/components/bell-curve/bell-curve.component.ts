@@ -25,11 +25,19 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   @ViewChild('dChart', { static: false }) dChart!: ElementRef;
   @ViewChild('bChart', { static: false }) bChart!: ElementRef;
   jsonArray: any = [25, 15, 20, 15, 20, 10];
-  chartLabels: any = ['0-39', '40-49', '50-59', '60-69', '70-79', '80+'];
+  chartLabels: any = ['0-9', '10-19', '20-29', '30-39', '40+'];
+  chartLabels_ScoreType: any = [
+    '0-39',
+    '40-49',
+    '50-59',
+    '60-69',
+    '70-79',
+    '80+',
+  ];
 
-  chartLabels_ScoreType: any = ['0-39', '40+'];
+  // chartLabels_ScoreType: any = ['0-39', '40+'];
 
-  cutOut: number = 75;
+  // cutOut: number = 75;
   backgroundColors: any = [
     '#E15D44',
     '#55B4B0',
@@ -37,13 +45,22 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
     '#9B2335',
     '#5B5EA6',
     '#d6a7f5',
+
+    // '#FF6384',
+    // '#36A2EB',
+    // '#FFCE56',
+    // '#AA65D8',
+    // '#FFA600',
+    // '#80ff80',
   ];
   constructor(
     private DashboardService: DashboardService,
     private cdr: ChangeDetectorRef
   ) {}
   @Input() dashboardData: any;
+  @Input() cardValue: any;
   @Input() scoreType: string = '';
+  @Input() cardRequested: EventEmitter<any> = new EventEmitter();
   @Input() dashboardDataUpdated: EventEmitter<any> = new EventEmitter();
   bellCurveChart: chartJS.Chart | undefined;
 
@@ -55,9 +72,9 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   stdDev!: any;
   studentCount!: any;
 
-  doughnutChartLabels = ['0-39', '40-49', '50-59', '60-69', '70-79', '80+'];
+  // doughnutChartLabels = ['0-39', '40-49', '50-59', '60-69', '70-79', '80+'];
   doughnutChartData = {
-    labels: this.doughnutChartLabels,
+    labels: [],
     datasets: [
       {
         data: [0, 0, 0, 0, 0, 0],
@@ -73,68 +90,21 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
     ],
   };
 
-  doughnutChartOptions: chartJS.ChartOptions<'doughnut'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      datalabels: {
-        formatter: (value, context) => {
-          const total = this.doughnutChartData.datasets[0].data.reduce(
-            (a, b) => a + b,
-            0
-          );
-          const percentage = ((value / total) * 100).toFixed(1);
-          return `${value} (${percentage}%)`;
-        },
-        color: '#fff',
-        font: {
-          weight: 'bold',
-        },
-      },
-    },
-    animation: {
-      duration: 1000,
-      easing: 'easeOutQuad',
-    },
-  };
-
-  doughnutChartPlugins = [ChartDataLabels];
-
-  bellCurveData = {
-    labels: this.bellCurveLabels,
-    datasets: [
-      {
-        label: 'Term 1 (2025)',
-        // animations: {
-        //   y: {
-        //     duration: 2000,
-        //     delay: 500
-        //   }
-        // },
-        data: this.generateBellCurveData(),
-        borderColor: '#0000FF',
-        backgroundColor: 'rgba(0,0,255,0.2)',
-        fill: true,
-        pointRadius: 0,
-        tension: 0.4,
-      },
-    ],
-  };
-
   ngOnChanges(changes: SimpleChanges) {
     if (changes['dashboardData'] && changes['dashboardData'].currentValue) {
+      // Logic for dashboardData changes, make sure chart data gets updated properly
       this.updateChartData();
       this.setData(this.chart, this.jsonArray);
     }
   }
 
-  // ngOnInit(): void {
-  //   this.loadDashboardStats();
-  //   const ref = this.loadDashboardStats();
-  //   console.log("MY LOAD DATA!!", ref);
-  // }
-
   ngOnInit(): void {
+    this.cardRequested.subscribe((data) => {
+      console.log('DATA RECEIVED!!!: ', data);
+      this.cardValue = data;
+      this.updateChartData();
+    });
+
     this.dashboardDataUpdated.subscribe((data) => {
       this.dashboardData = data;
       this.updateChartData();
@@ -164,6 +134,7 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     let cvs: any = this.dChart?.nativeElement;
+    console.log('DATA!!!!: ', this.cardValue);
     if (cvs) {
       this.chart = new chartJS.Chart(cvs, {
         type: 'doughnut',
@@ -192,14 +163,13 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
             tooltip: {
               callbacks: {
                 label: function (tooltipItem) {
-                  const dataset = tooltipItem.dataset;
-                  const total = dataset.data.reduce(
-                    (acc, value) => acc + value,
-                    0
-                  );
-                  const currentValue = dataset.data[tooltipItem.dataIndex];
-                  const percentage = ((currentValue / total) * 100).toFixed(2);
-                  return `${tooltipItem.label}: ${percentage}%`;
+                  const value = tooltipItem.raw as number; // ใช้ tooltipItem.raw เพื่อดึงค่าจริงของ slice
+                  const dataset = tooltipItem.chart.data.datasets[0]
+                    .data as number[];
+                  const total = dataset.reduce((a, b) => a + b, 0);
+                  const percentage = ((value / total) * 100).toFixed(1);
+
+                  return ` ${value} ราย (${percentage}%)`;
                 },
               },
             },
@@ -257,34 +227,75 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   updateData() {
+    console.log('DATA!!!!: ', this.cardValue);
     this.jsonArray = [20, 20, 20, 20, 20];
     this.setData(this.chart, this.jsonArray);
   }
 
   setData(chart: any, data = []) {
+    console.log('DATA!!!!: ', this.cardValue);
     const scoreRanges = this.calculateScoreRanges(
       this.dashboardData,
-      this.scoreType
+      this.cardValue
     );
 
     const labels =
-      this.scoreType === '' ? this.chartLabels : this.chartLabels_ScoreType;
-
+      this.cardValue !== 'คะแนนรวม'
+        ? this.chartLabels
+        : this.chartLabels_ScoreType;
     let doughnutData = [0, 0, 0, 0, 0, 0];
 
-    doughnutData[0] = scoreRanges['0-39'] || 0;
-    doughnutData[1] = scoreRanges['40-49'] || 0;
-    doughnutData[2] = scoreRanges['50-59'] || 0;
-    doughnutData[3] = scoreRanges['60-69'] || 0;
-    doughnutData[4] = scoreRanges['70-79'] || 0;
-    doughnutData[5] = scoreRanges['80+'] || 0;
+    if (this.cardValue === 'คะแนนรวม') {
+      doughnutData = [
+        scoreRanges['0-39'] || 0,
+        scoreRanges['40-49'] || 0,
+        scoreRanges['50-59'] || 0,
+        scoreRanges['60-69'] || 0,
+        scoreRanges['70-79'] || 0,
+        scoreRanges['80+'] || 0,
+      ];
+    } else {
+      doughnutData = [
+        scoreRanges['0-9'] || 0,
+        scoreRanges['10-19'] || 0,
+        scoreRanges['20-29'] || 0,
+        scoreRanges['30-39'] || 0,
+        scoreRanges['40+'] || 0,
+      ];
+    }
 
-    if (labels === this.chartLabels_ScoreType) {
-      doughnutData = [doughnutData[0], doughnutData[5]];
+    // ตรวจสอบว่าเป็น Label แบบไหน แล้วใช้สีที่เหมาะสม
+    let backgroundColors = [];
+    if (labels === this.chartLabels) {
+      backgroundColors = [
+        '#E15D44',
+        '#55B4B0',
+        '#DFCFBE',
+        '#9B2335',
+        '#5B5EA6',
+        '#d6a7f5',
+      ];
+    } else if (labels === this.chartLabels_ScoreType) {
+      backgroundColors = [
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+        '#AA65D8',
+        '#FFA600',
+      ];
+    } else {
+      backgroundColors = [
+        '#80ff80',
+        '#D2691E',
+        '#00FA9A',
+        '#DC143C',
+        '#4682B4',
+      ]; // ค่าเริ่มต้น
     }
 
     chart.data.labels = labels;
     chart.data.datasets[0].data = doughnutData;
+    chart.data.datasets[0].backgroundColor = backgroundColors; // กำหนดสีแบบไดนามิก
 
     chart.update();
   }
@@ -295,6 +306,7 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
 
   updateChartData() {
     if (!this.dashboardData || this.dashboardData.length === 0) {
+    console.log('MY TYPE:',this.cardValue)
       this.jsonArray = [0, 0, 0, 0, 0, 0];
       this.doughnutChartData.datasets[0].data = [0, 0, 0, 0, 0, 0];
       this.avgScore = 0;
@@ -304,7 +316,6 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       this.studentCount = 0;
 
       this.updateBellCurve();
-
       this.refreshDashboard();
       return;
     }
@@ -316,16 +327,26 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
 
     const scoreRanges = this.calculateScoreRanges(
       this.dashboardData,
-      this.scoreType
+      this.cardValue
     );
-    this.doughnutChartData.datasets[0].data = [
-      scoreRanges['0-39'] || 0,
-      scoreRanges['40-49'] || 0,
-      scoreRanges['50-59'] || 0,
-      scoreRanges['60-69'] || 0,
-      scoreRanges['70-79'] || 0,
-      scoreRanges['80+'] || 0,
-    ];
+
+    this.doughnutChartData.datasets[0].data =
+      this.cardValue === 'คะแนนรวม'
+        ? [
+            scoreRanges['0-39'] || 0,
+            scoreRanges['40-49'] || 0,
+            scoreRanges['50-59'] || 0,
+            scoreRanges['60-69'] || 0,
+            scoreRanges['70-79'] || 0,
+            scoreRanges['80+'] || 0,
+          ]
+        : [
+            scoreRanges['0-9'] || 0,
+            scoreRanges['10-19'] || 0,
+            scoreRanges['20-29'] || 0,
+            scoreRanges['30-39'] || 0,
+            scoreRanges['40+'] || 0,
+          ];
 
     this.avgScore = totalScore.avgTotalScore;
     this.minScore = totalScore.minTotalScore;
@@ -338,44 +359,68 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   calculateScoreRanges(data: any[], scoreType: string): any {
-    const ranges = {
-      '0-39': 0,
-      '40-49': 0,
-      '50-59': 0,
-      '60-69': 0,
-      '70-79': 0,
-      '80+': 0,
-    };
+    let ranges: any = {};
+    console.log("This is 1: ", data)
+    console.log("This is", scoreType)
 
-    if (Array.isArray(data)) {
-      const studentData: any[] =
-        data.find((item) => Array.isArray(item.studentScore))?.studentScore ||
-        [];
+    if (scoreType === 'คะแนนรวม') {
+      ranges = {
+        '0-39': 0,
+        '40-49': 0,
+        '50-59': 0,
+        '60-69': 0,
+        '70-79': 0,
+        '80+': 0,
+      };
+    } else {
+      ranges = {
+        '0-9': 0,
+        '10-19': 0,
+        '20-29': 0,
+        '30-39': 0,
+        '40+': 0,
+      };
+    }
 
-      studentData.forEach((student) => {
-        let totalScore = 0;
+    if (!Array.isArray(data)) return ranges;
 
-        if (scoreType === 'คะแนนกลางภาค') {
-          totalScore = student.midterm_score || 0;
-        } else if (scoreType === 'คะแนนปลายภาค') {
-          totalScore = student.final_score || 0;
-        } else if (scoreType === 'คะแนนระหว่างเรียน') {
-          totalScore = student.accumulated_score || 0;
-        } else {
-          totalScore =
-            (student.accumulated_score || 0) +
-            (student.midterm_score || 0) +
-            (student.final_score || 0);
-        }
+    const studentData: any[] =
+      data.find((item) => Array.isArray(item.studentScore))?.studentScore || [];
 
+    studentData.forEach((student) => {
+     console.log("student:", student);
+      let totalScore = 0;
+
+      if (scoreType === 'คะแนนกลางภาค') {
+        totalScore = student.midterm_score || 0;
+      } else if (scoreType === 'คะแนนปลายภาค') {
+        totalScore = student.final_score || 0;
+      } else if (scoreType === 'คะแนนระหว่างเรียน') {
+        totalScore = student.accumulated_score || 0;
+      } else {
+        totalScore =
+          (student.accumulated_score || 0) +
+          (student.midterm_score || 0) +
+          (student.final_score || 0);
+      }
+
+      if (scoreType === 'คะแนนรวม') {
         if (totalScore >= 0 && totalScore <= 39) ranges['0-39']++;
         else if (totalScore >= 40 && totalScore <= 49) ranges['40-49']++;
         else if (totalScore >= 50 && totalScore <= 59) ranges['50-59']++;
         else if (totalScore >= 60 && totalScore <= 69) ranges['60-69']++;
         else if (totalScore >= 70 && totalScore <= 79) ranges['70-79']++;
         else if (totalScore >= 80) ranges['80+']++;
-      });
-    }
+      } else {
+        if (totalScore >= 0 && totalScore <= 9) ranges['0-9']++;
+        else if (totalScore >= 10 && totalScore <= 19) ranges['10-19']++;
+        else if (totalScore >= 20 && totalScore <= 29)
+          ranges['20-29']++; // Fix range
+        else if (totalScore >= 30 && totalScore <= 39)
+          ranges['30-39']++; // Fix range
+        else if (totalScore >= 40) ranges['40+']++;
+      }
+    });
 
     return ranges;
   }
@@ -397,32 +442,4 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       return factor * Math.exp(exponent) * 100;
     });
   }
-
-  // loadDashboardStats = (): void => {
-  //   this.DashboardService.getDashboardStats({}).subscribe((response: any) => {
-  //     if (response.isSuccess) {
-  //       const data = response.objectResponse;
-
-  //       this.avgScore = data[0].final_score.avgFinalScore;
-  //       this.minScore = data[0].final_score.minFinalScore;
-  //       this.maxScore = data[0].final_score.maxFinalScore;
-  //       this.stdDev = data[0].final_score.stdFinalScore;
-  //       this.studentCount = data[0].final_score.numberOfStudents;
-
-  //       const scoreRanges = this.calculateScoreRanges(data, this.scoreType);
-  //       this.doughnutChartData.datasets[0].data = [
-  //         scoreRanges['0-39'] || 0,
-  //         scoreRanges['40-49'] || 0,
-  //         scoreRanges['50-59'] || 0,
-  //         scoreRanges['60-69'] || 0,
-  //         scoreRanges['70-79'] || 0,
-  //         scoreRanges['80+'] || 0,
-  //       ];
-
-  //       this.updateBellCurve();
-
-  //       this.refreshDashboard();
-  //     }
-  //   });
-  // };
 }
