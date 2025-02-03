@@ -524,6 +524,10 @@ export class UploadExcelContainerComponent implements OnInit {
     const successTitle = this.translationService.getTranslation(
       'uploadscore_swalSave_title'
     );
+    const successText = this.translationService.getTranslation(
+      'uploadscore_swalSave_text',
+      { number: this.rowData.length.toString() }
+    );
     const failTitle = this.translationService.getTranslation(
       'sweet_alert_fail_title'
     );
@@ -572,6 +576,7 @@ export class UploadExcelContainerComponent implements OnInit {
           this.cacheService.clearCacheForUrl('/api/MasterData/Subject');
           Swal.fire({
             title: successTitle,
+            text: successText,
             icon: 'success',
             confirmButtonColor: 'var(--primary-color)',
             confirmButtonText: okBtnText,
@@ -602,6 +607,19 @@ export class UploadExcelContainerComponent implements OnInit {
       },
       (error) => {
         console.log('Error', error);
+        const title = this.translationService.getTranslation(
+          'swalServerError_title'
+        );
+        const text = this.translationService.getTranslation(
+          'swalServerError_text'
+        );
+        Swal.fire({
+          title: title,
+          text: text,
+          icon: 'error',
+          confirmButtonColor: 'var(--secondary-color)',
+          confirmButtonText: closeBtnText,
+        });
       },
       () => {
         console.log('Complete');

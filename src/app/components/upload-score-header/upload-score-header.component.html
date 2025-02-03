@@ -1,7 +1,9 @@
 <div class="custom-card">
   <div class="card-body">
     <div class="fw-bold">{{ "uploadscore_header_title" | translate }}</div>
-    <div class="text-danger">{{ "uploadscore_header_remark" | translate }}</div>
+    <div *ngIf="isUploaded" class="text-danger">
+      {{ "uploadscore_header_remark" | translate }}
+    </div>
     <!-- parent will submit this form instead -->
     <form [formGroup]="form" class="w-100">
       <div class="row">
