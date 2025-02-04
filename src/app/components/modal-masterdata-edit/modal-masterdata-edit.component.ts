@@ -16,6 +16,7 @@ import { MasterDataService } from '../../services/master-data/master-data.servic
 import { UserService } from '../../services/sharedService/userService/userService.service';
 import Swal from 'sweetalert2';
 import { TranslationService } from '../../core/services/translation.service';
+import { CacheService } from '../../core/services/cache.service';
 
 @Component({
   selector: 'app-modal-masterdata-edit',
@@ -41,7 +42,8 @@ export class ModalMasterdataEditComponent implements AfterViewInit, OnChanges {
     private fb: FormBuilder,
     private MasterDataService: MasterDataService,
     private UserService: UserService,
-    private translate: TranslationService
+    private translate: TranslationService,
+    private CacheService: CacheService
   ) {}
 
   customSearchFn_SearchLan(term: string, item: any): boolean {
@@ -111,7 +113,6 @@ export class ModalMasterdataEditComponent implements AfterViewInit, OnChanges {
   }
 
   OnSaveData() {
-    const currentLang = localStorage.getItem('language') || 'en';
 
     this.form.markAllAsTouched();
 
@@ -148,6 +149,10 @@ export class ModalMasterdataEditComponent implements AfterViewInit, OnChanges {
               this.updateMasterData.emit(formData);
             }
           });
+          this.CacheService.clearCacheForUrl(
+            '/api/MasterData'
+          );
+          this.CacheService.clearCacheForUrl('/api/LovContant');
           this.closeModal();
         }
       },

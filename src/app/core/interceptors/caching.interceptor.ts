@@ -10,6 +10,9 @@ import { CacheService } from '../services/cache.service';
 
 @Injectable()
 export class CachingInterceptor implements HttpInterceptor {
+
+  private cacheList: string[] = ['/api/Dashboard/GetSubjectDashboard', '/api/LovContant' ];
+
   constructor(private cacheService: CacheService) {}
   intercept(
     request: HttpRequest<any>,
@@ -29,9 +32,10 @@ export class CachingInterceptor implements HttpInterceptor {
       });
     }
 
-    if (request.method !== 'GET') {
-      return next.handle(requestinjected); // แค่ Cache GET Requests
-    }
+    // if (request.method !== 'GET') {
+    //   return next.handle(requestinjected); // แค่ Cache GET Requests
+    // }
+
     if (!this.canCache(request)) {
       return next.handle(requestinjected);
     }
@@ -47,6 +51,11 @@ export class CachingInterceptor implements HttpInterceptor {
   }
 
   canCache(request: HttpRequest<unknown>): boolean {
-    return request.urlWithParams.includes('/api/MasterData');
+    // return request.urlWithParams.includes('/api/MasterData');
+    return (
+      request.method === 'GET' ||
+      (request.method === 'POST' &&
+        this.cacheList.some((url) => request.url.includes(url)))
+    );
   }
 }

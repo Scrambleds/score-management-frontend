@@ -5,6 +5,7 @@ import { Modal } from 'bootstrap';
 import { UserService } from '../../services/sharedService/userService/userService.service';
 import Swal from 'sweetalert2';
 import { TranslationService } from '../../core/services/translation.service';
+import { CacheService } from '../../core/services/cache.service';
 
 
 @Component({
@@ -27,7 +28,9 @@ export class ModalMasterdataAddComponent implements AfterViewInit, OnChanges {
   @Input() statusData: Array<{ id: string; title: string }> = [];
   @Output() addMasterData = new EventEmitter<any>();
 
-  constructor(private fb: FormBuilder, private MasterDataService: MasterDataService, private UserService: UserService, private translate: TranslationService) {}
+  constructor(private fb: FormBuilder, private MasterDataService: MasterDataService, private UserService: UserService, private translate: TranslationService,
+            private CacheService: CacheService
+  ) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -105,8 +108,7 @@ export class ModalMasterdataAddComponent implements AfterViewInit, OnChanges {
 
 
   onSave() {
-    const currentLang = localStorage.getItem('language') || 'en';
-  
+    
     this.form.markAllAsTouched();
   
     if (this.form.invalid) {
@@ -139,7 +141,11 @@ export class ModalMasterdataAddComponent implements AfterViewInit, OnChanges {
               window.location.reload();  // รีเฟรชหน้า
             }
           });
-    
+
+          this.CacheService.clearCacheForUrl(
+            '/api/MasterData'
+          );
+          this.CacheService.clearCacheForUrl('/api/LovContant');      
           this.closeModal();
         }
       },

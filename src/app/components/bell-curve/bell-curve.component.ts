@@ -406,18 +406,18 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       }
 
       if (scoreType === 'คะแนนรวม') {
-        if (totalScore >= 0 && totalScore <= 39) ranges['0-39']++;
-        else if (totalScore >= 40 && totalScore <= 49) ranges['40-49']++;
-        else if (totalScore >= 50 && totalScore <= 59) ranges['50-59']++;
-        else if (totalScore >= 60 && totalScore <= 69) ranges['60-69']++;
-        else if (totalScore >= 70 && totalScore <= 79) ranges['70-79']++;
+        if (totalScore >= 0 && totalScore < 40) ranges['0-39']++;
+        else if (totalScore >= 40 && totalScore < 50) ranges['40-49']++;
+        else if (totalScore >= 50 && totalScore < 60) ranges['50-59']++;
+        else if (totalScore >= 60 && totalScore < 70) ranges['60-69']++;
+        else if (totalScore >= 70 && totalScore < 80) ranges['70-79']++;
         else if (totalScore >= 80) ranges['80+']++;
       } else {
-        if (totalScore >= 0 && totalScore <= 9) ranges['0-9']++;
-        else if (totalScore >= 10 && totalScore <= 19) ranges['10-19']++;
-        else if (totalScore >= 20 && totalScore <= 29)
+        if (totalScore >= 0 && totalScore < 10) ranges['0-9']++;
+        else if (totalScore >= 10 && totalScore < 20) ranges['10-19']++;
+        else if (totalScore >= 20 && totalScore < 30)
           ranges['20-29']++; // Fix range
-        else if (totalScore >= 30 && totalScore <= 39)
+        else if (totalScore >= 30 && totalScore < 40)
           ranges['30-39']++; // Fix range
         else if (totalScore >= 40) ranges['40+']++;
       }

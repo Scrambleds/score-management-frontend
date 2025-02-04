@@ -574,6 +574,7 @@ export class UploadExcelContainerComponent implements OnInit {
         console.log('Success', response);
         if (response.isSuccess) {
           this.cacheService.clearCacheForUrl('/api/MasterData/Subject');
+          this.cacheService.clearCacheForUrl('/api/Dashboard/GetSubjectDashboard');
           Swal.fire({
             title: successTitle,
             text: successText,
