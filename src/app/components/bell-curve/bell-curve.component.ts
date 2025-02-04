@@ -277,11 +277,12 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       ];
     } else if (labels === this.chartLabels_ScoreType) {
       backgroundColors = [
-        '#FF6384',
-        '#36A2EB',
-        '#FFCE56',
-        '#AA65D8',
-        '#FFA600',
+        '#E15D44',
+        '#55B4B0',
+        '#DFCFBE',
+        '#9B2335',
+        '#5B5EA6',
+        '#d6a7f5',
       ];
     } else {
       backgroundColors = [
