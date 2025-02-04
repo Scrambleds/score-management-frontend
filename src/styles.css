@@ -104,3 +104,12 @@ input::-webkit-credentials-auto-fill-button,
 input::-webkit-contacts-auto-fill-button {
   display: none;
 }
+
+/* swal2 animation */
+.animate__headShake {
+  animation-iteration-count: infinite !important; /* ทำให้แอนิเมชั่นวนไปเรื่อยๆ */
+}
+
+.no-border {
+  border: 0 !important;
+}
