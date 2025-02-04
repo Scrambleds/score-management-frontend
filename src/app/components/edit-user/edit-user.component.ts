@@ -94,9 +94,9 @@ public onSearch(): void {
 public onReset(): void {
     console.log("Welcome to my reset func!")
     this.form.reset();
-    this.filteredData = [...this.originalData]; // คืนค่าข้อมูลทั้งหมด
+    this.filteredData = [...this.originalData];
     this.rowData = [...this.originalData];
-    this.searchService.updateSearchCriteria({});  // รีเซ็ต criteria
+    this.searchService.updateSearchCriteria({});
   }  
 
   isCurrentRoute(route: string): boolean{

@@ -28,10 +28,8 @@ export class FormEditComponent implements OnInit, AfterViewInit {
   roleData: any[] = [];
   prefixData: any[] = [];
   statusData: any[] = [];
+  allMasterData: any[] = [];
   form: FormGroup;
-
-  // roleOption = [{ id: 'ผู้ดูแลระบบ', title: 'ผู้ดูแลระบบ' }, { id: 'อาจารย์', title: 'อาจารย์' }];
-  // statusOption = [{ id: 'active', title: 'active' }, { id: 'inactive', title: 'inactive' }];
 
   constructor(
     private UserManageService: UserManageService,
@@ -69,9 +67,7 @@ export class FormEditComponent implements OnInit, AfterViewInit {
     this.UserManageService.getUsers().subscribe({
       next: (response: any) => {
         if (response.isSuccess) {
-          // Update originalData with the latest data
           this.originalData = response.objectResponse;
-          // Initialize filteredData with originalData or apply existing filters
           this.filteredData = [...this.originalData];
           console.log('MY DATA', this.filteredData);
         } else {
@@ -82,8 +78,7 @@ export class FormEditComponent implements OnInit, AfterViewInit {
         console.error('API Error:', err);
       },
     });
-  
-    // Fetch role, prefix, and status data
+
     forkJoin({
       roleData: this.SelectBoxService.getSystemParamRole(role),
       prefixData: this.SelectBoxService.getSystemParamPrefix(prefix),
@@ -120,23 +115,18 @@ export class FormEditComponent implements OnInit, AfterViewInit {
       },
     });
   
-    // Subscribe to search criteria and filter data accordingly
     this.searchService.currentSearchCriteria.subscribe((criteria) => {
       this.searchCriteria = criteria;
   
       if (this.searchCriteria) {
-        // Filter the data based on the current search criteria
         this.filteredData = this.filterData(this.originalData, this.searchCriteria);
       } else {
-        // If no search criteria, just reset the filtered data to original data
         this.filteredData = [...this.originalData];
       }
     });
-  
-    // Subscribe to real-time users updates from UserManageService
-    this.UserManageService.users$.subscribe((users) => {
-      this.filteredData = [...users]; // Update filteredData with real-time users data
-    });
+    // this.UserManageService.users$.subscribe((users) => {
+    //   this.filteredData = [...users];
+    // });
   }
   
   handleModalSubmit(updatedData: any) {
@@ -148,9 +138,8 @@ export class FormEditComponent implements OnInit, AfterViewInit {
       this.filteredData[index] = {
         ...this.filteredData[index],
         ...updatedData,
-      }; // Update the data array
+      };
   
-      // After modal submit, update the users data in the service
       this.UserManageService.updateUsers(this.filteredData);
     }
     this.closeModal();
@@ -221,11 +210,6 @@ export class FormEditComponent implements OnInit, AfterViewInit {
     return prefix ? prefix.byte_desc_th : '';
   }
 
-  // getStatusTitle(statusId: string): string {
-  //   const status = this.statusOption.find(status => status.id === statusId); // Cast statusId to a number
-  //   return status ? status.title : '';
-  // }
-
   // เปิด Modal
   openModal(row: any) {
     this.selectedRowData = { ...row };
@@ -243,27 +227,10 @@ export class FormEditComponent implements OnInit, AfterViewInit {
     this.isModalVisible = false;
   }
 
-  // Handle modal close event
   handleModalClose() {
     this.closeModal();
   }
 
-  // Handle modal submit event
-  // handleModalSubmit(updatedData: any) {
-  //   console.log('Submitted Data:', updatedData);
-  //   const index = this.filteredData.findIndex(
-  //     (item) => item.row_id === updatedData.row_id
-  //   );
-  //   if (index !== -1) {
-  //     this.filteredData[index] = {
-  //       ...this.filteredData[index],
-  //       ...updatedData,
-  //     }; // Update the data array
-  //   }
-  //   this.closeModal();
-  // }
-
-  // ngAfterViewInit for Modal initialization
   ngAfterViewInit() {
     this.modalElement = document.querySelector('.modal');
     this.modalInstance = new Modal(this.modalElement);

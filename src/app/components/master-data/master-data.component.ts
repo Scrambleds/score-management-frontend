@@ -153,17 +153,6 @@ export class MasterDataComponents implements OnInit {
     this.filteredData = [...this.allMasterData];
   }
 
-  // filterMasterData(searchTerm: string): void {
-  //   if (!searchTerm) {
-  //     this.filteredData = [...this.allMasterData]; // รีเซ็ตเมื่อไม่มีการค้นหา
-  //   } else {
-  //     this.filteredData = this.allMasterData.filter(item =>
-  //       item.byte_reference.toLowerCase().includes(searchTerm.toLowerCase())
-  //     );
-  //   }
-  //   console.log('Filtered Data:', this.filteredData); // ตรวจสอบค่าที่อัปเดต
-  // }
-
   filterMasterData(searchTerm: string): void {
     if (!searchTerm) {
       this.filteredData = [...this.allMasterData];
@@ -178,7 +167,6 @@ export class MasterDataComponents implements OnInit {
     }
     console.log('Filtered Data:', this.filteredData);
   }  
-  
   
   getMasterData(): void {
     this.MasterDataService.getMasterData().subscribe(
@@ -197,15 +185,6 @@ export class MasterDataComponents implements OnInit {
   toggleCollapse(index: number): void {
     this.openCollapse = this.openCollapse === index ? null : index;
   }
-
-  // onShowChange(show: boolean) {
-  //   this.showModal = show;
-  // }
-
-  // onSubmit(): void {
-  //   const values = this.form.value;
-  //   console.log('Form Submitted', values);
-  // }
 
   onAddModalChange = (show: boolean) => {
     this.showAddModal = show;
