@@ -47,6 +47,7 @@ export class MasterDataComponents implements OnInit {
   showAddModal = false;
   showEditModal = false;
   isModalVisible = false;
+  isSearchTriggered = false;
   selectedByteReference: string | null = null;
   selectedByteCode: string | null = null;
   selectedByteDescTH: string | null = null;
@@ -73,6 +74,7 @@ export class MasterDataComponents implements OnInit {
     this.getMasterData();
 
     this.searchSubscription = this.searchService.searchTerm$.subscribe(term => {
+      this.isSearchTriggered = !!term;
       this.filterMasterData(term);
     });
 

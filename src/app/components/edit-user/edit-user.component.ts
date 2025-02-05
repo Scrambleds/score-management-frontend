@@ -16,7 +16,7 @@ export class EditUserComponent {
  public form: FormGroup;
   submittedData: any = null;
   // isOnAdduser = true;
-  @Output() searchEvent = new EventEmitter<any>(); 
+  @Output() searchEvent = new EventEmitter<boolean>();
   @Output() submit = new EventEmitter<any>();
   
   // roleOption = [{ id: 'ผู้ดูแลระบบ', title: 'ผู้ดูแลระบบ' }, { id: 'อาจารย์', title: 'อาจารย์' }];
@@ -28,7 +28,7 @@ export class EditUserComponent {
   rowData: any[] = [];
   originalData: any[] = [];
   filteredData: any[] = [];
-  
+  isSearchTriggered = false;
 
   constructor(private UserManageService: UserManageService ,
     private fb: FormBuilder, 
@@ -72,6 +72,7 @@ ngOnInit() {
 public onSearch(): void {
   if (this.form.valid) {
     const searchCriteria = this.form.value;
+    this.isSearchTriggered = true;
 
     // แปลงคีย์จาก form ให้ตรงกับ data
     const cleanedCriteria = {
@@ -87,6 +88,7 @@ public onSearch(): void {
     console.log('Updated search criteria:', cleanedCriteria);
   } else {
     console.log('กรุณากรอกข้อมูลให้ครบถ้วน');
+    this.isSearchTriggered = true;
     this.searchService.updateSearchCriteria({}); // รีเซ็ต criteria ถ้าฟอร์มไม่ครบ
   }
 }

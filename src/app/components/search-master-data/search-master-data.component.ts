@@ -11,6 +11,7 @@ import { SearchMasterdataServiceTsComponent } from '../../services/search-master
 })
 export class SearchMasterDataComponent {
   searchForm: FormGroup;
+  isSearchTriggered = false;
 
   constructor(private fb: FormBuilder, private searchService: SearchMasterdataServiceTsComponent) {
     this.searchForm = this.fb.group({
@@ -19,15 +20,25 @@ export class SearchMasterDataComponent {
   }
 
   onInputChange(value: string): void {
-    this.searchService.setSearchTerm(value.trim()); // ส่งค่าทันทีขณะพิมพ์
+    const TrimValue = value ? value.trim() : '';
+    this.searchService.setSearchTerm(TrimValue); // ส่งค่าทันทีขณะพิมพ์
   }
 
   onSubmit(): void {
-    const searchValue = this.searchForm.value.searchInput.trim();
-    this.searchService.setSearchTerm(searchValue); // ส่งค่าค้นหาไปยัง Service
+    const searchValue = this.searchForm.value.searchInput
+    if (searchValue && searchValue.trim()) {
+      this.isSearchTriggered = true; // อัปเดตสถานะเมื่อกด Search
+      this.searchService.setSearchTerm(searchValue.trim());
+    } else {
+      // ถ้าไม่มีการกรอกข้อมูลให้แสดงข้อมูลทั้งหมด
+      this.isSearchTriggered = false;
+      this.searchService.setSearchTerm(''); // ล้างค่าค้นหา
+    }
   }
+
   onReset(): void {
     this.searchForm.reset();
+    this.isSearchTriggered = false;
     this.searchService.setSearchTerm(''); // ล้างค่าค้นหา
   }
 }

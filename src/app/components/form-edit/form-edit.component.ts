@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Modal } from 'bootstrap';
 import { SearchService } from '../../services/search-service/seach.service';
@@ -19,6 +19,8 @@ import { TranslationService } from '../../core/services/translation.service';
 export class FormEditComponent implements OnInit, AfterViewInit {
   isUploadExcelVisible = false;
   isModalVisible = false;
+  isSearchTriggered = false; 
+  @Input() searchEvent!: EventEmitter<boolean>;
   selectedRowData: any = null;
   modalElement: any;
   modalInstance: any;
@@ -116,6 +118,7 @@ export class FormEditComponent implements OnInit, AfterViewInit {
     });
   
     this.searchService.currentSearchCriteria.subscribe((criteria) => {
+      this.isSearchTriggered = !! criteria;
       this.searchCriteria = criteria;
   
       if (this.searchCriteria) {
