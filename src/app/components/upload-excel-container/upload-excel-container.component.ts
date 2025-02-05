@@ -134,7 +134,15 @@ export class UploadExcelContainerComponent implements OnInit {
     event.preventDefault();
     const file = event.dataTransfer?.files[0];
     if (file) {
-      this.processFile(file);
+      this.validateFile(file)
+        .then((isValid) => {
+          if (isValid) {
+            this.processFile(file);
+          }
+        })
+        .catch(() => {
+          // หากการตรวจสอบไม่ผ่าน จะไม่ทำอะไร
+        });
     }
   }
 
@@ -142,8 +150,108 @@ export class UploadExcelContainerComponent implements OnInit {
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.processFile(file);
+      this.validateFile(file)
+        .then((isValid) => {
+          if (isValid) {
+            this.processFile(file);
+          }
+        })
+        .catch(() => {
+          // หากการตรวจสอบไม่ผ่าน จะไม่ทำอะไร
+        });
     }
+  }
+
+  // ฟังก์ชันตรวจสอบประเภทไฟล์
+  validateFile(file: File): Promise<boolean> {
+    const allowedExtensions = ['.xlsx', '.xls'];
+    const allowedMimeTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-excel', // .xls
+    ];
+
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const isValidExtension =
+      fileExtension && allowedExtensions.includes(`.${fileExtension}`);
+    const isValidMimeType = allowedMimeTypes.includes(file.type);
+
+    if (!isValidExtension || !isValidMimeType) {
+      return this.showError(
+        `File Validation Error: ${file.name} is not a valid Excel file. Extension: ${fileExtension}, MIME Type: ${file.type}`
+      );
+    }
+
+    return this.checkMagicNumber(file);
+  }
+
+  // ฟังก์ชันตรวจสอบ Magic Number (File Signature)
+  checkMagicNumber(file: File): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const data = new Uint8Array(e.target.result);
+        const magicNumberXlsx = [0x50, 0x4b, 0x03, 0x04]; // .xlsx เป็น ZIP ไฟล์
+        const magicNumberXls = [0xd0, 0xcf, 0x11, 0xe0]; // .xls เป็น OLE compound
+
+        // ตรวจสอบ Magic Number สำหรับ .xlsx
+        if (file.name.toLowerCase().endsWith('.xlsx')) {
+          if (
+            !data
+              .slice(0, 4)
+              .every((byte, index) => byte === magicNumberXlsx[index])
+          ) {
+            return reject(
+              this.showError(
+                `Magic Number Mismatch: ${file.name} is not a valid .xlsx file.`
+              )
+            );
+          }
+        }
+
+        // ตรวจสอบ Magic Number สำหรับ .xls
+        if (file.name.toLowerCase().endsWith('.xls')) {
+          if (
+            !data
+              .slice(0, 4)
+              .every((byte, index) => byte === magicNumberXls[index])
+          ) {
+            return reject(
+              this.showError(
+                `Magic Number Mismatch: ${file.name} is not a valid .xls file.`
+              )
+            );
+          }
+        }
+
+        resolve(true); // คืนค่า resolve เมื่อผ่านการตรวจสอบ
+      };
+
+      reader.onerror = () => {
+        reject(
+          this.showError(`File Read Error: Unable to read file ${file.name}`)
+        );
+      };
+
+      reader.readAsArrayBuffer(file); // อ่านไฟล์
+    });
+  }
+
+  // ฟังก์ชันสำหรับแสดงการแจ้งเตือน
+  showError(
+    logMessage: string,
+    title: string = this.translationService.getTranslation(
+      'swal_FileTypeInvalid_title'
+    ),
+    text: string = this.translationService.getTranslation(
+      'swal_FileTypeInvalid_text'
+    )
+  ): Promise<boolean> {
+    console.error(logMessage); // แสดงรายละเอียดข้อผิดพลาดใน log
+    return Swal.fire({
+      icon: 'error',
+      title: title,
+      text: text,
+    }).then(() => false); // คืนค่าผลลัพธ์เป็น false หลังจากที่ Swal เสร็จสิ้น
   }
 
   // ฟังก์ชันที่ใช้ในการประมวลผลไฟล์ทั้งจากการลากวางและการเลือกไฟล์
