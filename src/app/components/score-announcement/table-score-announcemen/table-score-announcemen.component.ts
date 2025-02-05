@@ -192,6 +192,24 @@ export class TableScoreAnnouncementComponent {
         field: 'seat_no',
         flex: 0.6,
         minWidth: 70,
+        comparator: (valueA: string, valueB: string) => {
+          const regex = /^([A-Za-z]*)(\d*)$/; // แยกตัวอักษรและตัวเลข
+          const matchA = valueA.match(regex);
+          const matchB = valueB.match(regex);
+
+          if (!matchA || !matchB) return valueA.localeCompare(valueB);
+
+          const [_, letterA, numberA] = matchA;
+          const [__, letterB, numberB] = matchB;
+
+          if (!letterA && letterB) return -1;
+          if (!letterB && letterA) return 1;
+
+          const letterCompare = letterA.localeCompare(letterB);
+          if (letterCompare !== 0) return letterCompare;
+
+          return Number(numberA) - Number(numberB);
+        },
       },
       {
         headerName:
