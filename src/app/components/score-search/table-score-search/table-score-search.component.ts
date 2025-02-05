@@ -122,6 +122,10 @@ export class TableScoreSearchComponent {
         headerClass: 'text-center',
         flex: 1,
         minWidth: 120, // ความกว้างขั้นต่ำ
+        cellRenderer: (params: any) => {
+          const value = params.value;
+          return this.ScoreNullCellRenderer(value);
+        },
       },
       {
         headerName:
@@ -130,7 +134,11 @@ export class TableScoreSearchComponent {
         field: 'midterm_score',
         headerClass: 'text-center',
         flex: 1,
-        minWidth: 120, // ความกว้างขั้นต่ำ
+        minWidth: 120, // ความกว้างขั้นต่ำฃ
+        cellRenderer: (params: any) => {
+          const value = params.value;
+          return this.ScoreNullCellRenderer(value);
+        },
       },
       {
         headerName:
@@ -141,6 +149,10 @@ export class TableScoreSearchComponent {
         headerClass: 'text-center',
         flex: 1,
         minWidth: 120, // ความกว้างขั้นต่ำ
+        cellRenderer: (params: any) => {
+          const value = params.value;
+          return this.ScoreNullCellRenderer(value);
+        },
       },
       {
         headerName:
@@ -240,6 +252,18 @@ export class TableScoreSearchComponent {
       this.gridApi.setGridOption('rowData', this.gridData);
     }
   }
+
+  private ScoreNullCellRenderer(value: any): string {
+    if (
+      value === null ||
+      value === undefined ||
+      value.toString().trim() === ''
+    ) {
+      return `<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>`;
+    }
+    return value.toFixed(2);
+  }
+
   onGridReady(params: any): void {
     this.gridApi = params.api;
     this.gridApi.sizeColumnsToFit();
