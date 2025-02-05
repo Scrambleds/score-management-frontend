@@ -1,37 +1,12 @@
-import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as XLSX from 'xlsx';
-import {
-  FormBuilder,
-  FormGroup,
-  FormGroupDirective,
-  Validators,
-} from '@angular/forms';
-import { UploadScoreHeaderComponent } from '../upload-score-header/upload-score-header.component';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { UploadScoreService } from '../../services/upload-score/upload-score.service';
 import { UserService } from '../../services/sharedService/userService/userService.service';
 import { SelectBoxService } from '../../services/select-box/select-box.service';
 import { TranslationService } from '../../core/services/translation.service';
-import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import {
-  ClientSideRowModelModule,
-  ColDef,
-  ColGroupDef,
-  GridApi,
-  GridOptions,
-  GridReadyEvent,
-  ModuleRegistry,
-  createGrid,
-} from 'ag-grid-community';
-import { Subscription } from 'rxjs';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { CacheService } from '../../core/services/cache.service';
 
 @Component({
@@ -785,5 +760,27 @@ export class UploadExcelContainerComponent implements OnInit {
 
   customSearchFn(term: string, item: any): boolean {
     return this.translationService.searchFn(term, item);
+  }
+
+  onDownloadTemplate() {
+    const filePath = 'assets/templates/Template-uploadStudentScore.xlsx';
+
+    const link = document.createElement('a');
+    link.href = filePath;
+    link.download = 'Template-อัปโหลดคะแนนนิสิต.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    Swal.fire({
+      icon: 'success',
+      title: this.translationService.getTranslation(
+        'swal_downloadTemplateSuccess_title'
+      ),
+      text: this.translationService.getTranslation(
+        'swal_downloadTemplateSuccess_text'
+      ),
+      confirmButtonText: this.translationService.getTranslation('btn_ok'),
+    });
   }
 }

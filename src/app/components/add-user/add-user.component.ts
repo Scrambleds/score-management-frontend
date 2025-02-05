@@ -98,7 +98,7 @@ export class AddUserComponent implements OnInit {
 
   translateDropdown(value: string): string {
     return this.translations[value] || value;
-  }  
+  }
 
   onGridReady(params: any) {
     this.gridApi = params.api;
@@ -130,12 +130,12 @@ export class AddUserComponent implements OnInit {
   }
 
   LoadPrefix = () => {
-    this.SelectBoxService.getSystemParamPrefix
-  }
+    this.SelectBoxService.getSystemParamPrefix;
+  };
 
   LoadRole = () => {
-    this.SelectBoxService.getSystemParamRole
-  }
+    this.SelectBoxService.getSystemParamRole;
+  };
 
   onLoading = (): void => {
     this.onSomeAction();
@@ -505,37 +505,42 @@ export class AddUserComponent implements OnInit {
           cellClass: cellClass,
           cellRenderer: (params: any) => this.customCellRenderer(params.value),
           valueFormatter:
-          key === 'prefix' || key === 'role'
-            ? (params: any) => this.translateDropdown(params.value)
-            : undefined,
-        cellEditorParams: {
-          values:
-            key === 'prefix'
-              ? this.prefixData.map((item) =>
-                  this.translateDropdown(item.byte_desc_th)
-                )
-              : key === 'role'
-              ? this.roleData.map((item) =>
-                  this.translateDropdown(item.byte_desc_th)
-                )
-              : [],
-        },
-        cellEditor:
-        key === 'prefix' || key === 'role' ? 'agSelectCellEditor' : undefined,
-    };
-  }),
-];
-}
+            key === 'prefix' || key === 'role'
+              ? (params: any) => this.translateDropdown(params.value)
+              : undefined,
+          cellEditorParams: {
+            values:
+              key === 'prefix'
+                ? this.prefixData.map((item) =>
+                    this.translateDropdown(item.byte_desc_th)
+                  )
+                : key === 'role'
+                ? this.roleData.map((item) =>
+                    this.translateDropdown(item.byte_desc_th)
+                  )
+                : [],
+          },
+          cellEditor:
+            key === 'prefix' || key === 'role'
+              ? 'agSelectCellEditor'
+              : undefined,
+        };
+      }),
+    ];
+  }
 
   private customCellRenderer(value: any): string {
-    if (value === null || value === undefined || value.toString().trim() === '') {
+    if (
+      value === null ||
+      value === undefined ||
+      value.toString().trim() === ''
+    ) {
       return `<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>`;
     } else if (value === '-') {
       return `<span style="color: red; font-weight: bold;">-</span>`;
     }
     return value;
   }
-  
 
   onDeleteRow(rowId: number) {
     const title = this.translate.getTranslation('add_user_question_1');
@@ -818,5 +823,25 @@ export class AddUserComponent implements OnInit {
     }
 
     return true;
+  }
+
+  onDownloadTemplate() {
+    const filePath = 'assets/templates/Template-uploadUser.xlsx';
+
+    const link = document.createElement('a');
+    link.href = filePath;
+    link.download = 'Template-อัปโหลดผู้ใช้งานระบบ.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    Swal.fire({
+      icon: 'success',
+      title: this.translate.getTranslation(
+        'swal_downloadTemplateSuccess_title'
+      ),
+      text: this.translate.getTranslation('swal_downloadTemplateSuccess_text'),
+      confirmButtonText: this.translate.getTranslation('btn_ok'),
+    });
   }
 }
