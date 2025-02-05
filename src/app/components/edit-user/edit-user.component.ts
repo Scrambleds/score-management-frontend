@@ -16,7 +16,9 @@ export class EditUserComponent {
  public form: FormGroup;
   submittedData: any = null;
   // isOnAdduser = true;
-  @Output() searchEvent = new EventEmitter<boolean>();
+  // @Output() searchEvent = new EventEmitter<boolean>();
+  @Output() searchEvent = new EventEmitter<any>();
+
   @Output() submit = new EventEmitter<any>();
   
   // roleOption = [{ id: 'ผู้ดูแลระบบ', title: 'ผู้ดูแลระบบ' }, { id: 'อาจารย์', title: 'อาจารย์' }];

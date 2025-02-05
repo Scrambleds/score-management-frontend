@@ -9,12 +9,22 @@ import { SearchCriteria } from '../../services/search-service/seach.service';
   styleUrls: ['./add-user.component.css']
 })
 export class AddUserRoute {
-  rowData: any[] = []; // Data displayed in the ag-Grid table
-  originalData: any[] = []; // Original unfiltered data
+  // rowData: any[] = [];
+  rowData: SearchCriteria = {};
+  originalData: any[] = [];
 
   onSearchEvent(criteria: SearchCriteria): void {
-    this.rowData = this.filterData(this.originalData, criteria);
+    // this.rowData = this.filterData(this.originalData, criteria);
+    this.rowData = criteria;
   }
+  
+  // onSearchEvent(criteria: SearchCriteria): void {
+  //   if (criteria) {
+  //     this.rowData = this.filterData(this.originalData, criteria);
+  //   } else {
+  //     this.rowData = [...this.originalData]; // ถ้า criteria ไม่มีค่า ก็กำหนดให้เป็นข้อมูลเดิมทั้งหมด
+  //   }
+  // }
 
   // Filter function to filter rows based on search criteria
   private filterData(data: any[], criteria: SearchCriteria): any[] {
