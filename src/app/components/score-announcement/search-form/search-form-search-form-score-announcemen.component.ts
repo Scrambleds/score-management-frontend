@@ -145,6 +145,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       .subscribe((data: any) => {
         this.subjectList = (data.objectResponse || []).map((subject: any) => ({
           subjectSearch: `${subject.subject_id} ${subject.subject_name}`,
+          subject_id: subject.subject_id, //อย่าเอาออก
         }));
       });
   }
@@ -192,16 +193,16 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     this.form.reset();
     this.resetForm.emit(); // ส่ง requestData ไปยัง API
   }
-  selectSubject(subject: any): void {
-    this.form.patchValue({
-      subjectSearch: `${subject.subject_id} ${subject.subject_name}`,
-    });
-    this.filteredSuggestions = [];
-    this.showSuggestions = false;
-    //add update current subject_id
-    console.log('select :', subject);
-    this.currentSubjectId = subject.subject_id;
-  }
+  // selectSubject(subject: any): void {
+  //   this.form.patchValue({
+  //     subjectSearch: `${subject.subject_id} ${subject.subject_name}`,
+  //   });
+  //   this.filteredSuggestions = [];
+  //   this.showSuggestions = false;
+  //   //add update current subject_id
+  //   console.log('select :', subject);
+  //   this.currentSubjectId = subject.subject_id;
+  // }
 
   hideSuggestions(): void {
     setTimeout(() => {
