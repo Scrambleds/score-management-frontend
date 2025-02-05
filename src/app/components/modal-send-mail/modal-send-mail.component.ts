@@ -16,9 +16,11 @@ import { UserService } from '../../services/sharedService/userService/userServic
 import { Modal } from 'bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
-import { BehaviorSubject, switchMap } from 'rxjs';
+import { BehaviorSubject, Subscription, switchMap } from 'rxjs';
 import { CacheService } from '../../core/services/cache.service';
 import { TranslationService } from '../../core/services/translation.service';
+import { SignalRService } from '../../services/sharedService/signalRService/signal-r.service';
+
 // @ts-ignore
 const $: any = window['$'];
 
@@ -75,6 +77,11 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
   //current student data
   currentStudentData: any = [];
 
+  //progress
+  successCount = 0;
+  failCount = 0;
+  private progressSubscription!: Subscription;
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isSendPerPerson']) {
       // ทำบางอย่างเมื่อค่า isSendPerPerson เปลี่ยนแปลง
@@ -92,7 +99,8 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private cacheService: CacheService,
     private cdr: ChangeDetectorRef,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private signalRService: SignalRService
   ) {
     this.createTemplateForm = this.fb.group({
       nameTemplate: ['', Validators.required],
@@ -130,6 +138,13 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
           this.initDefaultTemplate(this.currentDefaultTemplate);
         });
     });
+    // Subscribe เพื่อรับ progress updates
+    this.progressSubscription = this.signalRService.progress$.subscribe(
+      (progress) => {
+        this.successCount = progress.successCount;
+        this.failCount = progress.failCount;
+      }
+    );
   }
 
   //load MasterData
@@ -661,6 +676,87 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
 
   // Method ที่ถูกเรียกเมื่อกดปุ่ม "ส่งอีเมล"
   sendEmail() {
+    const total = this.currentStudentData.length; // จำนวนรายการทั้งหมด
+    let progressSwal: any; // ตัวแปรเก็บ Swal Instance
+
+    // แสดง Swal แบบ Progress ไม่ให้ปิดได้
+    const spinnerIcon = `
+    <svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="20" r="15" fill="#25b09b">
+        <animateTransform attributeName="transform" type="rotate"
+          values="0 50 50; 90 50 50; 90 50 50; 180 50 50; 180 50 50; 270 50 50; 270 50 50; 360 50 50; 360 50 50;"
+          keyTimes="0;0.125;0.25;0.375;0.5;0.625;0.75;0.875;1"
+          dur="4s" repeatCount="indefinite"/>
+      </circle>
+    <circle cx="20" cy="50" r="15" fill="#25b09b">
+        <animateTransform attributeName="transform" type="rotate"
+          values="0 50 50; 90 50 50; 90 50 50; 180 50 50; 180 50 50; 270 50 50; 270 50 50; 360 50 50; 360 50 50;"
+          keyTimes="0;0.125;0.25;0.375;0.5;0.625;0.75;0.875;1"
+          dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="80" cy="50" r="15" fill="#25b09b">
+        <animateTransform attributeName="transform" type="rotate"
+          values="0 50 50; 90 50 50; 90 50 50; 180 50 50; 180 50 50; 270 50 50; 270 50 50; 360 50 50; 360 50 50;"
+          keyTimes="0;0.125;0.25;0.375;0.5;0.625;0.75;0.875;1"
+          dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="50" cy="80" r="15" fill="#25b09b">
+        <animateTransform attributeName="transform" type="rotate"
+          values="0 50 50; 90 50 50; 90 50 50; 180 50 50; 180 50 50; 270 50 50; 270 50 50; 360 50 50; 360 50 50;"
+          keyTimes="0;0.125;0.25;0.375;0.5;0.625;0.75;0.875;1"
+          dur="4s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+    `;
+    const progressText = this.translationService.getTranslation(
+      'scoreannouncement_swalSendMailProcessing_text',
+      { processed: '0', total: total.toString() }
+    );
+    Swal.fire({
+      title: this.translationService.getTranslation(
+        'scoreannouncement_swalSendMailProcessing_title'
+      ),
+      iconHtml: spinnerIcon, // ใช้ custom spinner
+      html: `<p id="swal-progress-text">${progressText}</p>`, // ใช้ <p> เพื่ออัปเดตเฉพาะส่วนนี้
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      customClass: {
+        icon: 'no-border',
+      },
+      allowOutsideClick: () => {
+        const popup = Swal.getPopup() as HTMLElement;
+        popup.classList.remove('swal2-show');
+        setTimeout(() => {
+          popup.classList.add('animate__animated', 'animate__headShake');
+          popup.style.animation = 'headShake 1s ease-in-out';
+        });
+        setTimeout(() => {
+          popup.classList.remove('animate__animated', 'animate__headShake');
+        }, 500);
+        return false;
+      },
+      didOpen: () => {
+        progressSwal = Swal.getPopup();
+      },
+    });
+    this.signalRService.startProgressConnection();
+    // ติดตาม progress และอัปเดต Swal
+    this.signalRService.progress$.subscribe(({ successCount, failCount }) => {
+      if (progressSwal) {
+        const progressTextEm = document.getElementById('swal-progress-text');
+        if (progressTextEm) {
+          const text = this.translationService.getTranslation(
+            'scoreannouncement_swalSendMailProcessing_text',
+            {
+              processed: (successCount + failCount).toString(),
+              total: total.toString(),
+            }
+          );
+          progressTextEm.innerHTML = text;
+        }
+      }
+    });
+
     const okBtnText = this.translationService.getTranslation('btn_ok');
     const closeBtnText = this.translationService.getTranslation('btn_close');
     console.log('sendEmail: CurrentSubject => ', this.currentSubject);
@@ -676,6 +772,7 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
     };
 
     console.log('Email Payload:', payload); // แสดงค่าใน console
+
     this.scoreAnnouncementService.sendMail(payload).subscribe(
       (response) => {
         this.createTemplateForm.reset();
@@ -718,8 +815,10 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
             }
           });
         }
+        this.signalRService.stopProgressConnection();
       },
       (error) => {
+        this.signalRService.stopProgressConnection();
         const title = this.translationService.getTranslation(
           'swalServerError_title'
         );

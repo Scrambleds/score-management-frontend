@@ -192,6 +192,24 @@ export class TableScoreAnnouncementComponent {
         field: 'seat_no',
         flex: 0.6,
         minWidth: 70,
+        comparator: (valueA: string, valueB: string) => {
+          const regex = /^([A-Za-z]*)(\d*)$/; // แยกตัวอักษรและตัวเลข
+          const matchA = valueA.match(regex);
+          const matchB = valueB.match(regex);
+
+          if (!matchA || !matchB) return valueA.localeCompare(valueB);
+
+          const [_, letterA, numberA] = matchA;
+          const [__, letterB, numberB] = matchB;
+
+          if (!letterA && letterB) return -1;
+          if (!letterB && letterA) return 1;
+
+          const letterCompare = letterA.localeCompare(letterB);
+          if (letterCompare !== 0) return letterCompare;
+
+          return Number(numberA) - Number(numberB);
+        },
       },
       {
         headerName:
@@ -242,12 +260,20 @@ export class TableScoreAnnouncementComponent {
         field: 'accumulated_score',
         flex: 1,
         minWidth: 120,
+        cellRenderer: (params: any) => {
+          const value = params.value;
+          return this.ScoreNullCellRenderer(value);
+        },
       },
       {
         headerName:
           this.translationService.getTranslation('midterm_score') ||
           'คะแนนกลางภาค',
         field: 'midterm_score',
+        cellRenderer: (params: any) => {
+          const value = params.value;
+          return this.ScoreNullCellRenderer(value);
+        },
         flex: 1,
         minWidth: 130,
       },
@@ -259,6 +285,10 @@ export class TableScoreAnnouncementComponent {
         field: 'final_score',
         flex: 1,
         minWidth: 130,
+        cellRenderer: (params: any) => {
+          const value = params.value;
+          return this.ScoreNullCellRenderer(value);
+        },
       },
       {
         headerName:
@@ -355,7 +385,16 @@ export class TableScoreAnnouncementComponent {
     sortable: true,
     filter: false,
   };
-
+  private ScoreNullCellRenderer(value: any): string {
+    if (
+      value === null ||
+      value === undefined ||
+      value.toString().trim() === ''
+    ) {
+      return `<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>`;
+    }
+    return value.toFixed(2);
+  }
   // ใน ngOnInit หรือเมื่อ gridData ถูกอัปเดต
   ngOnChanges(): void {
     if (this.gridApi) {
