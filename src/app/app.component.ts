@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
   ignoredUrls: string[] = [
     '/api/MasterData/Subject',
     '/api/StudentScore/SendStudentScore',
+    '/api/StudentScore/UploadScore',
   ];
 
   searchCriteria: any = {};
