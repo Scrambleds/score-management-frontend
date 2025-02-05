@@ -43,6 +43,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
+  z-index: 0;
 }
 
 .input-group-autocomplete[_ngcontent-ng-c1926015072] {
@@ -53,4 +54,39 @@
 
 .button-container {
   flex-wrap: wrap;
+}
+
+/*CSS สำหรับหน้าอัปโหลดและดาวน์โหลดไฟล์ Excel*/
+.dashed-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 8%;
+  position: relative;
+  /* padding: 0 1.25rem; */
+}
+
+.dashed-line::before,
+.dashed-line::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  border-bottom: 0.113rem dashed #615d5d;
+  z-index: -1;
+}
+
+.dashed-line::before {
+  left: 0;
+}
+
+.dashed-line::after {
+  right: 0;
+}
+
+/* เพิ่ม clip-path เพื่อให้เส้นประหายไปบริเวณข้อความ */
+.dashed-line span {
+  position: relative;
+  background-color: white;
+  padding: 0 0.313rem;
 }

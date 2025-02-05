@@ -20,3 +20,10 @@
   color: #007bff; 
   font-size: 1.5rem;
 }
+
+.collapsing{
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.35s ease;
+}

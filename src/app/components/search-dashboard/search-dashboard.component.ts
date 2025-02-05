@@ -182,8 +182,8 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
   // อัปเดตสถานะปุ่ม Export
   updateExportButtonState() {
     // ตรวจสอบแค่ฟิลด์ที่จำเป็น (ไม่รวม `score_type`)
-    const { subject_id, academic_year, semester, section } = this.form.value;
-    const allRequiredFieldsValid = subject_id !== null && academic_year !== null && semester !== null && section !== null;
+    const { subject_id, academic_year, semester, section, score_type } = this.form.value;
+    const allRequiredFieldsValid = subject_id !== null && academic_year !== null && semester !== null && section !== null && score_type !== null;
     
     const exportButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
     

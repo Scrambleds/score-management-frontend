@@ -1,10 +1,10 @@
 <div
   *ngIf="!isFileUploaded"
-  class="custom-card"
+  class="custom-card animate__animated animate__fadeIn"
   style="border: 1px dashed; width: 100%; height: 100%"
 >
   <div
-    class="card-body w-100"
+    class="card-body w-100 animate__animated animate__fadeIn" 
     (dragover)="onDragOver($event)"
     (drop)="onDrop($event)"
   >
@@ -23,6 +23,27 @@
       accept=".xls,.xlsx"
       (change)="onFileSelected($event)"
     />
+
+    <!--หรือ-->
+    <label class="fw-bold dashed-line"><span>{{ "condition_format_excel" | translate}}</span></label>
+
+    <!-- ดาวน์โหลดตัวอย่างรูปแบบไฟล์ -->
+    <div class="text-center">{{ "example_format_excel" | translate}}</div>
+    <label for="" class="btn btn-primary">
+      <i
+        class="bi bi-download"
+        style="font-size: var(--icon-size); color: var(--white-color)"
+      ></i>
+       <!-- เทมเพลต Excel -->
+       {{ "templete_excel_button" | translate}}
+    </label>
+    <input
+      id=""
+      type="file"
+      class="d-none"
+      accept=".xls,.xlsx"
+    />
+
   </div>
 </div>
 

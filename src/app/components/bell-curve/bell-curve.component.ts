@@ -25,7 +25,14 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   @ViewChild('dChart', { static: false }) dChart!: ElementRef;
   @ViewChild('bChart', { static: false }) bChart!: ElementRef;
   jsonArray: any = [25, 15, 20, 15, 20, 10];
-  chartLabels: any = ['0-9', '10-19', '20-29', '30-39', '40+'];
+  chartLabels: any = 
+  [
+    '0-9', 
+    '10-19', 
+    '20-29', 
+    '30-39', 
+    '40+',
+  ];
   chartLabels_ScoreType: any = [
     '0-39',
     '40-49',
@@ -38,21 +45,22 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   // chartLabels_ScoreType: any = ['0-39', '40+'];
 
   // cutOut: number = 75;
+  // backgroundColors: any = [
+  //   '#A3C8FF',
+  //   '#A4E6A4',
+  //   '#F5E06D',
+  //   '#FF7F3A',
+  //   '#D0021B',
+  // ];
   backgroundColors: any = [
-    '#E15D44',
-    '#55B4B0',
-    '#DFCFBE',
-    '#9B2335',
-    '#5B5EA6',
-    '#d6a7f5',
-
-    // '#FF6384',
-    // '#36A2EB',
-    // '#FFCE56',
-    // '#AA65D8',
-    // '#FFA600',
-    // '#80ff80',
+    '#264653',
+    '#2A9D8F',
+    '#8AB17D',
+    '#E9C46A',
+    // '#F4A261',
+    '#E76F51',
   ];
+
   constructor(
     private DashboardService: DashboardService,
     private cdr: ChangeDetectorRef
@@ -72,27 +80,27 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   stdDev!: any;
   studentCount!: any;
 
-  // doughnutChartLabels = ['0-39', '40-49', '50-59', '60-69', '70-79', '80+'];
+  doughnutChartLabels = ['0-39', '40-49', '50-59', '60-69', '70-79', '80+'];
   doughnutChartData = {
     labels: [],
     datasets: [
       {
         data: [0, 0, 0, 0, 0, 0],
         backgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-          '#AA65D8',
-          '#FFA600',
-          '#80ff80',
+          '#264653',
+          '#2A9D8F',
+          '#8AB17D',
+          '#E9C46A',
+          '#F4A261',
+          '#E76F51',
         ],
+        
       },
     ],
   };
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['dashboardData'] && changes['dashboardData'].currentValue) {
-      // Logic for dashboardData changes, make sure chart data gets updated properly
       this.updateChartData();
       this.setData(this.chart, this.jsonArray);
     }
@@ -109,7 +117,6 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       this.dashboardData = data;
       this.updateChartData();
     });
-
     this.resetDashboard();
   }
 
@@ -267,22 +274,40 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
     // ตรวจสอบว่าเป็น Label แบบไหน แล้วใช้สีที่เหมาะสม
     let backgroundColors = [];
     if (labels === this.chartLabels) {
+      // backgroundColors = [
+      //   '#A3C8FF',
+      //   '#A4E6A4',
+      //   '#F5E06D',
+      //   '#FF7F3A',
+      //   '#D0021B',
+      //   // '#d6a7f5',
+      // ];
+
       backgroundColors = [
-        '#E15D44',
-        '#55B4B0',
-        '#DFCFBE',
-        '#9B2335',
-        '#5B5EA6',
-        '#d6a7f5',
+        '#264653',
+        '#2A9D8F',
+        '#8AB17D',
+        '#E9C46A',
+        // '#F4A261',
+        '#E76F51',
+        // '#d6a7f5',
       ];
     } else if (labels === this.chartLabels_ScoreType) {
+      // backgroundColors = [
+      //   '#A3C8FF',
+      //   '#A4E6A4',
+      //   '#F5E06D',
+      //   '#FF7F3A',
+      //   '#D0021B',
+      //   '#9B2335',
+      // ];
       backgroundColors = [
-        '#E15D44',
-        '#55B4B0',
-        '#DFCFBE',
-        '#9B2335',
-        '#5B5EA6',
-        '#d6a7f5',
+        '#264653',
+        '#2A9D8F',
+        '#8AB17D',
+        '#E9C46A',
+        '#F4A261',
+        '#E76F51',
       ];
     } else {
       backgroundColors = [
