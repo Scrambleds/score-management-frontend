@@ -8,6 +8,7 @@ import { SelectBoxService } from '../../services/select-box/select-box.service';
 import { TranslationService } from '../../core/services/translation.service';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { CacheService } from '../../core/services/cache.service';
+import { SignalRService } from '../../services/sharedService/signalRService/signal-r.service';
 
 @Component({
   selector: 'app-upload-excel-container',
@@ -73,7 +74,8 @@ export class UploadExcelContainerComponent implements OnInit {
     private userService: UserService,
     private selectBoxService: SelectBoxService,
     private translationService: TranslationService,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private signalRService: SignalRService
   ) {
     this.form = this.fb.group({
       // subjectNo: [''],
@@ -226,6 +228,8 @@ export class UploadExcelContainerComponent implements OnInit {
       icon: 'error',
       title: title,
       text: text,
+      confirmButtonColor: 'var(--secondary-color)',
+      confirmButtonText: this.translationService.getTranslation('btn_close'),
     }).then(() => false); // คืนค่าผลลัพธ์เป็น false หลังจากที่ Swal เสร็จสิ้น
   }
 
@@ -626,7 +630,86 @@ export class UploadExcelContainerComponent implements OnInit {
     );
     const okBtnText = this.translationService.getTranslation('btn_ok');
     const closeBtnText = this.translationService.getTranslation('btn_close');
-    //list student score from Excel
+
+    let progressSwal: any; // ตัวแปรเก็บ Swal Instance
+
+    // แสดง Swal แบบ Progress ไม่ให้ปิดได้
+    const spinnerIcon = `
+        <svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="20" r="15" fill="#25b09b">
+            <animateTransform attributeName="transform" type="rotate"
+              values="0 50 50; 90 50 50; 90 50 50; 180 50 50; 180 50 50; 270 50 50; 270 50 50; 360 50 50; 360 50 50;"
+              keyTimes="0;0.125;0.25;0.375;0.5;0.625;0.75;0.875;1"
+              dur="4s" repeatCount="indefinite"/>
+          </circle>
+        <circle cx="20" cy="50" r="15" fill="#25b09b">
+            <animateTransform attributeName="transform" type="rotate"
+              values="0 50 50; 90 50 50; 90 50 50; 180 50 50; 180 50 50; 270 50 50; 270 50 50; 360 50 50; 360 50 50;"
+              keyTimes="0;0.125;0.25;0.375;0.5;0.625;0.75;0.875;1"
+              dur="4s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="80" cy="50" r="15" fill="#25b09b">
+            <animateTransform attributeName="transform" type="rotate"
+              values="0 50 50; 90 50 50; 90 50 50; 180 50 50; 180 50 50; 270 50 50; 270 50 50; 360 50 50; 360 50 50;"
+              keyTimes="0;0.125;0.25;0.375;0.5;0.625;0.75;0.875;1"
+              dur="4s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="50" cy="80" r="15" fill="#25b09b">
+            <animateTransform attributeName="transform" type="rotate"
+              values="0 50 50; 90 50 50; 90 50 50; 180 50 50; 180 50 50; 270 50 50; 270 50 50; 360 50 50; 360 50 50;"
+              keyTimes="0;0.125;0.25;0.375;0.5;0.625;0.75;0.875;1"
+              dur="4s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+        `;
+    const progressText = this.translationService.getTranslation(
+      'scoreannouncement_swalUploadScoreProcessing_text',
+      { processed: '0', total: this.rowData.length.toString() }
+    );
+    Swal.fire({
+      title: this.translationService.getTranslation(
+        'scoreannouncement_swalUploadScoreProcessing_title'
+      ),
+      iconHtml: spinnerIcon, // ใช้ custom spinner
+      html: `<p id="swal-progress-text">${progressText}</p>`, // ใช้ <p> เพื่ออัปเดตเฉพาะส่วนนี้
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      customClass: {
+        icon: 'no-border',
+      },
+      allowOutsideClick: () => {
+        const popup = Swal.getPopup() as HTMLElement;
+        popup.classList.remove('swal2-show');
+        setTimeout(() => {
+          popup.classList.add('animate__animated', 'animate__headShake');
+          popup.style.animation = 'headShake 1s ease-in-out';
+        });
+        setTimeout(() => {
+          popup.classList.remove('animate__animated', 'animate__headShake');
+        }, 500);
+        return false;
+      },
+      didOpen: () => {
+        progressSwal = Swal.getPopup();
+      },
+    });
+    this.signalRService.startProgressConnection();
+    // ติดตาม progress และอัปเดต Swal
+    this.signalRService.progress$.subscribe(({ successCount, failCount }) => {
+      if (progressSwal) {
+        const progressTextEm = document.getElementById('swal-progress-text');
+        if (progressTextEm) {
+          const text = this.translationService.getTranslation(
+            'scoreannouncement_swalUploadScoreProcessing_text',
+            {
+              processed: (successCount + failCount).toString(),
+              total: this.rowData.length.toString(),
+            }
+          );
+          progressTextEm.innerHTML = text;
+        }
+      }
+    });
 
     // Mapping rowData to match the ScoreStudent model
     const studentScoreData = {
@@ -700,8 +783,10 @@ export class UploadExcelContainerComponent implements OnInit {
             }
           });
         }
+        this.signalRService.stopProgressConnection();
       },
       (error) => {
+        this.signalRService.stopProgressConnection();
         console.log('Error', error);
         const title = this.translationService.getTranslation(
           'swalServerError_title'
@@ -781,6 +866,7 @@ export class UploadExcelContainerComponent implements OnInit {
         'swal_downloadTemplateSuccess_text'
       ),
       confirmButtonText: this.translationService.getTranslation('btn_ok'),
+      confirmButtonColor: 'var(--primary-color)',
     });
   }
 }
