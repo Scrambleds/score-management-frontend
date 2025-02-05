@@ -67,12 +67,12 @@ export class AddUserComponent implements OnInit {
   isFileUploaded = false;
   translations: any;
   requiredFields = [
-    'อีเมล', // ถ้าไม่จำเป็นสามารถเอาออกได้
-    'รหัสอาจารย์',
-    'คำนำหน้า',
-    'ชื่อ',
-    'นามสกุล',
-    'หน้าที่',
+    'email', // ถ้าไม่จำเป็นสามารถเอาออกได้
+    'teacher_code',
+    'prefix',
+    'firstname',
+    'lastname',
+    'role',
   ];
 
   defaultColDef = {
@@ -259,6 +259,8 @@ export class AddUserComponent implements OnInit {
         icon: 'error',
         title: title,
         text: text,
+        confirmButtonColor: 'var(--secondary-color)',
+        confirmButtonText: this.translate.getTranslation('btn_close'),
       }).then(() => false); // คืนค่าผลลัพธ์เป็น false หลังจากที่ Swal เสร็จสิ้น
     }
 
@@ -471,7 +473,8 @@ export class AddUserComponent implements OnInit {
       };
       reader.readAsArrayBuffer(file);
     }
-  }  
+  }
+  
   
   mapJsonData(data: any[]): any[] {
     const headers = data[0]; // ใช้แถวแรกเป็น header
@@ -732,36 +735,41 @@ export class AddUserComponent implements OnInit {
       return;
     }
 
-    // ตรวจสอบฟิลด์ที่ว่างเปล่าในแต่ละแถว
-    const missingFieldsGrouped = this.rowData
-      .map((row, index) => {
-        const missingFields = this.requiredFields.filter(
-          (field) =>
-            !row[field] ||
-            row[field].toString().trim() === '' ||
-            row[field].toString().trim().toUpperCase() === 'NULL'
-        );
-        return missingFields.length > 0
-          ? `${currentLang === 'th' ? 'แถวที่' : 'Row'} ${
-              index + 1
-            }: ${missingFields.join(', ')}`
-          : null;
-      })
-      .filter((item) => item !== null);
+  // ตรวจสอบฟิลด์ที่ว่างเปล่าในแต่ละแถว
+  const missingFieldsGrouped = this.rowData
+  .map((row, index) => {
+    const missingFields = this.requiredFields.filter((field) => {
+      // ตรวจสอบว่าฟิลด์มีอยู่จริงในแถวนี้หรือไม่
+      if (!row.hasOwnProperty(field)) {
+        return true;
+      }
+      
+      const value = row[field]; // ดึงค่าของฟิลด์นั้นๆ
+      // ตรวจสอบว่า value เป็น null, undefined, ค่าว่าง หรือ 'NULL'
+      return !value || value.toString().trim() === '' || value.toString().trim().toUpperCase() === 'NULL';
+    });
 
-    // หากมีฟิลด์ที่ว่างเปล่า แสดงการแจ้งเตือน
-    if (missingFieldsGrouped.length > 0) {
-      Swal.fire({
-        title: currentLang === 'th' ? 'ข้อมูลไม่ครบถ้วน' : 'Incomplete Data',
-        html: `${
-          currentLang === 'th' ? 'พบฟิลด์ที่ยังไม่ได้กรอก:' : 'Missing fields:'
-        }<br>${missingFieldsGrouped.join('<br>')}`,
-        icon: 'warning',
-        confirmButtonColor: '#0d6efd',
-        confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
-      });
-      return;
-    }
+    return missingFields.length > 0
+      ? `${currentLang === 'th' ? 'แถวที่' : 'Row'} ${index + 1}: ${missingFields.join(', ')}`
+      : null;
+  })
+  .filter((item) => item !== null);
+
+  // หากมีฟิลด์ที่ว่างเปล่า แสดงการแจ้งเตือน
+  if (missingFieldsGrouped.length > 0) {
+  console.log(this.rowData);  // แสดงข้อมูลใน console เพื่อดูค่า
+  Swal.fire({
+    title: currentLang === 'th' ? 'ข้อมูลไม่ครบถ้วน' : 'Incomplete Data',
+    html: `${
+      currentLang === 'th' ? 'พบฟิลด์ที่ยังไม่ได้กรอก:' : 'Missing fields:'
+    }<br>${missingFieldsGrouped.join('<br>')}`,
+    icon: 'warning',
+    confirmButtonColor: '#0d6efd',
+    confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
+  });
+  return;
+  }
+
 
     const UserInfo = this.UserService.username;
 
