@@ -165,9 +165,7 @@ export class UploadExcelContainerComponent implements OnInit {
       if (this.validateData(jsonData)) {
         // เปลี่ยน jsonData จากอาร์เรย์ 2 มิติให้เป็นอาร์เรย์ของอ็อบเจ็กต์
         const mappedData = this.mapJsonData(jsonData);
-
-        // ถ้าไม่มีข้อผิดพลาด
-        // ทำการประมวลผลข้อมูล
+        // ถ้าไม่มีข้อผิดพลาด ทำการประมวลผลข้อมูล
         const modifiedData = this.processData(mappedData);
         this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
         this.isFileUploaded = true; // ตั้งค่า flag เมื่อไฟล์อัปโหลดแล้ว
@@ -199,11 +197,23 @@ export class UploadExcelContainerComponent implements OnInit {
         'ชื่อ-นามสกุล': rowData['ชื่อ-นามสกุล'] || '',
         รหัสสาขา: rowData['รหัสสาขา'] || '',
         อีเมล: rowData['อีเมล'] || '',
-        คะแนนระหว่างเรียน: rowData['คะแนนระหว่างเรียน'] || null,
-        คะแนนกลางภาค: rowData['คะแนนกลางภาค'] || null,
-        คะแนนปลายภาค: rowData['คะแนนปลายภาค'] || null,
+        คะแนนระหว่างเรียน: this.parseScore(rowData['คะแนนระหว่างเรียน']),
+        คะแนนกลางภาค: this.parseScore(rowData['คะแนนกลางภาค']),
+        คะแนนปลายภาค: this.parseScore(rowData['คะแนนปลายภาค']),
       };
     });
+  }
+
+  parseScore(value: any): number | null {
+    if (typeof value === 'string') {
+      value = value.trim();
+    }
+    return value === null ||
+      value === undefined ||
+      value === '-' ||
+      value === ''
+      ? null
+      : value;
   }
 
   validateData(jsonData: any[]): boolean {
@@ -574,7 +584,9 @@ export class UploadExcelContainerComponent implements OnInit {
         console.log('Success', response);
         if (response.isSuccess) {
           this.cacheService.clearCacheForUrl('/api/MasterData/Subject');
-          this.cacheService.clearCacheForUrl('/api/Dashboard/GetSubjectDashboard');
+          this.cacheService.clearCacheForUrl(
+            '/api/Dashboard/GetSubjectDashboard'
+          );
           Swal.fire({
             title: successTitle,
             text: successText,
