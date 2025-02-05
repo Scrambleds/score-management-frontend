@@ -47,10 +47,27 @@ export class TableScoreSearchComponent {
         headerName:
           this.translationService.getTranslation(
             'uploadscore_tableFieldSeatNo'
-          ) || 'เลขที่',
+          ) || 'เลขที่นั่ง',
         field: 'seat_no',
         flex: 0.5,
-        minWidth: 60, // Example minWidth
+        minWidth: 60,  comparator: (valueA: string, valueB: string) => {
+          const regex = /^([A-Za-z]*)(\d*)$/; // แยกตัวอักษรและตัวเลข
+          const matchA = valueA.match(regex);
+          const matchB = valueB.match(regex);
+  
+          if (!matchA || !matchB) return valueA.localeCompare(valueB);
+  
+          const [_, letterA, numberA] = matchA;
+          const [__, letterB, numberB] = matchB;
+  
+          if (!letterA && letterB) return -1;
+          if (!letterB && letterA) return 1;
+  
+          const letterCompare = letterA.localeCompare(letterB);
+          if (letterCompare !== 0) return letterCompare;
+  
+          return Number(numberA) - Number(numberB);
+        }
       },
       {
         headerName:
@@ -174,8 +191,6 @@ export class TableScoreSearchComponent {
             const cancelButtonText =
               this.translationService.getTranslation('btn_cancel');
 
-           
-
             Swal.fire({
               title: title,
               text: text,
@@ -189,35 +204,29 @@ export class TableScoreSearchComponent {
               if (result.isConfirmed) {
                 const payload = { sys_subject_no, student_id };
 
-                this.scoreService
-                  .deleteScoreByCondition(payload)
-                  .subscribe({
-                    next: (response) => {
-                      const title = this.translationService.getTranslation(
-                        'alrt_del_score_success_text'
-                      );
-                      const text = this.translationService.getTranslation(
-                        'alrt_del_score_success_title'
-                      );
-                      Swal.fire(
-                        text,
-                        title,
-                        'success'
-                      );
-                      this.refreshGrid.emit();
-                      params.api.refreshCells();
-                    },
-                    error: (error) => {
-                      const title = this.translationService.getTranslation(
-                        'sweet_alert_fail_title'
-                      );
-                      Swal.fire(
-                        title,
-                        error.message || 'ไม่สามารถลบคะแนนได้',
-                        'error'
-                      );
-                    },
-                  });
+                this.scoreService.deleteScoreByCondition(payload).subscribe({
+                  next: (response) => {
+                    const title = this.translationService.getTranslation(
+                      'alrt_del_score_success_text'
+                    );
+                    const text = this.translationService.getTranslation(
+                      'alrt_del_score_success_title'
+                    );
+                    Swal.fire(text, title, 'success');
+                    this.refreshGrid.emit();
+                    params.api.refreshCells();
+                  },
+                  error: (error) => {
+                    const title = this.translationService.getTranslation(
+                      'sweet_alert_fail_title'
+                    );
+                    Swal.fire(
+                      title,
+                      error.message || 'ไม่สามารถลบคะแนนได้',
+                      'error'
+                    );
+                  },
+                });
               }
             });
           });

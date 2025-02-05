@@ -115,8 +115,22 @@ export class SearchFormScoreComponent implements OnInit {
       });
   }
   loadSubjects() {
+    const userInfo = localStorage.getItem('userInfo');
+    let teacher_code: string | null = null;
+    let role: string | null = null;
+    if (userInfo) {
+      const parsedUserInfo = JSON.parse(userInfo);
+      if (parsedUserInfo.role == 1) {
+        teacher_code = '';
+        role = parsedUserInfo.role;
+      } else {
+        role = parsedUserInfo.role;
+        teacher_code = parsedUserInfo.teacher_code;
+      }
+    }
+    const requestData = { role, teacher_code };
     this.contantLovService
-      .getDataByCondition('api/LovContant/GetLovSubject', {})
+      .getDataByCondition('api/LovContant/GetLovSubject', requestData)
       .subscribe((data: any) => {
         this.subjectList = (data.objectResponse || []).map((subject: any) => ({
           subjectSearch: `${subject.subject_id} ${subject.subject_name}`,
