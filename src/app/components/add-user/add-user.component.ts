@@ -67,12 +67,12 @@ export class AddUserComponent implements OnInit {
   isFileUploaded = false;
   translations: any;
   requiredFields = [
-    'email',
-    'teacher_code',
-    'prefix',
-    'firstname',
-    'lastname',
-    'role',
+    'อีเมล', // ถ้าไม่จำเป็นสามารถเอาออกได้
+    'รหัสอาจารย์',
+    'คำนำหน้า',
+    'ชื่อ',
+    'นามสกุล',
+    'หน้าที่',
   ];
 
   defaultColDef = {
@@ -123,13 +123,6 @@ export class AddUserComponent implements OnInit {
       console.log('Method in EditUserComponent called!');
     }
   }
-
-  // onFileSelected(event: any) {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     this.processFile(file);
-  //   }
-  // }
 
   LoadPrefix = () => {
     this.SelectBoxService.getSystemParamPrefix;
@@ -415,10 +408,7 @@ export class AddUserComponent implements OnInit {
     event.preventDefault();
   }
 
-  // เมื่อไฟล์ถูกวางลง
-  // onDrop(event: DragEvent) {
-  //   event.preventDefault();
-  //   const file = event.dataTransfer?.files[0];
+  // processFile(file: File) {
   //   if (file) {
   //     const reader = new FileReader();
   //     reader.onload = (e: any) => {
@@ -429,7 +419,7 @@ export class AddUserComponent implements OnInit {
   //       const sheet = workbook.Sheets[sheetName];
   //       // ใช้ header: 1 เพื่อให้แถวแรกเป็น header
   //       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-  //       console.log(jsonData); // ตรวจสอบข้อมูลที่ได้
+  //       console.log("MY JSON", jsonData); // ตรวจสอบข้อมูลที่ได้
 
   //       const mappedData = this.mapJsonData(jsonData);
   //       // if (this.validateFields(jsonData)) {
@@ -455,30 +445,34 @@ export class AddUserComponent implements OnInit {
       reader.onload = (e: any) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
-
+  
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         // ใช้ header: 1 เพื่อให้แถวแรกเป็น header
-        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        console.log(jsonData); // ตรวจสอบข้อมูลที่ได้
-
-        const mappedData = this.mapJsonData(jsonData);
-        // if (this.validateFields(jsonData)) {
+        const jsonData: (string | null)[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+  
+        // กรองแถวที่มีข้อมูลในคอลัมน์ที่ต้องการ (หน้าที่, รหัสอาจารย์, คำนำหน้า, ชื่อ, นามสกุล, อีเมล)
+        const filteredData = jsonData.filter((row) => {
+          // ตรวจสอบว่าแถวมีข้อมูลในคอลัมน์ที่สำคัญ
+          return row[0] && row[1] && row[2] && row[3] && row[4] && row[5]; 
+        });
+  
+        console.log("Filtered JSON", filteredData); // ตรวจสอบข้อมูลที่กรองแล้ว
+  
+        const mappedData = this.mapJsonData(filteredData);
         console.log('MAPDATA: ', mappedData);
+        
         const modifiedData = this.processData(mappedData);
         console.log('modifiedData: ', modifiedData);
         this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
-        // this.rowData = [];
-        // this.originalData = [];
-
-        // this.generateColumnDefs(modifiedData);
+  
         this.isFileUploaded = true;
         this.isUploaded.emit(true);
-        // }
       };
       reader.readAsArrayBuffer(file);
     }
-  }
+  }  
+  
   mapJsonData(data: any[]): any[] {
     const headers = data[0]; // ใช้แถวแรกเป็น header
     const rows = data.slice(1); // ใช้แถวที่เหลือเป็นข้อมูลจริง
@@ -503,6 +497,7 @@ export class AddUserComponent implements OnInit {
       };
     });
   }
+
   processData(data: any[]): any[] {
     return data.map((row, index) => {
       // จัดเรียงข้อมูลตามลำดับที่กำหนด
@@ -521,7 +516,7 @@ export class AddUserComponent implements OnInit {
 
   loadGridData(data: any[]) {
     if (data.length > 0) {
-      console.log(data);
+      console.log("Mydata", data);
       this.rowData = data;
       this.originalData = data;
       this.columnDefs = this.generateColumnDefs(data);
@@ -900,7 +895,8 @@ export class AddUserComponent implements OnInit {
   }
 
   validateFields(data: any[]): boolean {
-    if (!data || data.length === 0 || !data[0]) {
+    // if (!data || data.length === 0 || !data[0]) {
+    if (data.length === 0){
       const Failed_title = this.translate.getTranslation(
         'add_user_failed_title'
       );
@@ -935,6 +931,8 @@ export class AddUserComponent implements OnInit {
     ];
 
     const fileFields = Object.keys(data[0]).map((field) => field.trim());
+
+    console.log("NEW GEN:", fileFields)
 
     const missingFields = requiredFields.filter(
       (field) => !fileFields.some((f) => f.trim() === field.trim())
