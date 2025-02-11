@@ -7,7 +7,7 @@
         <div class="subject-group">
           <label class="fw-bold mb-0 ps-2"
             [appRequiredMarker]="form.get('subject_id')">{{ "subject_code" | translate }}/{{
-            "add_dashboard_label_subject" | translate }}</label>
+            "add_dashboard_label_subject" | translate }} </label>
           <div class="select-group">
             <ng-select class="w-100" id="subject_id" formControlName="subject_id" [items]="SubjectList"
               bindValue="subjectCode" bindLabel="subjectName" [placeholder]="'placeholder_select' | translate"
@@ -15,10 +15,6 @@
               <ng-template ng-option-tmp let-item="item">
                 {{ item.subjectCode }} - {{ item.subjectName }}
               </ng-template>
-
-              <!-- <ng-template ng-label-tmp ng-label-tmp let-item="item">
-                {{ item.subjectCode }} - {{ item.subjectName }}
-              </ng-template> -->
             </ng-select>
             <div *ngIf="form.get('subject_id')?.touched && form.get('subject_id')?.invalid" class="text-danger ps-2">
               <!-- กรุณากรอกข้อมูล -->
@@ -26,15 +22,9 @@
             </div>
           </div>
         </div>
-
-        <!-- <div class="d-flex justify-content-center ps-2">
-        
-      </div> -->
-        <!-- </div> -->
-
         <div class="form-group">
           <label class="fw-bold mb-0 ps-2"
-            [appRequiredMarker]="form.get('academic_year')">{{ "academic_year" | translate }}</label>
+            [appRequiredMarker]="form.get('academic_year')">{{ "academic_year" | translate }} </label>
           <div class="select-group">
             <ng-select class="w-100" name="academic_year" formControlName="academic_year" [items]="academicYearList" [searchFn]="customSearchFn_SearchLan.bind(this)"
               bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate"
@@ -53,7 +43,7 @@
 
         <div class="form-group">
           <label class="fw-bold mb-0 ps-2" [appRequiredMarker]="form.get('semester')">
-            {{ "semester" | translate}}</label>
+            {{ "semester" | translate}} </label>
           <div class="select-group">
             <ng-select class="w-100" name="semester" formControlName="semester" [items]="semesterList" [searchFn]="customSearchFn_SearchLan.bind(this)"
               bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate" [searchable]="true"
@@ -71,7 +61,7 @@
 
         <div class="form-group">
           <label class="fw-bold mb-0 ps-2" [appRequiredMarker]="form.get('section')">
-            {{ "section" | translate }}</label>
+            {{ "section" | translate }} </label>
           <div class="select-group">
             <ng-select class="w-100" name="section" formControlName="section" [items]="sectionList"
               bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate"
@@ -88,7 +78,7 @@
         </div>
 
         <div class="form-group">
-          <label class="fw-bold mb-0 ps-2"[appRequiredMarker]="form.get('score_type')">{{ "dashboard_scoretype" | translate}}</label>
+          <label class="fw-bold mb-0 ps-2"[appRequiredMarker]="form.get('score_type')">{{ "dashboard_scoretype" | translate}} </label>
           <div class="select-group">
             <ng-select class="w-100" name="score_type" formControlName="score_type" [items]="scoreTypeList" [searchFn]="customSearchFn_SearchLan.bind(this)"
               bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate" [searchable]="true"

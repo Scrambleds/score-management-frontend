@@ -26,7 +26,7 @@
             <div class="row g-3 mb-4">
               <!-- รหัสอ้างอิง -->
               <div class="col-12 col-md-6 col-lg-4">
-                <label for="byte_code" class="form-label ps-2" [appRequiredMarker]="form.get('byte_code')">{{ "master_modal_bytecode" | translate }}</label>
+                <label for="byte_code" class="form-label ps-2" [appRequiredMarker]="form.get('byte_code')">{{ "master_modal_bytecode" | translate }} </label>
                 <input type="text" id="byte_code" class="form-control" formControlName="byte_code"
                   [placeholder]="'placeholder_text' | translate" />
                   <div *ngIf="form.get('byte_code')?.invalid && form.get('byte_code')?.touched" class="text-danger ps-2">
@@ -36,7 +36,7 @@
 
               <!-- ประเภทอ้างอิง -->
               <div class="col-12 col-md-6 col-lg-4">
-                <label for="byte_reference" class="form-label ps-2" [appRequiredMarker]="form.get('byte_reference')">{{ "master_modal_byteref" | translate }}</label>
+                <label for="byte_reference" class="form-label ps-2" [appRequiredMarker]="form.get('byte_reference')">{{ "master_modal_byteref" | translate }} </label>
                 <input type="text" id="byte_reference" class="form-control" formControlName="byte_reference"
                   [placeholder]="'placeholder_text' | translate" />
                   <div *ngIf="form.get('byte_reference')?.invalid && form.get('byte_reference')?.touched" class="text-danger ps-2">
@@ -46,7 +46,7 @@
 
               <!-- Active Status -->
               <div class="col-12 col-md-6 col-lg-4">
-                <label for="active_status" class="form-label ps-2" [appRequiredMarker]="form.get('active_status')">{{ "user_manage_status" | translate }} </label>
+                <label for="active_status" class="form-label ps-2" [appRequiredMarker]="form.get('active_status')">{{"user_manage_status" | translate}} </label>
                 <ng-select [items]="statusData" bindLabel="byte_desc_th" bindValue="byte_desc_th"
                   [placeholder]="'placeholder_select' | translate" formControlName="active_status" [searchFn]="customSearchFn_SearchLan.bind(this)"
                   [searchable]="true">

@@ -26,7 +26,7 @@
             <div class="row g-3 mb-4">
               <!-- รหัสอ้างอิง -->
               <div class="col-12 col-md-12 col-lg-6">
-                <label for="byte_code" class="form-label ps-2" [appRequiredMarker]="form.get('byte_code')">{{ "master_modal_bytecode" | translate }}</label>
+                <label for="byte_code" class="form-label ps-2" [appRequiredMarker]="form.get('byte_code')">{{ "master_modal_bytecode" | translate }} </label>
                 <input type="text" id="byte_code" class="form-control" formControlName="byte_code"
                   [placeholder]="'placeholder_text' | translate" />
                   <div *ngIf="form.get('byte_code')?.invalid && form.get('byte_code')?.touched" class="text-danger ps-2">
@@ -36,7 +36,7 @@
 
               <!-- ประเภทอ้างอิง -->
               <div class="col-12 col-md-12 col-lg-6">
-                <label for="email" class="form-label ps-2" [appRequiredMarker]="form.get('byte_reference')">{{ "master_modal_byteref" | translate }}</label>
+                <label for="email" class="form-label ps-2" [appRequiredMarker]="form.get('byte_reference')">{{ "master_modal_byteref" | translate }} </label>
                 <input type="text" id="email" class="form-control" formControlName="byte_reference"
                   [placeholder]="'placeholder_text' | translate" />
                   <div *ngIf="form.get('byte_reference')?.invalid && form.get('byte_reference')?.touched" class="text-danger ps-2">
@@ -58,7 +58,7 @@
           <div class="container">
             <div class="row g-3 mb-3">
               <div class="col-12 col-md-12 col-lg-12">
-                <label for="lastname" class="form-label ps-2" [appRequiredMarker]="form.get('byte_desc_en')">{{ "master_modal_engdesc" | translate }}</label>
+                <label for="lastname" class="form-label ps-2" [appRequiredMarker]="form.get('byte_desc_en')">{{"master_modal_engdesc" | translate }} </label>
                 <input type="text" id="lastname" class="form-control" formControlName="byte_desc_en"
                   [placeholder]="'placeholder_text' | translate" />
                   <div *ngIf="form.get('byte_desc_en')?.invalid && form.get('byte_desc_en')?.touched" class="text-danger ps-2">
@@ -68,7 +68,7 @@
 
               <!-- ชื่ออ้างอิงภาษาไทย -->
               <div class="col-12 col-md-12 col-lg-12">
-                <label for="byte_desc_th" class="form-label ps-2" [appRequiredMarker]="form.get('byte_desc_th')">{{ "master_modal_thaidesc" | translate }}</label>
+                <label for="byte_desc_th" class="form-label ps-2" [appRequiredMarker]="form.get('byte_desc_th')">{{ "master_modal_thaidesc" | translate }} </label>
                 <input type="text" id="byte_desc_th" class="form-control" formControlName="byte_desc_th"
                   [placeholder]="'placeholder_text' | translate" />
                   <div *ngIf="form.get('byte_desc_th')?.invalid && form.get('byte_desc_th')?.touched" class="text-danger ps-2">
