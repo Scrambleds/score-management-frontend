@@ -679,16 +679,12 @@ export class AddUserComponent implements OnInit {
     console.log(rowId);
     if (rowIndex !== -1) {
       Swal.fire({
-        // title: 'คุณยืนยันที่จะลบข้อมูลผู้ใช้นี้?',
-        // text: 'คำเตือน: หากลบไปแล้วจะไม่สามารถนำกลับมาได้อีก',
         title: title,
         text: text,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#6c757d',
-        // confirmButtonText: 'ลบ',
-        // cancelButtonText: 'ยกเลิก',
         confirmButtonText: delete_button,
         cancelButtonText: cancel_button,
       }).then((result) => {
@@ -696,11 +692,17 @@ export class AddUserComponent implements OnInit {
           if (this.gridApi) {
             this.originalData.splice(rowIndex, 1);
 
+            //รีเซ็ตค่า row_id สำหรับแถวที่เหลือ
+            this.originalData.forEach((row, index) => {
+              row.row_id = index + 1;
+            });
+
             this.gridApi.applyTransaction({
               remove: this.originalData.filter(
                 (row) => row.row_id === rowIndex
               ),
             });
+            
             this.rowData = [...this.originalData];
             this.gridApi.setGridOption('rowData', this.rowData);
             this.gridApi.refreshCells({ force: true });
