@@ -14,6 +14,8 @@ import { SelectBoxService } from '../../services/select-box/select-box.service';
 import { forkJoin } from 'rxjs';
 import { SearchMasterdataServiceTsComponent } from '../../services/search-masterdata.service/search-masterdata.service.ts.component';
 import { Subscription } from 'rxjs';
+import { isBuffer } from 'node:util';
+import { match } from 'node:assert';
 
 interface ByteDetail {
   byte_code: string;
@@ -60,15 +62,15 @@ export class MasterDataComponents implements OnInit {
   searchSubscription!: Subscription;
   filteredData: MasterData[] = [];
   allMasterData: MasterData[] = [];
-  data: { 
-          masterData: MasterData[] 
-        } = { 
-          masterData: [] 
-        };
+  data: {
+    masterData: MasterData[]
+  } = {
+      masterData: []
+    };
 
-  constructor(private fb: FormBuilder, private MasterDataService: MasterDataService, private masterDataService: masterDataService, 
-              private SelectBoxService: SelectBoxService, private searchService: SearchMasterdataServiceTsComponent) {}
-  
+  constructor(private fb: FormBuilder, private MasterDataService: MasterDataService, private masterDataService: masterDataService,
+    private SelectBoxService: SelectBoxService, private searchService: SearchMasterdataServiceTsComponent) { }
+
   ngOnInit(): void {
     // this.form = this.fb.group({});
     this.getMasterData();
@@ -92,26 +94,26 @@ export class MasterDataComponents implements OnInit {
         console.log('Received role data: ', results.roleData);
         console.log('Received prefix data: ', results.prefixData);
         console.log('Received status data: ', results.statusData);
-  
+
         // เก็บข้อมูลที่ได้รับจาก API ลงในตัวแปรที่แตกต่างกัน
         if (results.roleData && results.roleData.objectResponse) {
           this.roleData = results.roleData.objectResponse.filter(
             (item: any) => item.byte_code && item.byte_desc_th
           );
         }
-  
+
         if (results.prefixData && results.prefixData.objectResponse) {
           this.prefixData = results.prefixData.objectResponse.filter(
             (item: any) => item.byte_code && item.byte_desc_th
           );
         }
-  
+
         if (results.statusData && results.statusData.objectResponse) {
           this.statusData = results.statusData.objectResponse.filter(
             (item: any) => item.byte_code && item.byte_desc_en
           );
         }
-  
+
         this.masterDataService.setMasterData(this.roleData, this.prefixData, this.statusData);
       },
       error: (err: any) => {
@@ -142,7 +144,7 @@ export class MasterDataComponents implements OnInit {
 
   onMasterDataAdded(newItem: any) {
     let existingMasterData = this.allMasterData.find(item => item.byte_reference === newItem.byte_reference);
-    
+
     if (existingMasterData) {
       existingMasterData.byteDetail.push(newItem);
     } else {
@@ -158,18 +160,64 @@ export class MasterDataComponents implements OnInit {
   filterMasterData(searchTerm: string): void {
     if (!searchTerm) {
       this.filteredData = [...this.allMasterData];
+      this.openCollapse = null;
     } else {
-      this.filteredData = this.allMasterData.filter(item =>
+      this.filteredData = this.allMasterData.filter((item, index) => {
+        const match =
         item.byte_reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.byteDetail.some(detail =>
-          detail.byte_desc_th.toLowerCase().includes(searchTerm.toLowerCase()) || 
-          detail.byte_desc_en.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
+        item.byteDetail.some(detail => {
+          const thMatch = detail.byte_desc_th.toLowerCase().includes(searchTerm.toLowerCase());
+          const enMatch = detail.byte_desc_en.toLowerCase().includes(searchTerm.toLowerCase());
+          console.log(`Searching!!!: ${searchTerm}, byte_desc_th: ${detail.byte_desc_th}, byte_desc_en: ${detail.byte_desc_en}`);
+          console.log(`Searching: ${searchTerm}, byte_desc_th: ${detail.byte_desc_th}, byte_desc_en: ${detail.byte_desc_en}, thMatch: ${thMatch}, enMatch: ${enMatch}`);
+          console.log(`Match found for: ${searchTerm}, opening collapse-${index}`);
+          return thMatch || enMatch;
+        });
+      
+      console.log(`Match found for: ${searchTerm}: ${match}`);      
+
+      if (match) {
+        this.openCollapse = 0;
+        console.log("My Collaspe: ", this.openCollapse);
+        setTimeout(() => {
+          const element = document.getElementById(`collapse-${this.openCollapse}`);
+          if (element) {
+            console.log(`Scrolling to collapse-${this.openCollapse}`);
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 100);
+      }      
+        return match;
+      });
+
+     // ถ้ามีแค่ข้อมูลเดียวที่ตรงกัน (filteredData.length === 1)
+     if (this.filteredData.length === 1) {
+      this.openCollapse = 0;
+      console.log("My Collaspe: ", this.openCollapse);
+    } else {
+      // ถ้ามีข้อมูลซ้ำกันในรายการอื่นๆ ไม่ต้อง expand
+      const uniqueMatches = new Set(this.filteredData.map(item => item.byte_reference));
+      if (uniqueMatches.size === 1) {
+        this.openCollapse = 0; // ถ้ามีข้อมูลเดียวก็ขยายที่ 0
+      } else {
+        this.openCollapse = null; // ถ้ามีข้อมูลซ้ำกันก็ไม่ขยาย
+      }
     }
-    console.log('Filtered Data:', this.filteredData);
-  }  
-  
+
+    // สั่ง scroll ไปที่ collapse ถ้ามีการขยาย
+    if (this.openCollapse !== null) {
+      setTimeout(() => {
+        const element = document.getElementById(`collapse-${this.openCollapse}`);
+        if (element) {
+          console.log(`Scrolling to collapse-${this.openCollapse}`);
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  }
+  // console.log('Filtered Data:', this.filteredData);
+}
+
   getMasterData(): void {
     this.MasterDataService.getMasterData().subscribe(
       (response: any) => {
@@ -182,10 +230,14 @@ export class MasterDataComponents implements OnInit {
         console.error('Error fetching master data:', error);
       }
     );
-  }  
+  }
 
   toggleCollapse(index: number): void {
-    this.openCollapse = this.openCollapse === index ? null : index;
+    if (this.openCollapse === index) {
+      this.openCollapse = null;
+    } else {
+      this.openCollapse = index;
+    }
   }
 
   onAddModalChange = (show: boolean) => {
@@ -213,7 +265,7 @@ export class MasterDataComponents implements OnInit {
     this.showEditModal = true;
     console.log('showEditModal:', this.showEditModal);
   }
-  
+
   closeEditModal = () => {
     this.showEditModal = false;
   }
@@ -222,17 +274,17 @@ export class MasterDataComponents implements OnInit {
     this.showAddModal = false;
   }
 
-  getMaxByteCode = (byteDetail: ByteDetail[]):string => {
-    if(!byteDetail || byteDetail.length === 0){
+  getMaxByteCode = (byteDetail: ByteDetail[]): string => {
+    if (!byteDetail || byteDetail.length === 0) {
       return '1';
     }
 
     const maxByteCode = Math.max(...byteDetail.map(detail => parseInt(detail.byte_code, 10) || 0));
     return (maxByteCode + 1).toString();
   }
-  
-    ngAfterViewInit() {
-      this.modalElement = document.querySelector('.modal');
-      this.modalInstance = new Modal(this.modalElement);
-    }
+
+  ngAfterViewInit() {
+    this.modalElement = document.querySelector('.modal');
+    this.modalInstance = new Modal(this.modalElement);
+  }
 }

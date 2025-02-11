@@ -12,6 +12,7 @@ import { SearchMasterdataServiceTsComponent } from '../../services/search-master
 export class SearchMasterDataComponent {
   searchForm: FormGroup;
   isSearchTriggered = false;
+  expandedReferences: Set<string> = new Set();
 
   constructor(private fb: FormBuilder, private searchService: SearchMasterdataServiceTsComponent) {
     this.searchForm = this.fb.group({
@@ -21,7 +22,9 @@ export class SearchMasterDataComponent {
 
   onInputChange(value: string): void {
     const TrimValue = value ? value.trim() : '';
+    console.log("Search term:", TrimValue);
     this.searchService.setSearchTerm(TrimValue); // ส่งค่าทันทีขณะพิมพ์
+    
   }
 
   onSubmit(): void {

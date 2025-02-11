@@ -11,5 +11,8 @@ export class SearchMasterdataServiceTsComponent {
 
   setSearchTerm(term: string) {
     this.searchTerm.next(term);
+    this.searchTerm$.subscribe(term => {
+      console.log("Filtered term received in subscription:", term);
+    });    
   }
 }

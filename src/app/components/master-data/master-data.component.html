@@ -3,9 +3,11 @@
     <!-- Card Header -->
     <div class="card-header bg-light border-bottom">
       <div class="row ms-1 mt-2">
-        <p class="mb-2" style="font-size: 0.8rem; color: #838383; font-weight: 600">{{ "add_masterdata_header" | translate }}</p>
+        <p class="mb-2" style="font-size: 0.8rem; color: #838383; font-weight: 600">
+          {{ "add_masterdata_header" | translate }}</p>
         <div class="d-flex justify-content-between">
-          <h4 class="text-title fw-bold mb-2 mt-0">{{ "add_masterdata_total" | translate }} {{ filteredData.length }} {{ "add_masterdata_item" | translate}}</h4>
+          <h4 class="text-title fw-bold mb-2 mt-0">{{ "add_masterdata_total" | translate }} {{ filteredData.length }}
+            {{ "add_masterdata_item" | translate}}</h4>
         </div>
       </div>
     </div>
@@ -25,8 +27,8 @@
 
             <div class="col-6 px-4 d-flex justify-content-end align-items-center">
               <div class="col-12 d-flex align-items-center justify-content-end" (click)="toggleCollapse(i)">
-                <button *ngIf="item.byte_reference !== 'score_type'"
-                  type="submit" class="btn btn-primary" (click)="openAddModal(item.byte_reference, item.byteDetail); $event.stopPropagation()">
+                <button *ngIf="item.byte_reference !== 'score_type'" type="submit" class="btn btn-primary"
+                  (click)="openAddModal(item.byte_reference, item.byteDetail); $event.stopPropagation()">
                   <i class="bi bi-plus-circle"></i>
                   {{ "master_modal_header2" | translate }}
                 </button>
@@ -39,25 +41,34 @@
               </div>
             </div>
 
-            <div *ngIf="openCollapse === i" class="mt-2 mb-2">
+            <!-- <div *ngIf="openCollapse === i" class="mt-2 mb-2"> -->
+            <div *ngIf="openCollapse === i" class="mt-2 mb-2" id="collapse-{{ i }}">
               <div *ngFor="let detail of item.byteDetail" class="card p-3 mb-3">
                 <div class="d-flex flex-wrap justify-content-between align-items-center">
                   <div class="col-12 col-md-12 col-lg-1 d-flex justify-content-start align-items-center mb-0">
                     <p class="mb-0"><strong>{{ detail.byte_code }}</strong></p>
                   </div>
-                  <div class="col-12 col-md-12 col-lg-3 d-flex justify-content-start align-items-center text-start mb-0">
-                    <p class="mb-0"><strong>{{ "add_masterdata_descth" | translate }}:</strong> {{ detail.byte_desc_th }}</p>
+                  <div
+                    class="col-12 col-md-12 col-lg-3 d-flex justify-content-start align-items-center text-start mb-0">
+                    <p class="mb-0"><strong>{{ "add_masterdata_descth" | translate }}:</strong>
+                      {{ detail.byte_desc_th }}</p>
                   </div>
-                  <div class="col-12 col-md-12 col-lg-3 d-flex justify-content-start align-items-center text-start mb-0">
-                    <p class="mb-0 me-0"><strong>{{ "add_masterdata_descen" | translate }}:</strong> {{ detail.byte_desc_en }}</p>
+                  <div
+                    class="col-12 col-md-12 col-lg-3 d-flex justify-content-start align-items-center text-start mb-0">
+                    <p class="mb-0 me-0"><strong>{{ "add_masterdata_descen" | translate }}:</strong>
+                      {{ detail.byte_desc_en }}</p>
                   </div>
                   <div class="d-flex flex-row justify-content-start col-12 col-md-12 col-lg-3">
-                    <p class="mb-0 me-0"><strong>{{ "add_masterdata_createdate" | translate }}:</strong> {{ detail.create_date | date:'yyyy-MM-dd' }}</p>
+                    <p class="mb-0 me-0"><strong>{{ "add_masterdata_createdate" | translate }}:</strong>
+                      {{ detail.create_date | date:'yyyy-MM-dd' }}</p>
                   </div>
-                  <div class="col-12 col-md-12 col-lg-2 d-flex justify-content-between align-items-center text-start mb-0">
-                    <p class="mb-0 me-2"><strong>{{ "user_manage_status" | translate }}:</strong> {{ detail.active_status }}</p>
+                  <div
+                    class="col-12 col-md-12 col-lg-2 d-flex justify-content-between align-items-center text-start mb-0">
+                    <p class="mb-0 me-2"><strong>{{ "user_manage_status" | translate }}:</strong>
+                      {{ detail.active_status }}</p>
                     <a>
-                      <button type="button" class="btn btn-text-blue min-w-1.25rem p-0" (click)="openEditModal(item.byte_reference, detail.byte_code, detail.byte_desc_th, detail.byte_desc_en, detail.active_status)">
+                      <button type="button" class="btn btn-text-blue min-w-1.25rem p-0"
+                        (click)="openEditModal(item.byte_reference, detail.byte_code, detail.byte_desc_th, detail.byte_desc_en, detail.active_status)">
                         <i class="bi bi-pencil-square" style="color: #0d00ff; font-size: 1.2rem;"></i>
                       </button>
                     </a>
@@ -83,22 +94,12 @@
   </div>
 </ng-template>
 
-<app-modal-masterdata-add
-  [show]="showAddModal" 
-  [byteCode]="selectedByteCode"
-  [byteReference]="selectedByteReference"
-  (addMasterData)="onMasterDataAdded($event)"
-  (showChange)="onAddModalChange($event)">
+<app-modal-masterdata-add [show]="showAddModal" [byteCode]="selectedByteCode" [byteReference]="selectedByteReference"
+  (addMasterData)="onMasterDataAdded($event)" (showChange)="onAddModalChange($event)">
 </app-modal-masterdata-add>
 
-<app-modal-masterdata-edit 
-  [show]="showEditModal" 
-  [byteReference]="selectedByteReference"
-  [byteCode]="selectedByteCode"
-  [byteDescTH]="selectedByteDescTH"
-  [byteDescEN]="selectedByteDescEN"
-  [statusData]="statusData"
-  [activeStatus]="selectedActiveStatus"
-  (updateMasterData)="onMasterDataUpdated($event)" 
+<app-modal-masterdata-edit [show]="showEditModal" [byteReference]="selectedByteReference" [byteCode]="selectedByteCode"
+  [byteDescTH]="selectedByteDescTH" [byteDescEN]="selectedByteDescEN" [statusData]="statusData"
+  [activeStatus]="selectedActiveStatus" (updateMasterData)="onMasterDataUpdated($event)"
   (showChange)="onEditModalChange($event)">
 </app-modal-masterdata-edit>
