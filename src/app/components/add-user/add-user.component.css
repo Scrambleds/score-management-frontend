@@ -59,7 +59,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 8%;
+  width: 100%;
   position: relative;
   /* padding: 0 1.25rem; */
 }
@@ -70,7 +70,7 @@
   position: absolute;
   top: 50%;
   width: 50%;
-  border-bottom: 0.113rem dashed #615d5d;
+  /* border-bottom: 0.113rem dashed #615d5d; */
   z-index: -1;
 }
 

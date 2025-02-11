@@ -23,21 +23,15 @@
       accept=".xls,.xlsx"
       (change)="onFileSelected($event)"
     />
+    
+    <label class="fw-bold text-danger dashed-line">
+      <span>*{{ "condition_format_excel" | translate }}</span>
+    </label>
+    <a class="btn btn-link" (click)="onDownloadTemplate()" style="cursor: pointer; text-decoration: none;">
+      <i class="bi bi-download" style="font-size: var(--icon-size); color: var(--primary-color); text-decoration: none; margin-right: 0.313rem;"></i>
+      <span style="text-decoration: underline;">{{ "example_format_excel" | translate}}</span>
+    </a>
 
-    <!--หรือ-->
-    <label class="fw-bold dashed-line"><span>{{ "condition_format_excel" | translate}}</span></label>
-
-    <!-- ดาวน์โหลดตัวอย่างรูปแบบไฟล์ -->
-     <div class="text-center">{{ "example_format_excel" | translate}}</div>
-      <button class="btn btn-primary" (click)="onDownloadTemplate()">
-      <i
-        class="bi bi-download"
-        style="font-size: var(--icon-size); color: var(--white-color)"
-      ></i>
-       <!-- เทมเพลต Excel -->
-        {{ "templete_excel_button" | translate}}
-  </button>
-  
   </div>
 </div>
 

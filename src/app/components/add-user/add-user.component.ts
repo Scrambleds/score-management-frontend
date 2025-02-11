@@ -770,7 +770,6 @@ export class AddUserComponent implements OnInit {
   return;
   }
 
-
     const UserInfo = this.UserService.username;
 
     // กำหนดข้อมูลที่ต้องการส่ง
@@ -977,6 +976,7 @@ export class AddUserComponent implements OnInit {
         'swal_downloadTemplateSuccess_title'
       ),
       text: this.translate.getTranslation('swal_downloadTemplateSuccess_text'),
+      confirmButtonColor: '#0d6efd',
       confirmButtonText: this.translate.getTranslation('btn_ok'),
     });
   }
