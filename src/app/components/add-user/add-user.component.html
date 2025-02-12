@@ -1,6 +1,6 @@
-<div *ngIf="!isFileUploaded" class="custom-card animate__animated animate__fadeIn"
+<div *ngIf="!isFileUploaded" class="custom-card"
   style="border: 1px dashed; width: 100%; height: 100%">
-  <div class="card-body w-100 animate__animated animate__fadeIn" (dragover)="onDragOver($event)"
+  <div class="card-body w-100" (dragover)="onDragOver($event)"
     (drop)="onDrop($event)">
 
     <!-- <div class="col-12 d-flex justify-content-between align-items-center">
