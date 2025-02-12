@@ -16,6 +16,7 @@ import * as Handlebars from 'handlebars';
 export class TopNavComponent implements OnInit {
   currentLang = '';
   currentTitle: string = '';
+  showBadge: boolean = false; // ควบคุมการแสดง badge
   @Input() isOpen: boolean = false; // รับค่าจาก Parent
   @Output() toggle = new EventEmitter<void>(); // ส่ง Event กลับไปยัง Parent
 
@@ -109,17 +110,37 @@ export class TopNavComponent implements OnInit {
     //notify signalR
     this.signalRService.startConnection(); // เริ่มการเชื่อมต่อกับ SignalR Hub
     this.signalRService.onNotification((notification: any) => {
-      const renderedNotification = this.renderNotification(notification);
-      const notificationList = document.getElementById('notify-list');
-      if (notificationList) {
-        // notificationList.appendChild(renderedNotification);
-        // ถ้าไม่มีรายการใน list, firstChild จะเป็น null
-        const firstItem = notificationList.firstChild;
+      // const renderedNotification = this.renderNotification(notification);
+      // const notificationList = document.getElementById('notify-list');
+      // if (notificationList) {
+      //   // notificationList.appendChild(renderedNotification);
+      //   // ถ้าไม่มีรายการใน list, firstChild จะเป็น null
+      //   const firstItem = notificationList.firstChild;
 
-        // แทรกรายการใหม่ที่ด้านบนสุด ถ้า firstItem เป็น null, renderedNotification จะถูกเพิ่มเป็นลูกแรก
-        notificationList.insertBefore(renderedNotification, firstItem); // ถ้าไม่มี firstChild, ให้แทรก renderedNotification ที่ตำแหน่งแรก
-      }
+      //   // แทรกรายการใหม่ที่ด้านบนสุด ถ้า firstItem เป็น null, renderedNotification จะถูกเพิ่มเป็นลูกแรก
+      //   notificationList.insertBefore(renderedNotification, firstItem); // ถ้าไม่มี firstChild, ให้แทรก renderedNotification ที่ตำแหน่งแรก
+      // }
+      this.notifications.unshift(notification); // เพิ่มการแจ้งเตือนใหม่ใน Array
+      this.showBadge = true; // แสดง badge
+      this.renderNotificationList(); // อัพเดตรายการใน UI
     });
+  }
+
+  // ฟังก์ชันสำหรับล้าง badge เมื่อกดปุ่ม
+  clearBadge(): void {
+    this.showBadge = false;
+  }
+
+  // ฟังก์ชันอัพเดตรายการแจ้งเตือนใน UI
+  private renderNotificationList(): void {
+    const notificationList = document.getElementById('notify-list');
+    if (notificationList) {
+      notificationList.innerHTML = ''; // ลบรายการเดิม
+      this.notifications.forEach((item) => {
+        const newItem = this.renderNotification(item); // Render Notification
+        notificationList.appendChild(newItem);
+      });
+    }
   }
 
   // Function สำหรับ Toggle Side Nav

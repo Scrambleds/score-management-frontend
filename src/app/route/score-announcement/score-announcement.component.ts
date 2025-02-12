@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ScoreAnnouncementService } from '../../services/score-announcement/score-announcement.service';
+import { SearchFormScoreAnnouncementComponent } from '../../components/score-announcement/search-form/search-form-search-form-score-announcemen.component';
 
 @Component({
   selector: 'app-score-announcement',
@@ -15,6 +16,7 @@ export class ScoreAnnouncementComponent {
   teacherCode: string | null = null;
   rowData: any[] = []; // ข้อมูลสำหรับ ag-grid
   currentSubjectData: any = null;
+  @ViewChild('scoreHeader') header!: SearchFormScoreAnnouncementComponent;
 
   constructor(
     private scoreService: ScoreAnnouncementService,
@@ -56,5 +58,16 @@ export class ScoreAnnouncementComponent {
 
   onCurrentSubjectHandle(subjectData: any) {
     this.currentSubjectData = subjectData;
+  }
+
+  handleEmailStatus(status: boolean) {
+    // เมื่อได้รับ event จาก A Component (ซึ่ง bubbled มาจาก app-send-email)
+    console.log('Received email status from child:', status);
+
+    if (status) {
+      // หากส่งอีเมลสำเร็จ เรียกใช้ onSubmit() ใน B Component
+      this.header.onSubmit();
+    }
+    // หากต้องการจัดการกรณีไม่สำเร็จก็สามารถทำได้ที่นี่
   }
 }

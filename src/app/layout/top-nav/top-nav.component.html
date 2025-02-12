@@ -21,16 +21,18 @@
       <!-- Notify -->
       <div class="dropdown d-flex align-items-center">
         <button
-          class="btn btn-link"
+          class="btn btn-link notify"
           type="button"
           id="notificationDropdown"
           data-bs-toggle="dropdown"
           aria-expanded="false"
+          (click)="clearBadge()"
         >
           <i
             class="bi bi-bell-fill"
             style="font-size: var(--icon-size); color: var(--white-color)"
           ></i>
+          <span *ngIf="showBadge" class="notify-badge rounded-circle"></span>
         </button>
         <ul
           class="notify-container dropdown-menu dropdown-menu-end"

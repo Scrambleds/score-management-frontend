@@ -3,9 +3,11 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
   OnChanges,
   OnInit,
+  Output,
   Renderer2,
   SimpleChanges,
   ViewChild,
@@ -32,6 +34,8 @@ const $: any = window['$'];
   styleUrl: './modal-send-mail.component.css',
 })
 export class ModalSendMailComponent implements OnInit, OnChanges {
+  @Output() emailStatusChanged = new EventEmitter<boolean>(); // EventEmitter สำหรับส่งค่ากลับไปยัง parent component
+
   messageText: string = ''; // ข้อความใน textarea
   emailSubject: string = ''; // ข้อความใน input subject
   selectedVariable: any = null; // ตัวแปรที่เลือกจาก select กำหนดเป็น null เพื่อแสดง placeholder
@@ -792,10 +796,13 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
             icon: 'success',
             confirmButtonColor: 'var(--primary-color)',
             confirmButtonText: okBtnText,
+            allowEscapeKey: false,
+            allowOutsideClick: false,
           }).then((result) => {
             if (result.isConfirmed) {
               // หากคลิก "ตกลง"
               console.log('success : ', response.messageDesc);
+              this.emailStatusChanged.emit(true); // ส่งค่า true เมื่อสำเร็จ
             }
           });
         } else {
@@ -808,10 +815,13 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
             icon: 'error',
             confirmButtonColor: 'var(--secondary-color)',
             confirmButtonText: closeBtnText,
+            allowEscapeKey: false,
+            allowOutsideClick: false,
           }).then((result) => {
             if (result.isConfirmed) {
               // หากคลิก "ตกลง"
               console.log('error : ', response.messageDesc);
+              this.emailStatusChanged.emit(true); // ส่งค่า true ไม่สำเร็จ
             }
           });
         }

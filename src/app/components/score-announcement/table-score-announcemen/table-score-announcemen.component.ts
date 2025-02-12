@@ -35,6 +35,7 @@ import { TranslationService } from '../../../core/services/translation.service';
 export class TableScoreAnnouncementComponent {
   @Input() gridData: any[] = [];
   @Input() currentSubject: any[] = [];
+  @Output() emailStatusChanged = new EventEmitter<boolean>();
   gridApi?: GridApi<any>;
   @ViewChild(ModalSendMailComponent) modal?: ModalSendMailComponent;
   columnDefs: any[] = [];
@@ -458,5 +459,13 @@ export class TableScoreAnnouncementComponent {
     const selectedRowsCount = this.gridApi!.getSelectedRows().length;
     this.isRowSelected = selectedRowsCount > 0;
     console.log('isSelectRow => ', this.isRowSelected);
+  }
+
+  onChildEmailStatus(status: boolean) {
+    // เมื่อได้รับ event จาก app-send-email ให้ส่งต่อไปยัง Parent
+    if (status) {
+      this.modal?.closeModal();
+    }
+    this.emailStatusChanged.emit(status);
   }
 }

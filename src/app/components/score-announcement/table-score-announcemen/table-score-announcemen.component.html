@@ -1,4 +1,6 @@
-<app-modal-send-mail></app-modal-send-mail>
+<app-modal-send-mail
+  (emailStatusChanged)="onChildEmailStatus($event)"
+></app-modal-send-mail>
 <div class="custom-card">
   <div class="card-body w-100 gx-0">
     <div class="row gx-0 w-100">
