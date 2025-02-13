@@ -139,7 +139,7 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
             ...this.basicTemplateList,
           ];
           this.currentDefaultTemplate = resp.defaultTemplates;
-          this.initDefaultTemplate(this.currentDefaultTemplate);
+          // this.initDefaultTemplate(this.currentDefaultTemplate);
         });
     });
     // Subscribe เพื่อรับ progress updates
@@ -380,12 +380,19 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
             icon: 'success',
             confirmButtonColor: 'var(--primary-color)',
             confirmButtonText: okBtnText,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // หากคลิก "ตกลง"
-              console.log('success : ', response.messageDesc);
-            }
-          });
+          })
+            .then((result) => {
+              if (result.isConfirmed) {
+                // หากคลิก "ตกลง"
+                console.log('success : ', response.messageDesc);
+              }
+            })
+            .then(() => {
+              this.cacheService.clearCacheForUrl(
+                '/api/MasterData/EmailTemplate'
+              );
+              this.refreshTemplates();
+            });
         } else {
           const failTitle = this.translationService.getTranslation(
             'scoreannouncement_swalSetDefaultTemplateFail_title'
@@ -448,7 +455,7 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
     console.log(`update Template : ${templateKey}`);
     const okBtnText = this.translationService.getTranslation('btn_ok');
     const closeBtnText = this.translationService.getTranslation('btn_close');
-    const cancleBtnText = this.translationService.getTranslation('btn_cancle');
+    const cancleBtnText = this.translationService.getTranslation('btn_cancel');
     const payload = {
       template_id: templateKey, // Assuming templateKey maps to template_id
       subject: this.emailSubject,
@@ -555,7 +562,7 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
     const okBtnText = this.translationService.getTranslation('btn_ok');
     const closeBtnText = this.translationService.getTranslation('btn_close');
     const deleteBtnText = this.translationService.getTranslation('btn_delete');
-    const cancleBtnText = this.translationService.getTranslation('btn_cancle');
+    const cancleBtnText = this.translationService.getTranslation('btn_cancel');
 
     console.log(`deleteTemplate : ${templateKey}`);
     const payload = {
@@ -936,7 +943,7 @@ export class ModalSendMailComponent implements OnInit, OnChanges {
               'scoreannouncement_swalCreateTemplateSuccess_title'
             );
             const successText = this.translationService.getTranslation(
-              'scoreannouncement_swalSuccess_text',
+              'scoreannouncement_swalCreateTemplateSuccess_text',
               { templateName: formData.nameTemplate }
             );
             Swal.fire({

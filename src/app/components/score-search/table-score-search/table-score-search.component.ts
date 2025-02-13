@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ScoreAnnouncementService } from '../../../services/score-announcement/score-announcement.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import Swal from 'sweetalert2';
 import { SearchScoreService } from '../../../services/search-score/search-score.service';
+import { GridOptions } from 'ag-grid-community';
 
 @Component({
   selector: 'table-score',
@@ -17,6 +17,8 @@ export class TableScoreSearchComponent {
   pagination = true;
   columnDefs: any[] = [];
 
+  gridOptions?: GridOptions;
+
   defaultColDef = {
     resizable: true,
     sortable: true,
@@ -26,7 +28,11 @@ export class TableScoreSearchComponent {
     private translationService: TranslationService,
     private scoreService: SearchScoreService
   ) {
-    this.generateColumnDefs();
+    // this.generateColumnDefs();
+    this.gridOptions = {
+      columnDefs: this.columnDefs,
+      defaultColDef: this.defaultColDef,
+    };
   }
 
   // @Input() gridData: any[] = [];
@@ -41,8 +47,20 @@ export class TableScoreSearchComponent {
       }
     }
   }
+
+  ngOnInit() {
+    this.translationService.getTranslations().subscribe(() => {
+      // this.generateColumnDefs(); // รีเฟรชชื่อคอลัมน์เมื่อเปลี่ยนภาษา
+      console.log('change lang done!');
+      console.log(
+        this.translationService.getTranslation('uploadscore_tableFieldSeatNo')
+      );
+      this.refreshHeaderNames(); // รีเฟรชชื่อคอลัมน์เมื่อเปลี่ยนภาษา
+    });
+  }
+
   generateColumnDefs() {
-    this.columnDefs = [
+    return [
       {
         headerName:
           this.translationService.getTranslation(
@@ -266,12 +284,28 @@ export class TableScoreSearchComponent {
 
   onGridReady(params: any): void {
     this.gridApi = params.api;
+    if (this.gridApi) {
+      console.log('gridReady api work');
+      this.refreshHeaderNames();
+    } else {
+      console.log('gridReady api not work');
+    }
     this.gridApi.sizeColumnsToFit();
   }
   ngAfterViewInit(): void {
     // ทำให้แน่ใจว่า sizeColumnsToFit ถูกเรียกหลังจาก grid ถูกโหลด
     if (this.gridApi) {
       this.gridApi.sizeColumnsToFit();
+    }
+  }
+  // ฟังก์ชันสำหรับรีเฟรชชื่อคอลัมน์เมื่อเปลี่ยนภาษา
+  refreshHeaderNames() {
+    this.columnDefs = this.generateColumnDefs();
+    // ตรวจสอบว่ามี gridApi หรือยัง
+    if (this.gridApi) {
+      this.gridApi.setGridOption('columnDefs', this.columnDefs);
+    } else {
+      console.log('grid not work');
     }
   }
 }
