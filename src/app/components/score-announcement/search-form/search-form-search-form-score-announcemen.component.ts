@@ -1,25 +1,15 @@
 import {
   Component,
   ElementRef,
-  AfterViewInit,
   Input,
   OnInit,
   Output,
   ViewChild,
   EventEmitter,
 } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 // import { UploadScoreService } from '../../services/upload-score/upload-score.service';
-import {
-  debounceTime,
-  switchMap,
-  map,
-  distinctUntilChanged,
-  first,
-  tap,
-} from 'rxjs/operators';
-import Swal from 'sweetalert2';
-import { ScoreAnnouncementService } from '../../../services/score-announcement/score-announcement.service';
+import { debounceTime } from 'rxjs/operators';
 import { ContantService } from '../../../shared/service/contants-service.service';
 import { Observable, of } from 'rxjs';
 import { ModalSendMailComponent } from '../../modal-send-mail/modal-send-mail.component';
@@ -58,6 +48,8 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
   isAutocompleteVisible = false;
   isSubjectNameReadonly = false;
   isSubmit: boolean = true;
+
+  private studentSearchEnabled = false;
 
   isAcademicYearDisabled: boolean = true;
   isSemesterDisabled: boolean = true;
@@ -150,17 +142,9 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       });
   }
   ngOnInit(): void {
-    // ฟังก์ชันสำหรับแสดง Auto-complete เมื่อมีการกรอกข้อมูลใน subjectSearch
-    // this.showAutocomplete();
-
-    // ฟังการเปลี่ยนแปลงของฟอร์ม
-    this.form.valueChanges
-      .pipe(
-        debounceTime(300) // ลดความถี่ในการเรียกฟังก์ชัน
-      )
-      .subscribe((value) => {
-        this.toggleFields(value);
-      });
+    this.form.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
+      this.toggleFields(value);
+    });
   }
 
   toggleFields(value: {
@@ -169,64 +153,54 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
     semester?: string | null;
     section?: string | null;
   }) {
-    if (
+    const shouldEnableStudentSearch =
       String(value.subjectSearch || '').trim() &&
       String(value.academic_year || '').trim() &&
       String(value.semester || '').trim() &&
-      String(value.section || '').trim()
-    ) {
-      // เปิดฟิลด์เมื่อ subjectSearch, academic_year, semester มีค่าครบ
-      this.form.get('studentSearch')?.enable();
-      this.form.get('sendStatus')?.enable();
+      String(value.section || '').trim();
+
+    if (shouldEnableStudentSearch) {
+      if (!this.studentSearchEnabled) {
+        this.form.get('studentSearch')?.enable();
+        this.form.get('sendStatus')?.enable();
+        this.studentSearchEnabled = true;
+        this.onSubmit();
+        this.listenStudentSearch();
+      }
     } else {
-      // ปิดฟิลด์และรีเซ็ตค่าหากไม่มีค่า
+      this.studentSearchEnabled = false;
       this.form.get('studentSearch')?.disable();
       this.form.get('studentSearch')?.reset(null);
-      // this.form.get('section')?.disable();
-      // this.form.get('section')?.reset(null);
       this.form.get('sendStatus')?.disable();
       this.form.get('sendStatus')?.reset(null);
     }
+  }
+
+  private listenStudentSearch(): void {
+    this.form
+      .get('studentSearch')
+      ?.valueChanges.pipe(debounceTime(300))
+      .subscribe(() => {
+        this.onSubmit();
+      });
+    this.form
+      .get('sendStatus')
+      ?.valueChanges.pipe(debounceTime(300))
+      .subscribe(() => {
+        this.onSubmit();
+      });
   }
 
   onReset() {
     this.form.reset();
     this.resetForm.emit(); // ส่ง requestData ไปยัง API
   }
-  // selectSubject(subject: any): void {
-  //   this.form.patchValue({
-  //     subjectSearch: `${subject.subject_id} ${subject.subject_name}`,
-  //   });
-  //   this.filteredSuggestions = [];
-  //   this.showSuggestions = false;
-  //   //add update current subject_id
-  //   console.log('select :', subject);
-  //   this.currentSubjectId = subject.subject_id;
-  // }
 
   hideSuggestions(): void {
     setTimeout(() => {
       this.showSuggestions = false;
     }, 200); // เพิ่มดีเลย์เพื่อป้องกันการคลิกหาย
   }
-
-  // showAutocomplete() {
-  //   this.form
-  //     .get('subjectSearch')
-  //     ?.valueChanges.pipe(
-  //       debounceTime(300), // เพิ่มดีเลย์เพื่อลดจำนวนคำขอ API
-  //       switchMap((searchText: string) => {
-  //         if (!searchText) return of([]); // คืนค่าเป็นอาเรย์ว่างหากไม่มีคำค้นหา
-  //         return this.contantLovService.getDataByCondition(
-  //           'api/ScoreAnnoucement/GetSubjectByCondition',
-  //           { subjectSearch: searchText }
-  //         );
-  //       })
-  //     )
-  //     .subscribe((response: any) => {
-  //       this.filteredSuggestions = response.objectResponse || [];
-  //     });
-  // }
 
   onSubmit(): void {
     this.form.markAllAsTouched();

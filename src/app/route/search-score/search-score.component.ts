@@ -69,6 +69,7 @@ export class SearchScoreComponent {
   }
 
   onResetForm(): void {
-    this.onSearchSubmit(this.payload);
+    // this.onSearchSubmit(this.payload);
+    this.gridData = [];
   }
 }

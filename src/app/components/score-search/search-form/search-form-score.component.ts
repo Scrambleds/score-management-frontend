@@ -45,7 +45,7 @@ export class SearchFormScoreComponent implements OnInit {
   isAcademicYearDisabled: boolean = true;
   isSemesterDisabled: boolean = true;
   isSectionCodeDisabled: boolean = true;
-  isSearching: boolean = false; // ใช้สำหรับบอกว่ากำลังค้นหาหรือไม่
+  isSearchingStudent: boolean = false; // ใช้สำหรับบอกว่ากำลังค้นหาหรือไม่
   selectedSubject: any = null; // เก็บข้อมูลที่ผู้ใช้เลือก
 
   statuses: { desc_th: string; desc_en: string; placeholder_key: string }[] =
@@ -102,18 +102,15 @@ export class SearchFormScoreComponent implements OnInit {
       });
 
     // เรียก toggleFields เพื่อให้ตั้งค่าเริ่มต้นของฟอร์ม
+    this.toggleFields(this.form.value);
   }
 
   ngOnInit(): void {
-    // ฟังการเปลี่ยนแปลงของฟอร์ม
-    this.form.valueChanges
-      .pipe(
-        debounceTime(300) // ลดความถี่ในการเรียกฟังก์ชัน
-      )
-      .subscribe((value) => {
-        this.toggleFields(value);
-      });
+    this.form.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
+      this.toggleFields(value);
+    });
   }
+
   loadSubjects() {
     const userInfo = localStorage.getItem('userInfo');
     let teacher_code: string | null = null;
@@ -141,19 +138,35 @@ export class SearchFormScoreComponent implements OnInit {
   toggleFields(value: {
     subjectSearch?: string | null;
     academic_year?: string | null;
+    section?: string | null;
     semester?: string | null;
   }) {
-    if (
+    const isString =
       String(value.subjectSearch || '').trim() &&
       String(value.academic_year || '').trim() &&
-      String(value.semester || '').trim()
-    ) {
-      this.form.get('studentSearch')?.enable();
+      String(value.semester || '').trim() &&
+      String(value.section || '').trim();
+    if (isString) {
+      if (!this.isSearchingStudent) {
+        this.form.get('studentSearch')?.enable();
+        this.isSearchingStudent = true;
+        this.onSubmit();
+        this.listenSearchStudent();
+      }
     } else {
-      // ปิดฟิลด์และรีเซ็ตค่าหากไม่มีค่า
+      this.isSearchingStudent = false;
       this.form.get('studentSearch')?.disable();
       this.form.get('studentSearch')?.reset('');
     }
+  }
+
+  private listenSearchStudent(): void {
+    this.form
+      .get('studentSearch')
+      ?.valueChanges.pipe(debounceTime(300))
+      .subscribe(() => {
+        this.onSubmit();
+      });
   }
 
   selectSubject(subject: any): void {
@@ -170,24 +183,8 @@ export class SearchFormScoreComponent implements OnInit {
     }, 200); // เพิ่มดีเลย์เพื่อป้องกันการคลิกหาย
   }
 
-  // showAutocomplete() {
-  //   this.form
-  //     .get('subjectSearch')
-  //     ?.valueChanges.pipe(
-  //       debounceTime(300), // เพิ่มดีเลย์เพื่อลดจำนวนคำขอ API
-  //       switchMap((searchText: string) => {
-  //         if (!searchText) return of([]); // คืนค่าเป็นอาเรย์ว่างหากไม่มีคำค้นหา
-  //         return this.contantLovService.getDataByCondition(
-  //           'api/ScoreAnnoucement/GetSubjectByCondition',
-  //           { subjectSearch: searchText }
-  //         );
-  //       })
-  //     )
-  //     .subscribe((response: any) => {
-  //       this.filteredSuggestions = response.objectResponse || [];
-  //     });
-  // }
   onSubmit(): void {
+    this.form.markAllAsTouched();
     if (this.form.valid) {
       const userInfo = localStorage.getItem('userInfo');
       let teacher_code: string | null = null;
@@ -227,6 +224,7 @@ export class SearchFormScoreComponent implements OnInit {
 
   onReset() {
     this.form.reset();
+    this.resetForm.emit();
   }
 
   customSearchFn(term: string, item: any): boolean {
