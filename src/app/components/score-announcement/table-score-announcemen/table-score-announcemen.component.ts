@@ -5,6 +5,8 @@ import {
   Output,
   ViewChild,
   OnInit,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 
 // import { UploadScoreHeaderComponent } from '../table-score-announcemen.component';
@@ -25,7 +27,7 @@ import { TranslationService } from '../../../core/services/translation.service';
   templateUrl: './table-score-announcemen.component.html',
   styleUrl: './table-score-announcemen.component.css',
 })
-export class TableScoreAnnouncementComponent implements OnInit {
+export class TableScoreAnnouncementComponent implements OnInit, OnChanges {
   // @Input() gridData: any[] = [];
   @Input() gridData: any[] = [];
   @Input() currentSubject: any[] = [];
@@ -54,9 +56,12 @@ export class TableScoreAnnouncementComponent implements OnInit {
       // suppressRowClickSelection: false, // เปิดให้คลิกแถวเพื่อเลือก
     };
   }
-  refreshColumnDefs() {
-    if (this.gridApi) {
-      this.gridApi.getColumnDefs();
+
+  ngOnChanges(changes: SimpleChanges): void {
+    //check @Input() gridData: any[] = []; ถ้าค่าเปลี่ยนให้ทำการเรียกใช้โค้ดนี้
+    if (changes['gridData']) {
+      console.log('gridData changed:', changes['gridData'].currentValue);
+      this.isRowSelected = false;
     }
   }
 

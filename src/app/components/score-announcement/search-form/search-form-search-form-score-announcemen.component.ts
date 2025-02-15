@@ -179,7 +179,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
   private listenStudentSearch(): void {
     this.form
       .get('studentSearch')
-      ?.valueChanges.pipe(debounceTime(300))
+      ?.valueChanges.pipe(debounceTime(1000))
       .subscribe(() => {
         this.onSubmit();
       });

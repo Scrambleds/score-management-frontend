@@ -753,6 +753,7 @@ export class UploadExcelContainerComponent implements OnInit {
           this.cacheService.clearCacheForUrl(
             '/api/Dashboard/GetSubjectDashboard'
           );
+          this.cacheService.clearCacheForUrl('/api/LovContant/GetLovSubject');
           Swal.fire({
             title: successTitle,
             text: successText,
