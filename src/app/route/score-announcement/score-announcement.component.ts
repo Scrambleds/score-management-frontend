@@ -68,6 +68,5 @@ export class ScoreAnnouncementComponent {
       // หากส่งอีเมลสำเร็จ เรียกใช้ onSubmit() ใน B Component
       this.header.onSubmit();
     }
-    // หากต้องการจัดการกรณีไม่สำเร็จก็สามารถทำได้ที่นี่
   }
 }
