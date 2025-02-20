@@ -143,6 +143,7 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
   }
   ngOnInit(): void {
     this.form.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
+      this.onSubmit();
       this.toggleFields(value);
     });
   }
@@ -164,8 +165,6 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
         this.form.get('studentSearch')?.enable();
         this.form.get('sendStatus')?.enable();
         this.studentSearchEnabled = true;
-        this.onSubmit();
-        this.listenStudentSearch();
       }
     } else {
       this.studentSearchEnabled = false;
@@ -174,21 +173,6 @@ export class SearchFormScoreAnnouncementComponent implements OnInit {
       this.form.get('sendStatus')?.disable();
       this.form.get('sendStatus')?.reset(null);
     }
-  }
-
-  private listenStudentSearch(): void {
-    this.form
-      .get('studentSearch')
-      ?.valueChanges.pipe(debounceTime(1000))
-      .subscribe(() => {
-        this.onSubmit();
-      });
-    this.form
-      .get('sendStatus')
-      ?.valueChanges.pipe(debounceTime(300))
-      .subscribe(() => {
-        this.onSubmit();
-      });
   }
 
   onReset() {
