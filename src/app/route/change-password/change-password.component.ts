@@ -74,7 +74,9 @@ export class ChangePasswordComponent {
       const title = this.translate.getTranslation(
         'alrt_pwd_change_confirm_title'
       );
-      const text = this.translate.getTranslation('alrt_pwd_change_confirm_sub_tile');
+      const text = this.translate.getTranslation(
+        'alrt_pwd_change_confirm_sub_tile'
+      );
       const confirmButtonText = this.translate.getTranslation('btn_ok');
       const cancelButtonText = this.translate.getTranslation('btn_cancel');
       // แสดง SweetAlert เพื่อยืนยันก่อนส่ง API
@@ -83,8 +85,8 @@ export class ChangePasswordComponent {
         text: text,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: 'var(--danger-color)',
+        cancelButtonColor: 'var(--secondary-color)',
         confirmButtonText: confirmButtonText,
         cancelButtonText: cancelButtonText,
       }).then((result) => {
@@ -94,13 +96,16 @@ export class ChangePasswordComponent {
             (response) => {
               if (response.isSuccess) {
                 // หากสำเร็จ เคลียร์ localStorage และไปหน้า Login
-                const successTitle = this.translate.getTranslation('msg_success_title');
-                const success_desc = this.translate.getTranslation('msg_success_desc');
-                Swal.fire(
-                  successTitle,
-                  success_desc,
-                  'success'
-                ).then(() => {
+                const successTitle =
+                  this.translate.getTranslation('msg_success_title');
+                const success_desc =
+                  this.translate.getTranslation('msg_success_desc');
+                Swal.fire({
+                  text: success_desc,
+                  title: successTitle,
+                  icon: 'success',
+                  confirmButtonColor: '#0d6efd',
+                }).then(() => {
                   localStorage.clear();
                   this.router.navigate(['/Login']);
                 });

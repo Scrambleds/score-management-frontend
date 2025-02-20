@@ -11,6 +11,7 @@ import { GridOptions } from 'ag-grid-community';
   styleUrl: './table-score-search.component.css',
 })
 export class TableScoreSearchComponent {
+  gridApi: any;
   @Input() gridData: any[] = [];
   @Output() refreshGrid = new EventEmitter<void>();
   selectedRows: any[] = [];
@@ -33,19 +34,6 @@ export class TableScoreSearchComponent {
       columnDefs: this.columnDefs,
       defaultColDef: this.defaultColDef,
     };
-  }
-
-  // @Input() gridData: any[] = [];
-  gridApi: any;
-
-  // ใน ngOnInit หรือเมื่อ gridData ถูกอัปเดต
-  ngOnChanges(): void {
-    if (this.gridData && this.gridData.length > 0) {
-      if (this.gridApi) {
-        this.gridApi.setRowData(this.gridData); // รีเฟรชข้อมูล
-        this.gridApi.sizeColumnsToFit(); // ปรับขนาดคอลัมน์ให้พอดีกับข้อมูล
-      }
-    }
   }
 
   ngOnInit() {
@@ -227,8 +215,8 @@ export class TableScoreSearchComponent {
               text: text,
               icon: 'warning',
               showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
+              confirmButtonColor: 'var(--danger-color)',
+              cancelButtonColor: 'var(--secondary-color)',
               confirmButtonText: confirmButtonText,
               cancelButtonText: cancelButtonText,
             }).then((result) => {
@@ -243,7 +231,12 @@ export class TableScoreSearchComponent {
                     const text = this.translationService.getTranslation(
                       'alrt_del_score_success_title'
                     );
-                    Swal.fire(text, title, 'success');
+                    Swal.fire({
+                      text: title,
+                      title: text,
+                      icon: 'success',
+                      confirmButtonColor: '#0d6efd',
+                    });
                     this.refreshGrid.emit();
                     params.api.refreshCells();
                   },
