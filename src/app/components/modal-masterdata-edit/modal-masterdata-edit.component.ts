@@ -147,6 +147,7 @@ export class ModalMasterdataEditComponent implements AfterViewInit, OnChanges {
           }).then((result) => {
             if (result.isConfirmed) {
               this.updateMasterData.emit(formData);
+              window.location.reload(); 
             }
           });
           this.CacheService.clearCacheForUrl(
