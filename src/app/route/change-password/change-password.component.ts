@@ -94,9 +94,11 @@ export class ChangePasswordComponent {
             (response) => {
               if (response.isSuccess) {
                 // หากสำเร็จ เคลียร์ localStorage และไปหน้า Login
+                const successTitle = this.translate.getTranslation('msg_success_title');
+                const success_desc = this.translate.getTranslation('msg_success_desc');
                 Swal.fire(
-                  'Success!',
-                  'Your password has been changed successfully.',
+                  successTitle,
+                  success_desc,
                   'success'
                 ).then(() => {
                   localStorage.clear();
