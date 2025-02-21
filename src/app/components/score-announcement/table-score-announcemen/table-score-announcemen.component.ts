@@ -198,7 +198,7 @@ export class TableScoreAnnouncementComponent implements OnInit, OnChanges {
           params.data.final_score,
       },
       {
-        headerName: this.translationService.getTranslation('status') || 'สถานะ',
+        headerName: this.translationService.getTranslation('send_status') || 'สถานะส่งคะแนน',
         field: 'send_status_code_desc_th',
         flex: 1.1,
         minWidth: 80,
@@ -219,14 +219,6 @@ export class TableScoreAnnouncementComponent implements OnInit, OnChanges {
             default:
               backgroundColor = '#e0e0e0'; // สีเทา
           }
-
-          // return `
-          //   <div style="position: relative; background-color: ${backgroundColor}; padding: 5px; border-radius: 4px;">
-          //     <span title="${sendDesc}" style="cursor: pointer; color: #ffffff;">
-          //       ${sendStatus}
-          //     </span>
-          //   </div>
-          // `;
           return `
             <div class="h-100" style="display: flex; align-items: center;">
               <div title="${sendDesc}" style="cursor: pointer; color: #ffffff; background: ${backgroundColor}" class="badge">

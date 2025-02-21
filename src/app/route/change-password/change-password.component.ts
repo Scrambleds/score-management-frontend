@@ -60,10 +60,21 @@ export class ChangePasswordComponent {
   }
 
   passwordMatchValidator(form: FormGroup) {
-    return form.get('newPassword')?.value === form.get('conNewPassword')?.value
-      ? null
-      : { mismatch: true };
+    const oldPassword = form.get('password')?.value;
+    const newPassword = form.get('newPassword')?.value;
+    const conNewPassword = form.get('conNewPassword')?.value;
+  
+    if (oldPassword === newPassword) {
+      return { sameAsOld: true }; // รหัสผ่านใหม่ห้ามเหมือนรหัสผ่านเก่า
+    }
+  
+    if (newPassword !== conNewPassword) {
+      return { mismatch: true }; // รหัสผ่านใหม่และยืนยันรหัสผ่านต้องตรงกัน
+    }
+  
+    return null; 
   }
+  
 
   onSubmit() {
     this.passwordForm.markAllAsTouched();
