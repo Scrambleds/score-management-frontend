@@ -58,7 +58,6 @@
   align-items: center; /* จัดกลางแนวตั้ง */
 }
 
-/* ปรับให้ input-group มีการจัดระเบียบ */
 .input-group {
   position: relative;
   display: flex;
@@ -68,9 +67,9 @@
 
 /* ปรับขอบของ input ให้เหมือนกัน */
 .input-group input.form-control {
-  border: 1px solid #ced4da; /* เส้นขอบสีเทาอ่อน */
-  border-radius: 0.375rem; /* ขอบกลมเหมือนกัน */
-  box-shadow: none; /* เอาเงาออก */
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  box-shadow: none;
 }
 
 /* ปรับปรุงให้ไอคอนสวยงาม */
@@ -80,12 +79,21 @@
 
 /* เอฟเฟกต์เมื่อ hover ที่ปุ่ม */
 .btn-outline-secondary:hover {
-  color: #007bff; /* เปลี่ยนสีฟ้าเมื่อ hover */
-  background-color: rgba(0, 123, 255, 0.1); /* เพิ่มสีพื้นหลังเมื่อ hover */
+  color: #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
 }
 
 /* เอฟเฟกต์เมื่อคลิกที่ปุ่ม */
 .btn-outline-secondary:active .bi-eye-fill, 
 .btn-outline-secondary:active .bi-eye-slash-fill {
   transform: scale(1.1); /* ขยายขนาดเมื่อคลิก */
+}
+
+::ng-deep .custom-dropdown .ng-dropdown-panel {
+  max-height: unset !important; /* ให้ panel ยืดตามเนื้อหา */
+}
+
+::ng-deep .custom-dropdown .ng-dropdown-panel .ng-dropdown-panel-items {
+  max-height: 160px !important; /* จำกัดความสูงของรายการ dropdown */
+  overflow-y: auto !important; /* ให้ scroll เฉพาะรายการ */
 }

@@ -6,3 +6,37 @@
   overflow: hidden;
   position: relative;
 }
+
+.custom-table {
+  overflow: hidden;
+  min-width: 800px;
+  white-space: nowrap;
+}
+
+.custom-table thead {
+  font-weight: bold;
+  /* text-align: center; */
+  /* border: none; */
+}
+
+.custom-table thead th {
+  background-color: #03a96b !important;
+  color: white !important;
+  padding: 12px;
+  /* border: none; */
+}
+
+.custom-table tbody tr {
+  background-color: #f8f9fa;
+}
+
+.custom-table-container {
+  width: 98%;
+  overflow-x: auto;
+  max-width: 98%;
+  border-radius: 0.5rem;
+}
+
+.custom-table tbody tr:nth-child(even) {
+  background-color: #e9ecef;
+}

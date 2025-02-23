@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 })
 export class AddUserService {
   private apiUrlInsert = `${environment.apiUrl}/api/EditUser/InsertUser`;
+  private apiUrlSaveValidUsers = `${environment.apiUrl}/api/EditUser/SaveValidUsers`;  // เพิ่ม URL สำหรับการบันทึกข้อมูลผู้ใช้ที่ถูกตรวจสอบแล้ว
 
   // ใช้ BehaviorSubject เก็บข้อผิดพลาด
   private errorsSubject = new BehaviorSubject<string[]>([]);
@@ -47,10 +48,32 @@ export class AddUserService {
         if (error.error) {
           // เก็บ errors ไว้ใน BehaviorSubject
           this.errorsSubject.next(error.error);
-          console.log(error.error)
+          console.log(error.error);
           return throwError(() => error.error);
         }
         return throwError(() => new Error('Failed to insert user data. Please try again.'));
+      })
+    );
+  }
+
+  // ฟังก์ชันใหม่สำหรับการบันทึกข้อมูลผู้ใช้ที่ถูกตรวจสอบแล้ว
+  saveValidUsers(validResources: any[]): Observable<any> {
+    const headers = this.getAuthHeaders();
+    if (!headers) {
+      return throwError(() => new Error('Authorization token is missing or invalid'));
+    }
+
+    console.log('Saving valid users with headers:', headers);
+    return this.http.post<any>(this.apiUrlSaveValidUsers, validResources, { headers, withCredentials: true }).pipe(
+      catchError((error) => {
+        console.error('Error occurred while saving valid user data:', error);
+        if (error.error) {
+          // เก็บ errors ไว้ใน BehaviorSubject
+          this.errorsSubject.next(error.error);
+          console.log(error.error);
+          return throwError(() => error.error);
+        }
+        return throwError(() => new Error('Failed to save valid user data. Please try again.'));
       })
     );
   }

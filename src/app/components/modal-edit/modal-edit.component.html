@@ -77,13 +77,22 @@
                   <!-- คำนำหน้าชื่อ -->
                   {{ "user_manage_prefix" | translate }}
                 </label>
-                <ng-select [items]="prefixData" bindLabel="byte_desc_th" bindValue="byte_desc_th" [searchFn]="customSearchFn_SearchLan.bind(this)"
+                <ng-select 
+                class="custom-select custom-dropdown"
+                [items]="prefixData"
+                bindLabel="byte_desc_th"
+                bindValue="byte_desc_th"
+                [searchFn]="customSearchFn_SearchLan.bind(this)"
                 [placeholder]="'placeholder_select' | translate"
-                  formControlName="prefix" [searchable]="true">
-                  <ng-template ng-option-tmp ng-label-tmp let-item="item">
-                    {{ item | translateDropdown }}
-                  </ng-template>
-                </ng-select>
+                formControlName="prefix"
+                [searchable]="true">
+              
+                <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                  {{ item | translateDropdown }}
+                </ng-template>
+              
+              </ng-select>
+              
                 <div *ngIf="form.get('prefix')?.touched && form.get('prefix')?.invalid"
                   class="text-danger ps-2">
                   <!-- กรุณากรอกข้อมูล -->

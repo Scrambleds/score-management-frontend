@@ -720,9 +720,161 @@ export class AddUserComponent implements OnInit {
     }
   }
 
+  // onSaveData() {
+  //   const currentLang = localStorage.getItem('language') || 'en';
+
+  //   // ตรวจสอบว่ามีข้อมูลในตารางหรือไม่
+  //   if (!this.rowData || this.rowData.length === 0) {
+  //     Swal.fire({
+  //       title: currentLang === 'th' ? 'ไม่มีข้อมูล' : 'No data',
+  //       text:
+  //         currentLang === 'th'
+  //           ? 'กรุณาอัปโหลดข้อมูลก่อนบันทึก'
+  //           : 'Please upload data before saving',
+  //       icon: 'error',
+  //       confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
+  //     });
+  //     return;
+  //   }
+
+  // // ตรวจสอบฟิลด์ที่ว่างเปล่าในแต่ละแถว
+  // const missingFieldsGrouped = this.rowData
+  // .map((row, index) => {
+  //   const missingFields = this.requiredFields.filter((field) => {
+  //     // ตรวจสอบว่าฟิลด์มีอยู่จริงในแถวนี้หรือไม่
+  //     if (!row.hasOwnProperty(field)) {
+  //       return true;
+  //     }
+      
+  //     const value = row[field]; // ดึงค่าของฟิลด์นั้นๆ
+  //     // ตรวจสอบว่า value เป็น null, undefined, ค่าว่าง หรือ 'NULL'
+  //     return !value || value.toString().trim() === '' || value.toString().trim().toUpperCase() === 'NULL';
+  //   });
+
+  //   return missingFields.length > 0
+  //     ? `${currentLang === 'th' ? 'แถวที่' : 'Row'} ${index + 1}: ${missingFields.join(', ')}`
+  //     : null;
+  // })
+  // .filter((item) => item !== null);
+
+  // // หากมีฟิลด์ที่ว่างเปล่า แสดงการแจ้งเตือน
+  // if (missingFieldsGrouped.length > 0) {
+  // console.log(this.rowData);  // แสดงข้อมูลใน console เพื่อดูค่า
+  // Swal.fire({
+  //   title: currentLang === 'th' ? 'ข้อมูลไม่ครบถ้วน' : 'Incomplete Data',
+  //   html: `${
+  //     currentLang === 'th' ? 'พบฟิลด์ที่ยังไม่ได้กรอก:' : 'Missing fields:'
+  //   }<br>${missingFieldsGrouped.join('<br>')}`,
+  //   icon: 'warning',
+  //   confirmButtonColor: '#0d6efd',
+  //   confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
+  // });
+  // return;
+  // }
+
+  //   const UserInfo = this.UserService.username;
+
+  //   // กำหนดข้อมูลที่ต้องการส่ง
+  //   const dataToSend = this.rowData.map((row) => {
+  //     const { create_date, ...filteredRow } = row;
+  //     return {
+  //       ...filteredRow,
+  //       create_by: UserInfo,
+  //     };
+  //   });
+
+  //   const Success_title = this.translate.getTranslation('sweet_alert_success');
+  //   const Success_text = this.translate.getTranslation('sweet_alert_edit');
+  //   const Submit_Button = this.translate.getTranslation('btn_ok');
+  //   const Fail_title = this.translate.getTranslation('sweet_alert_fail_title');
+  //   const Fail_text = this.translate.getTranslation('sweet_alert_fail_text');
+  //   const email_duplicated = this.translate.getTranslation('email_duplicated');
+  //   const teacherCode_duplicated = this.translate.getTranslation(
+  //     'add_user_duplicated_teachercode'
+  //   );
+
+  //   // ส่งข้อมูลไปยัง API
+  //   this.addUserService.insertUser(dataToSend).subscribe(
+  //     (response) => {
+  //       Swal.fire({
+  //         title: Success_title,
+  //         text: Success_text,
+  //         icon: 'success',
+  //         confirmButtonColor: '#0d6efd',
+  //         confirmButtonText: Submit_Button,
+  //       }).then(() => {
+  //         this.CacheService.clearCacheForUrl(
+  //           '/api/EditUser/GetAllUser'
+  //         );
+  //         this.router.navigate(['/UserManagement']);
+  //       });
+  //     },
+  //     (error) => {
+  //       console.error('Error occurred while inserting user data: ', error);
+
+  //       if (error && error.errors) {
+  //         const errorMessages = error.errors;
+  //         const errorMessage_code = error.message;
+
+  //         if (
+  //           errorMessages.length > 0 &&
+  //           errorMessage_code == 'มีอีเมลบางรายการที่ใช้งานแล้ว'
+  //         ) {
+  //           console.log(errorMessages);
+  //           console.log('My error email: ', errorMessage_code);
+  //           // const errorMessage = errorMessages
+  //           // .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
+  //           //   .join('<br>');
+  //           const duplicatedEmail = errorMessages.join('<br>');
+
+  //           Swal.fire({
+  //             title: Fail_title,
+  //             html: `${email_duplicated}<br>${duplicatedEmail}`,
+  //             icon: 'error',
+  //             confirmButtonColor: '#0d6efd',
+  //             confirmButtonText: Submit_Button,
+  //           });
+  //           return;
+  //         }
+
+  //         if (
+  //           errorMessages.length > 0 &&
+  //           errorMessage_code == 'มีรหัสอาจารย์ถูกใช้งานแล้ว'
+  //         ) {
+  //           console.log(errorMessages);
+  //           console.log('My error teacher_code: ', errorMessage_code);
+  //           // const errorMessage = errorMessages
+  //           // .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
+  //           // .join('<br>');
+
+  //           const duplicatedCodes = errorMessages.join('<br>');
+
+  //           Swal.fire({
+  //             title: Fail_title,
+  //             // html: `${teacherCode_duplicated}<br>${errorMessage}`,
+  //             html: `${teacherCode_duplicated}<br>${duplicatedCodes}`,
+  //             icon: 'error',
+  //             confirmButtonColor: '#0d6efd',
+  //             confirmButtonText: Submit_Button,
+  //           });
+  //           return;
+  //         }
+  //       }
+
+  //       Swal.fire({
+  //         title: Fail_title,
+  //         text: Fail_text,
+  //         icon: 'error',
+  //         confirmButtonText: Submit_Button,
+  //         confirmButtonColor: '#0d6efd',
+  //       });
+  //     }
+  //   );
+  // }
+
   onSaveData() {
     const currentLang = localStorage.getItem('language') || 'en';
-
+  
     // ตรวจสอบว่ามีข้อมูลในตารางหรือไม่
     if (!this.rowData || this.rowData.length === 0) {
       Swal.fire({
@@ -737,43 +889,29 @@ export class AddUserComponent implements OnInit {
       return;
     }
 
-  // ตรวจสอบฟิลด์ที่ว่างเปล่าในแต่ละแถว
-  const missingFieldsGrouped = this.rowData
-  .map((row, index) => {
-    const missingFields = this.requiredFields.filter((field) => {
-      // ตรวจสอบว่าฟิลด์มีอยู่จริงในแถวนี้หรือไม่
-      if (!row.hasOwnProperty(field)) {
-        return true;
+    const emailDuplicates = this.findDuplicates(this.rowData.map(row => row.email));
+    const teacherCodeDuplicates = this.findDuplicates(this.rowData.map(row => row.teacher_code));
+
+    if (emailDuplicates.length > 0 || teacherCodeDuplicates.length > 0) {
+      let duplicateMessage = '';
+      if (emailDuplicates.length > 0) {
+        duplicateMessage += `${currentLang === 'th' ? 'อีเมลที่ซ้ำกันในตาราง' : 'Duplicate emails in the table'}:<br>${emailDuplicates.join('<br>')}<br><br>`;
       }
-      
-      const value = row[field]; // ดึงค่าของฟิลด์นั้นๆ
-      // ตรวจสอบว่า value เป็น null, undefined, ค่าว่าง หรือ 'NULL'
-      return !value || value.toString().trim() === '' || value.toString().trim().toUpperCase() === 'NULL';
-    });
-
-    return missingFields.length > 0
-      ? `${currentLang === 'th' ? 'แถวที่' : 'Row'} ${index + 1}: ${missingFields.join(', ')}`
-      : null;
-  })
-  .filter((item) => item !== null);
-
-  // หากมีฟิลด์ที่ว่างเปล่า แสดงการแจ้งเตือน
-  if (missingFieldsGrouped.length > 0) {
-  console.log(this.rowData);  // แสดงข้อมูลใน console เพื่อดูค่า
-  Swal.fire({
-    title: currentLang === 'th' ? 'ข้อมูลไม่ครบถ้วน' : 'Incomplete Data',
-    html: `${
-      currentLang === 'th' ? 'พบฟิลด์ที่ยังไม่ได้กรอก:' : 'Missing fields:'
-    }<br>${missingFieldsGrouped.join('<br>')}`,
-    icon: 'warning',
-    confirmButtonColor: '#0d6efd',
-    confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
-  });
-  return;
-  }
-
+      if (teacherCodeDuplicates.length > 0) {
+        duplicateMessage += `${currentLang === 'th' ? 'รหัสอาจารย์ที่ซ้ำกันในตาราง' : 'Duplicate teacher codes in the table'}:<br>${teacherCodeDuplicates.join('<br>')}<br><br>`;
+      }
+  
+      Swal.fire({
+        title: currentLang === 'th' ? 'พบข้อมูลซ้ำในตาราง' : 'Duplicate data found in table',
+        html: duplicateMessage,
+        icon: 'error',
+        confirmButtonText: currentLang === 'th' ? 'ตกลง' : 'OK',
+      });
+      return;
+    }
+  
     const UserInfo = this.UserService.username;
-
+  
     // กำหนดข้อมูลที่ต้องการส่ง
     const dataToSend = this.rowData.map((row) => {
       const { create_date, ...filteredRow } = row;
@@ -782,43 +920,94 @@ export class AddUserComponent implements OnInit {
         create_by: UserInfo,
       };
     });
-
+  
     const Success_title = this.translate.getTranslation('sweet_alert_success');
-    const Success_text = this.translate.getTranslation('sweet_alert_edit');
     const Submit_Button = this.translate.getTranslation('btn_ok');
     const Fail_title = this.translate.getTranslation('sweet_alert_fail_title');
     const Fail_text = this.translate.getTranslation('sweet_alert_fail_text');
     const email_duplicated = this.translate.getTranslation('email_duplicated');
-    const teacherCode_duplicated = this.translate.getTranslation(
-      'add_user_duplicated_teachercode'
-    );
-
-    // ส่งข้อมูลไปยัง API
+    const teacherCode_duplicated = this.translate.getTranslation('add_user_duplicated_teachercode');
+  
+    // ส่งข้อมูลไปยัง API สำหรับการตรวจสอบข้อมูลที่สามารถบันทึกได้
     this.addUserService.insertUser(dataToSend).subscribe(
       (response) => {
-        Swal.fire({
-          title: Success_title,
-          text: Success_text,
-          icon: 'success',
-          confirmButtonColor: '#0d6efd',
-          confirmButtonText: Submit_Button,
-        }).then(() => {
-          this.CacheService.clearCacheForUrl(
-            '/api/EditUser/GetAllUser'
-          );
-          this.router.navigate(['/UserManagement']);
-        });
+        const validResources = response.validResources || [];
+        const existingEmails = response.existingEmails || [];
+        const existingTeacherCode = response.existingTeacherCode || [];
+        const bothDuplicateData = response.bothDuplicateData || [];
+  
+        if (validResources.length > 0) {
+          let errorMessage = '';
+  
+          // Handle duplicated email and teacher code
+          if (existingEmails.length > 0) {
+            errorMessage += `${email_duplicated}:<br>${existingEmails.join('<br>')}<br><br>`;
+          }
+          if (existingTeacherCode.length > 0) {
+            errorMessage += `${teacherCode_duplicated}:<br>${existingTeacherCode.join('<br>')}<br><br>`;
+          }
+          if (bothDuplicateData.length > 0) {
+            errorMessage += `รายการที่ซ้ำทั้งอีเมลและรหัสอาจารย์<br>${bothDuplicateData.map((r: any) => `${r.email} (${r.teacher_code})`).join('<br>')}<br><br>`;
+          }
+  
+          // Show valid records that can be saved
+          Swal.fire({
+            title: 'มีรายการที่สามารถเลือกบันทึกได้ดังนี้',
+            html: `
+              <p>${currentLang === 'th' ? 'รายการต่อไปนี้สามารถบันทึกได้:' : 'The following records can be saved:'}</p>
+              <ul>${validResources.map((r: any) => `<li>${r?.email || 'N/A'} (${r?.teacher_code || 'N/A'})</li>`).join('')}</ul>
+              <br><br>
+              ${errorMessage ? `<strong>${currentLang === 'th' ? 'ข้อมูลที่ซ้ำกัน:</strong>' : 'Duplicated data:'}</strong><br>${errorMessage}` : ''}
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: currentLang === 'th' ? 'บันทึก' : 'Save',
+            cancelButtonText: currentLang === 'th' ? 'ยกเลิก' : 'Cancel',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // ส่ง validResources ไปยัง SaveValidUsers เพื่อบันทึกลงฐานข้อมูล
+              this.addUserService.saveValidUsers(validResources).subscribe(
+                (insertResponse: any) => {
+                  Swal.fire({
+                    title: currentLang === 'th' ? 'สำเร็จ' : 'Success',
+                    text: currentLang === 'th' ? 'บันทึกข้อมูลสำเร็จ' : 'Data saved successfully',
+                    icon: 'success',
+                    confirmButtonText: Submit_Button,
+                  }).then(() => {
+                    this.CacheService.clearCacheForUrl('/api/EditUser/GetAllUser');
+                    this.router.navigate(['/UserManagement']);
+                  });
+                },
+                (error: any) => {
+                  console.error('Error occurred while inserting user data: ', error);
+                  Swal.fire({
+                    title: Fail_title,
+                    text: Fail_text,
+                    icon: 'error',
+                    confirmButtonText: Submit_Button,
+                  });
+                }
+              );
+            }
+          });
+        } else {
+          Swal.fire({
+            title: Fail_title,
+            text: Fail_text,
+            icon: 'error',
+            confirmButtonText: Submit_Button,
+          });
+        }
       },
       (error) => {
-        console.error('Error occurred while inserting user data: ', error);
-
+        
         if (error && error.errors) {
           const errorMessages = error.errors;
           const errorMessage_code = error.message;
 
           if (
             errorMessages.length > 0 &&
-            errorMessage_code == 'มีอีเมลบางรายการที่ใช้งานแล้ว'
+            errorMessage_code == 'ไม่มีข้อมูลที่สามารถบันทึกได้'
           ) {
             console.log(errorMessages);
             console.log('My error email: ', errorMessage_code);
@@ -839,7 +1028,7 @@ export class AddUserComponent implements OnInit {
 
           if (
             errorMessages.length > 0 &&
-            errorMessage_code == 'มีรหัสอาจารย์ถูกใช้งานแล้ว'
+            errorMessage_code == 'ไม่มีข้อมูลที่สามารถบันทึกได้'
           ) {
             console.log(errorMessages);
             console.log('My error teacher_code: ', errorMessage_code);
@@ -866,12 +1055,26 @@ export class AddUserComponent implements OnInit {
           text: Fail_text,
           icon: 'error',
           confirmButtonText: Submit_Button,
-          confirmButtonColor: '#0d6efd',
         });
       }
     );
   }
 
+  findDuplicates(arr: string[]): string[] {
+    const uniqueItems = new Set();
+    const duplicates = new Set();
+    
+    arr.forEach(item => {
+      if (uniqueItems.has(item)) {
+        duplicates.add(item);
+      } else {
+        uniqueItems.add(item);
+      }
+    });
+    
+    return Array.from(duplicates) as string[];  // Type assertion added here
+  }  
+  
   onDelete() {
     const title = this.translate.getTranslation('add_user_question_1');
     const text = this.translate.getTranslation('add_user_question_2');

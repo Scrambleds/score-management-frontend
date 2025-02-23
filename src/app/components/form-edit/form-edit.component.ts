@@ -31,6 +31,13 @@ export class FormEditComponent implements OnInit, AfterViewInit {
   prefixData: any[] = [];
   statusData: any[] = [];
   allMasterData: any[] = [];
+
+  pagedData: any[] = []; // ข้อมูลเฉพาะหน้าปัจจุบัน
+  currentPage: number = 1;
+  pageSize: number = 10;
+  totalPages: number = 1;
+  totalPagesArray: number[] = [];
+
   form: FormGroup;
 
   constructor(
@@ -49,6 +56,25 @@ export class FormEditComponent implements OnInit, AfterViewInit {
       role: ['', Validators.required],
       active_status: ['', Validators.required],
     });
+  }
+
+  public updatePagination() {
+    // คำนวณจำนวนหน้า
+    this.totalPages = Math.ceil(this.filteredData.length / this.pageSize);
+    this.totalPagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  
+    // แบ่งข้อมูลตามหน้าและขนาดหน้าจอ (แสดง 10 แถวต่อหน้า)
+    this.pagedData = this.filteredData.slice(
+      (this.currentPage - 1) * this.pageSize,
+      this.currentPage * this.pageSize
+    );
+  }
+  
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();  // อัพเดตข้อมูลหน้าใหม่
+    }
   }
 
   onAddUserClick() {
@@ -71,6 +97,7 @@ export class FormEditComponent implements OnInit, AfterViewInit {
         if (response.isSuccess) {
           this.originalData = response.objectResponse;
           this.filteredData = [...this.originalData];
+          this.updatePagination();
           console.log('MY DATA', this.filteredData);
         } else {
           console.error('Failed to fetch data', response.message);
@@ -126,10 +153,9 @@ export class FormEditComponent implements OnInit, AfterViewInit {
       } else {
         this.filteredData = [...this.originalData];
       }
+
+      this.updatePagination();
     });
-    // this.UserManageService.users$.subscribe((users) => {
-    //   this.filteredData = [...users];
-    // });
   }
   
   handleModalSubmit(updatedData: any) {

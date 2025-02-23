@@ -1,10 +1,11 @@
 import { FormBuilder, FormGroup, Validators  } from '@angular/forms';
-import { Component, EventEmitter, HostListener, Input, output, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { SearchService } from '../../services/search-service/seach.service'
 import { Router } from '@angular/router';
 import { UserManageService } from '../../services/user-manage/user-manage.service';
 import { masterDataService } from '../../services/sharedService/masterDataService/masterDataService';
 import { TranslationService } from '../../core/services/translation.service';
+import { FormEditComponent } from '../form-edit/form-edit.component';
 
 @Component({
   selector: 'app-edit-user',
@@ -20,6 +21,8 @@ export class EditUserComponent {
   @Output() searchEvent = new EventEmitter<any>();
 
   @Output() submit = new EventEmitter<any>();
+
+  @ViewChild(FormEditComponent) FormEditComponent!: FormEditComponent;
   
   // roleOption = [{ id: 'ผู้ดูแลระบบ', title: 'ผู้ดูแลระบบ' }, { id: 'อาจารย์', title: 'อาจารย์' }];
   // statusOption = [{ id: 'active', title: 'active' }, { id: 'inactive', title: 'inactive' }];
@@ -30,6 +33,10 @@ export class EditUserComponent {
   rowData: any[] = [];
   originalData: any[] = [];
   filteredData: any[] = [];
+  currentPage: number = 1;
+  pageSize: number = 10;
+  totalPages: number = 1;
+  totalPagesArray: number[] = [];
   isSearchTriggered = false;
 
   constructor(private UserManageService: UserManageService ,
@@ -96,12 +103,18 @@ public onSearch(): void {
 }
 
 public onReset(): void {
-    console.log("Welcome to my reset func!")
-    this.form.reset();
-    this.filteredData = [...this.originalData];
-    this.rowData = [...this.originalData];
-    this.searchService.updateSearchCriteria({});
-  }  
+  console.log("Welcome to my reset func!");
+
+  // รีเซ็ตฟอร์ม
+  this.form.reset();
+
+  // รีเซ็ต criteria และกรองข้อมูลใหม่
+  this.searchService.updateSearchCriteria({});
+
+  // รีเซ็ตข้อมูลในตาราง
+  this.filteredData = [...this.originalData];
+  this.rowData = [...this.originalData];
+}
 
   isCurrentRoute(route: string): boolean{
     return this.router.url === route;
