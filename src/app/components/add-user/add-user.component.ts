@@ -1002,19 +1002,20 @@ export class AddUserComponent implements OnInit {
       (error) => {
         
         if (error && error.errors) {
-          const errorMessages = error.errors;
+          const errorMessages_email = error.errors.emails;
+          const errorMessages_teacher_code = error.errors.teacher_codes;
           const errorMessage_code = error.message;
 
           if (
-            errorMessages.length > 0 &&
+            errorMessages_email.length > 0 &&
             errorMessage_code == 'ไม่มีข้อมูลที่สามารถบันทึกได้'
           ) {
-            console.log(errorMessages);
+            console.log(errorMessages_email);
             console.log('My error email: ', errorMessage_code);
             // const errorMessage = errorMessages
             // .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
             //   .join('<br>');
-            const duplicatedEmail = errorMessages.join('<br>');
+            const duplicatedEmail = errorMessages_email.join('<br>');
 
             Swal.fire({
               title: Fail_title,
@@ -1027,16 +1028,16 @@ export class AddUserComponent implements OnInit {
           }
 
           if (
-            errorMessages.length > 0 &&
+            errorMessages_teacher_code.length > 0 &&
             errorMessage_code == 'ไม่มีข้อมูลที่สามารถบันทึกได้'
           ) {
-            console.log(errorMessages);
+            console.log(errorMessages_teacher_code);
             console.log('My error teacher_code: ', errorMessage_code);
             // const errorMessage = errorMessages
             // .map((err: { th: string; en: string }) => (err as { [key: string]: string })[currentLang])
             // .join('<br>');
 
-            const duplicatedCodes = errorMessages.join('<br>');
+            const duplicatedCodes = errorMessages_teacher_code.join('<br>');
 
             Swal.fire({
               title: Fail_title,
