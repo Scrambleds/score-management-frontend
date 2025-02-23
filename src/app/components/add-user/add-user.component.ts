@@ -952,7 +952,7 @@ export class AddUserComponent implements OnInit {
   
           // Show valid records that can be saved
           Swal.fire({
-            title: 'มีรายการที่สามารถเลือกบันทึกได้ดังนี้',
+            title: 'คุณต้องการบันทึกข้อมูลผู้ใช้ดังนี้หรือไม่?',
             html: `
               <p>${currentLang === 'th' ? 'รายการต่อไปนี้สามารถบันทึกได้:' : 'The following records can be saved:'}</p>
               <ul>${validResources.map((r: any) => `<li>${r?.email || 'N/A'} (${r?.teacher_code || 'N/A'})</li>`).join('')}</ul>
@@ -961,6 +961,7 @@ export class AddUserComponent implements OnInit {
             `,
             icon: 'question',
             showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
             confirmButtonText: currentLang === 'th' ? 'บันทึก' : 'Save',
             cancelButtonText: currentLang === 'th' ? 'ยกเลิก' : 'Cancel',
           }).then((result) => {
@@ -972,6 +973,7 @@ export class AddUserComponent implements OnInit {
                     title: currentLang === 'th' ? 'สำเร็จ' : 'Success',
                     text: currentLang === 'th' ? 'บันทึกข้อมูลสำเร็จ' : 'Data saved successfully',
                     icon: 'success',
+                    confirmButtonColor: '#0d6efd',
                     confirmButtonText: Submit_Button,
                   }).then(() => {
                     this.CacheService.clearCacheForUrl('/api/EditUser/GetAllUser');
