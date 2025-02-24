@@ -26,7 +26,8 @@ export class UploadScoreComponent {
 
   handleSubmitRequest() {
     // 6. call fn: onSubmit form UploadScoreHeaderComponent
-    this.scoreHeader.onSubmit();
+    // this.scoreHeader.onSubmit();
+    this.scoreHeader.handleSubmitRequest();
   }
 
   // 10. call&send FormData to fn: sendToApi form UploadExcelContainerComponent

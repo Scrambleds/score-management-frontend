@@ -1,7 +1,6 @@
 import {
   Component,
   ElementRef,
-  AfterViewInit,
   Input,
   OnInit,
   Output,
@@ -10,13 +9,11 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UploadScoreService } from '../../services/upload-score/upload-score.service';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import Swal from 'sweetalert2';
 import { SelectBoxService } from '../../services/select-box/select-box.service';
-import { BehaviorSubject } from 'rxjs';
 import { TranslationService } from '../../core/services/translation.service';
+import { UserService } from '../../services/sharedService/userService/userService.service';
 
 @Component({
   selector: 'app-upload-score-header',
@@ -33,16 +30,19 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
   //viewChild
   @ViewChild('subjectCode', { read: ElementRef }) subjectCodeRef?: ElementRef;
   @ViewChild('subjectName', { read: ElementRef }) subjectNameRef?: ElementRef;
+  @ViewChild('formSubject', { static: false, read: ElementRef })
+  formSubjectRef?: ElementRef;
 
   @Output() formSubmitted = new EventEmitter<FormGroup>(); // Emit form data when submitted
 
   public form: FormGroup;
   filteredSubjects: { subjectCode: string; subjectName: string }[] = [];
-  selectedSubjectCode: string = ''; // ตัวแปรที่เก็บค่าที่เลือก
+  subjectCodeValue?: string; // Add this property
 
   isAutocompleteVisible = false;
   isSubjectNameReadonly = false;
   isSubmit: boolean = true;
+  showSuggestions: boolean = false;
 
   isAcademicYearDisabled: boolean = true;
   isSemesterDisabled: boolean = true;
@@ -61,10 +61,18 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private uploadScoreService: UploadScoreService,
     private selectBoxService: SelectBoxService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private userService: UserService
   ) {
     this.form = this.fb.group({
-      subjectCode: ['', Validators.required],
+      subjectCode: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(11), // ความยาวขั้นต่ำเป็น 11 ตัวอักษร (ตัวเลข 8 หลัก + ขีด + ตัวเลข 2 หลัก)
+          Validators.pattern(/^\d{8}-\d{2}$/), // รูปแบบต้องเป็นตัวเลข 8 หลัก แล้วตามด้วยขีดแล้วตัวเลข 2 หลัก
+        ],
+      ],
       subjectName: ['', Validators.required],
       academicYearCode: [{ value: null }, Validators.required],
       semesterCode: [{ value: null }, Validators.required],
@@ -80,54 +88,66 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.form.get('subjectCode')?.disable();
-    this.form.get('subjectName')?.disable();
+    // this.form.get('subjectName')?.disable();
+    this.isSubjectNameReadonly = true;
     this.inputFormToggle(false);
     this.loadSection();
     this.loadSemester();
     this.loadAcademicYear();
     this.loadTeacher();
+    this.subjectCodeValue = this.form.get('subjectCode')?.value;
   }
   ngOnChanges(changes: SimpleChanges) {
     if (changes['isUploaded'] && !changes['isUploaded'].firstChange) {
       console.log('isUploaded changed:', this.isUploaded);
       if (this.isUploaded) {
         this.checkSubjectCode();
+        const subjectCodeValue = this.form.get('subjectCode')?.value?.trim();
+        this.fillDropdown(subjectCodeValue);
+        // Auto select teacher
+        const selectedTeacher = this.teacherList.find(
+          (t) => t.teacherCode === this.userService.teacherCode
+        );
+        if (selectedTeacher) {
+          this.form.get('teacher')?.setValue([selectedTeacher.teacherCode]);
+        }
+        this.form.get('subjectCode')?.enable();
       } else {
         this.form.get('subjectCode')?.disable();
-        this.form.get('subjectName')?.disable();
+        // this.form.get('subjectName')?.disable();
+        this.isSubjectNameReadonly = true;
         this.inputFormToggle(false);
-        this.clearForm();
+        // this.clearForm();
       }
     }
   }
+
+  // Update form control manually when the value changes
+  onSubjectCodeChange(newValue: string) {
+    this.form.get('subjectCode')?.setValue(newValue);
+  }
+
   checkSubjectCode() {
-    // ตรวจสอบว่ามี ViewChild หรือไม่
-    if (!this.subjectCodeRef) {
-      console.error('subjectCodeRef is not defined.');
-      return;
-    }
-    // เข้าถึง input element
-    const inputElement =
-      this.subjectCodeRef.nativeElement.querySelector('input');
-    if (!inputElement) {
-      console.error('Input element not found inside subjectCodeRef.');
-      return;
-    }
-    console.log('ngAfterViewInit: Input Element:', inputElement);
-    // เพิ่ม Event Listener เพื่อฟังการเปลี่ยนแปลงค่า
-    inputElement.addEventListener('input', (event: Event) => {
-      const value = (event.target as HTMLInputElement).value.trim();
-      console.log('Input Value:', value);
-      // อัปเดตสถานะของตัวแปรที่ใช้ควบคุม ng-select
-      const isNotEmpty = value.length > 0;
-      console.log('Is Input Not Empty:', isNotEmpty);
-      // ปรับปรุงการเปิด/ปิด ng-select จาก form control
+    const checkInputValue = (isNotEmpty: boolean) => {
+      console.log('checkInputValue : ', isNotEmpty);
       if (isNotEmpty) {
         this.inputFormToggle(true);
       } else {
-        this.form.get('subjectName')?.disable();
+        // this.form.get('subjectName')?.disable();
+        this.isSubjectNameReadonly = true;
         this.inputFormToggle(false);
       }
+    };
+
+    //check value not empty then enable input
+    const isNotEmpty = this.form.get('subjectCode')?.value?.trim().length > 0;
+    checkInputValue(isNotEmpty);
+
+    //check event value change not empty then enable input
+    this.form.get('subjectCode')?.valueChanges.subscribe((value) => {
+      const isNotEmpty = value?.trim().length > 0;
+      console.log('Is Input Not Empty:', isNotEmpty);
+      checkInputValue(isNotEmpty);
     });
   }
 
@@ -160,119 +180,66 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
     });
   }
 
-  searchCode(term: string) {
+  searchCode() {
     console.log('search code');
-    this.uploadScoreService.searchSubjects(term).subscribe((results) => {
-      console.log(results);
-      this.filteredSubjects = results;
-
-      if (this.filteredSubjects.length === 1) {
-        console.log('filteredSubjects = 1');
-        // มีข้อมูลในผลลัพธ์เพียงหนึ่งรายการ
-        const subjectCode = this.filteredSubjects[0].subjectCode;
-        const subjectName = this.filteredSubjects[0].subjectName;
-        if (subjectCode.toUpperCase() === term.toUpperCase()) {
-          // เงื่อนไขที่ต้องการตรวจสอบ
-          this.form.get('subjectCode')!.setValue(term, { emitEvent: false });
-          this.form.get('subjectName')!.setValue(subjectName, {
-            emitEvent: false,
-          });
-          this.isSubjectNameReadonly = true;
-        } else {
-          // ถ้า subjectCode ไม่ตรงกับที่ต้องการ
-          this.isSubjectNameReadonly = false;
-          this.form.get('subjectCode')!.setValue(term, { emitEvent: false });
-          this.form.get('subjectName')!.reset();
-          this.form.get('subjectName')?.disable();
-        }
-      } else if (this.filteredSubjects.length === 0) {
-        console.log('filteredSubjects = 0');
-        this.form.get('subjectCode')!.setValue(term, { emitEvent: false });
-        this.form.get('subjectName')!.reset();
-        this.form.get('subjectName')?.enable();
-        this.isSubjectNameReadonly = false;
-      } else {
-        console.log('filteredSubjects = else');
-        // มีข้อมูลมากกว่าหนึ่งรายการ
-        this.isSubjectNameReadonly = false;
-        this.form.get('subjectName')!.reset();
-      }
-    });
-  }
-
-  searchSubject(term: string) {
-    console.log('search subject');
-    this.uploadScoreService.searchSubjects(term).subscribe((results) => {
-      console.log(results);
-      this.filteredSubjects = results;
-
-      if (this.filteredSubjects.length === 1) {
-        console.log('filteredSubjects = 1');
-        // มีข้อมูลในผลลัพธ์เพียงหนึ่งรายการ
-        const subjectCode = this.filteredSubjects[0].subjectCode;
-        const subjectName = this.filteredSubjects[0].subjectName;
-        if (subjectCode.toUpperCase() === term.toUpperCase()) {
-          // เงื่อนไขที่ต้องการตรวจสอบ
-          this.form.get('subjectName')!.setValue(subjectName, {
-            emitEvent: false,
-          });
-          this.isSubjectNameReadonly = true;
-        } else {
-          // ถ้า subjectCode ไม่ตรงกับที่ต้องการ
-          this.isSubjectNameReadonly = false;
-          this.form.get('subjectName')!.setValue(term, {
-            emitEvent: false,
-          });
-        }
-      } else if (this.filteredSubjects.length === 0) {
-        console.log('filteredSubjects = 0');
-        this.form.get('subjectName')!.setValue(term, { emitEvent: false });
-      } else {
-        console.log('filteredSubjects = else');
-        // มีข้อมูลมากกว่าหนึ่งรายการ
-        this.isSubjectNameReadonly = false;
-        this.form.get('subjectName')!.reset();
-      }
-    });
-  }
-
-  selectSubject(item: any) {
-    if (item && item.subjectName) {
-      console.log('================selectName=======================');
-      console.log(item);
-      this.form
-        .get('subjectName')!
-        .setValue(item.subjectName, { emitEvent: false });
-      // this.filteredSubjects = [];
-    }
-  }
-
-  selectCode(item: any) {
-    if (item && item.subjectCode) {
-      console.log('================selectCode=======================');
-      console.log(item);
-      this.form
-        .get('subjectName')!
-        .setValue(item.subjectName, { emitEvent: false });
-      this.form
-        .get('subjectCode')!
-        .setValue(item.subjectCode, { emitEvent: false });
-      this.inputFormToggle(true);
-      this.selectedSubjectCode = item.subjectCode;
+    //check subjectCode not Empty
+    const subjectCodeValue = this.form.get('subjectCode')?.value;
+    const isNotEmpty = subjectCodeValue?.trim().length > 0;
+    console.log('isNotEmpty : ', isNotEmpty);
+    if (!isNotEmpty) {
+      // this.form.get('subjectName')!.reset();
+      // this.form.get('subjectName')?.disable();
       this.isSubjectNameReadonly = true;
-      // this.filteredSubjects = [];
+      return;
     }
+    this.fillDropdown(subjectCodeValue);
+  }
+
+  fillDropdown(term: string) {
+    this.uploadScoreService.searchSubjects(term).subscribe((results) => {
+      console.log(results);
+      //check subjectCode is valid and auto select to subjectName
+      this.filteredSubjects = results;
+      console.log('fillDropdown', this.filteredSubjects);
+      if (this.filteredSubjects.length === 1) {
+        console.log('filteredSubjects = 1');
+        // มีข้อมูลในผลลัพธ์เพียงหนึ่งรายการ
+        const subjectCode = this.filteredSubjects[0].subjectCode;
+        const subjectName = this.filteredSubjects[0].subjectName;
+        if (subjectCode.toUpperCase() === term.toUpperCase()) {
+          // เงื่อนไขที่ต้องการตรวจสอบ
+          this.form.get('subjectCode')!.setValue(term);
+          this.form.get('subjectName')!.setValue(subjectName);
+          // this.isSubjectNameReadonly = true;
+          // this.form.get('subjectName')?.disable();
+          this.isSubjectNameReadonly = true;
+        } else {
+          // ถ้า subjectCode ไม่ตรงกับที่ต้องการ
+          this.form.get('subjectCode')!.setValue(term);
+          // this.form.get('subjectName')!.reset();
+          // this.form.get('subjectName')?.disable();
+          // this.form.get('subjectName')?.enable();
+          this.isSubjectNameReadonly = false;
+        }
+      } else if (this.filteredSubjects.length === 0) {
+        console.log('filteredSubjects = 0');
+        this.form.get('subjectCode')!.setValue(term);
+        // this.form.get('subjectName')!.reset();
+        // this.form.get('subjectName')?.enable();
+        this.isSubjectNameReadonly = false;
+      } else {
+        console.log('filteredSubjects = else');
+        this.isSubjectNameReadonly = false;
+        // มีข้อมูลมากกว่าหนึ่งรายการ
+        // this.form.get('subjectName')!.reset();
+      }
+    });
   }
 
   onSelectChange(selectedValue: any, controlName: string): void {
     if (selectedValue && selectedValue.value === null) {
       this.form.get(controlName)?.reset();
     }
-  }
-
-  // ฟังก์ชันที่รับข้อมูลจาก select emitter
-  onSubjectSelected(selectedItem: any): void {
-    this.selectedSubjectCode = selectedItem.subjectCode;
   }
 
   //autocomplete
@@ -288,7 +255,8 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
   }
 
   // 8. validate and send formdata to parent
-  onSubmit() {
+  onSubmit(event: Event) {
+    event.preventDefault(); // ป้องกันการรีเฟรชหน้า
     this.isSubmit = true;
     this.form.markAllAsTouched();
     this.form.updateValueAndValidity();
@@ -325,19 +293,11 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
 
   inputFormToggle(isClear: boolean) {
     if (!isClear) {
-      // this.form.get('academicYearCode')?.setValue();
-      // this.form.get('semesterCode')?.setValue();
-      // this.form.get('sectionCode')?.setValue();
-      // this.form.get('teacher')?.setValue();
-      // this.form.get('subjectCode')?.disable();
-      // this.form.get('subjectName')?.disable();
       this.form.get('academicYearCode')?.disable();
       this.form.get('semesterCode')?.disable();
       this.form.get('sectionCode')?.disable();
       this.form.get('teacher')?.disable();
     } else {
-      // this.form.get('subjectCode')?.enable();
-      // this.form.get('subjectName')?.enable();
       this.form.get('academicYearCode')?.enable();
       this.form.get('semesterCode')?.enable();
       this.form.get('sectionCode')?.enable();
@@ -356,5 +316,37 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
       sectionCode: null,
       teacher: null,
     });
+  }
+
+  handleSubmitRequest() {
+    if (this.form.valid) {
+      this.onSubmit(new Event('submit')); // เรียกใช้ onSubmit โดยตรง
+    }
+  }
+
+  // ค้นหาข้อมูลเมื่อมีการพิมพ์
+  selectCode(subject: any) {
+    this.form.get('subjectCode')?.setValue(subject.subjectCode);
+    this.form.get('subjectName')?.setValue(subject.subjectName);
+    this.isSubjectNameReadonly = true;
+    this.showSuggestions = false;
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      this.showSuggestions = false;
+    }
+  }
+
+  hideSuggestions() {
+    setTimeout(() => {
+      this.showSuggestions = false;
+    }, 200); // ใช้ setTimeout เพื่อให้มีเวลาคลิกเลือก
+  }
+
+  onFocus() {
+    if (this.filteredSubjects.length > 0) {
+      this.showSuggestions = true; // แสดง dropdown เมื่อมีข้อมูล
+    }
   }
 }

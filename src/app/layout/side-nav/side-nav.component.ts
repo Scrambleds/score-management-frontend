@@ -24,20 +24,20 @@ export class SideNavComponent {
 
   currentLang!: string; // สำหรับเก็บค่าภาษาปัจจุบัน
 
-  constructor(private translationService: TranslationService, private AuthGuard: AuthGuard,
-              private UserService: UserService
+  constructor(
+    private translationService: TranslationService,
+    private AuthGuard: AuthGuard,
+    private UserService: UserService
   ) {}
 
   ngOnInit(): void {
+    // this.waitForUserInfo().then(() => {
+    // console.log(localStorage.getItem('userInfo')); // userInfo พร้อมใช้งานแล้ว
 
-        this.waitForUserInfo().then(() => {
-          console.log(localStorage.getItem('userInfo')); // userInfo พร้อมใช้งานแล้ว
-    
-          this.userRole = this.UserService.role;
-          console.log(this.userRole)
-          console.log("MY USER ROLE!!: ", this.userRole);
-          this.checkPermissions(this.userRole)
-            });
+    this.userRole = this.UserService.role;
+    console.log('MY USER ROLE!!: ', this.userRole);
+    this.checkPermissions(this.userRole);
+    // });
     // เริ่มต้นให้ตรวจสอบภาษาปัจจุบัน
     this.translationService.getTranslations().subscribe((translations) => {
       this.currentLang = this.translationService.getCurrentLanguage(); // ดึงค่าภาษาปัจจุบันจากบริการ
@@ -62,7 +62,7 @@ export class SideNavComponent {
     // console.log("MY USER ROLE!!: ", userRole);
     // กำหนดการแสดงเมนูตาม role ของผู้ใช้
     if (userRole === 1) {
-      console.log("Admin role");
+      console.log('Admin role');
       this.showMasterData = true;
       this.showUserManagement = true;
       this.showUploadScore = true;
@@ -70,7 +70,7 @@ export class SideNavComponent {
       this.showSearchScore = true;
       this.showDashboard = true;
     } else if (userRole === 2) {
-      console.log("Teacher role");
+      console.log('Teacher role');
       this.showUploadScore = true;
       this.showScoreAnnouncement = true;
       this.showSearchScore = true;

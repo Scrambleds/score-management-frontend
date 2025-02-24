@@ -24,7 +24,7 @@ import { UserService } from '../../services/sharedService/userService/userServic
   selector: 'app-search-dashboard',
   standalone: false,
   templateUrl: './search-dashboard.component.html',
-  styleUrls: ['./search-dashboard.component.css']
+  styleUrls: ['./search-dashboard.component.css'],
 })
 export class SearchDashboardComponent implements OnInit {
   @ViewChild(BellCurveComponent) bellcurve?: BellCurveComponent;
@@ -43,67 +43,83 @@ export class SearchDashboardComponent implements OnInit {
   teacherCode: any;
   Role: any;
 
-  constructor(private fb: FormBuilder, private selectBoxService: SelectBoxService, private UploadScoreService: UploadScoreService,
-              private DashboardService: DashboardService, private cdr: ChangeDetectorRef, private searchTranslateService: TranslationService,
-              private ExcelExportService: ExcelExportService, private UserService: UserService) {}
+  constructor(
+    private fb: FormBuilder,
+    private selectBoxService: SelectBoxService,
+    private UploadScoreService: UploadScoreService,
+    private DashboardService: DashboardService,
+    private cdr: ChangeDetectorRef,
+    private searchTranslateService: TranslationService,
+    private ExcelExportService: ExcelExportService,
+    private UserService: UserService
+  ) {}
 
-loadMajor() {
-  const role = this.UserService.role;
-  const teacher_code = this.UserService.teacherCode;
+  loadMajor() {
+    const role = this.UserService.role;
+    const teacher_code = this.UserService.teacherCode;
 
-  if (Number(role) == 2) {
-    console.log("roledashboard", role);
-    console.log("MyteacherCode", teacher_code);
-    this.selectBoxService.getSubjectDashboard(teacher_code).subscribe((resp) => {
-      if (resp && Array.isArray(resp)) {
-        this.SubjectList = resp;
-      } else {
-        console.error('Invalid data format for SubjectList:', resp);
-      }
-    });
-  } else {
-    const teacher_code = '';
-    console.log("MyteacherCode", teacher_code);
-    this.selectBoxService.getSubjectDashboard(teacher_code).subscribe((resp) => {
-      if (resp && Array.isArray(resp)) {
-        this.SubjectList = resp;
-      } else {
-        console.error('Invalid data format for SubjectList:', resp);
-      }
-    });
+    if (role === 2) {
+      console.log('roledashboard', role);
+      console.log('MyteacherCode', teacher_code);
+      this.selectBoxService
+        .getSubjectDashboard(teacher_code)
+        .subscribe((resp) => {
+          if (resp && Array.isArray(resp)) {
+            this.SubjectList = resp;
+          } else {
+            console.error('Invalid data format for SubjectList:', resp);
+          }
+        });
+    } else {
+      const teacher_code = '';
+      console.log('MyteacherCode', teacher_code);
+      this.selectBoxService
+        .getSubjectDashboard(teacher_code)
+        .subscribe((resp) => {
+          if (resp && Array.isArray(resp)) {
+            this.SubjectList = resp;
+          } else {
+            console.error('Invalid data format for SubjectList:', resp);
+          }
+        });
+    }
   }
-}
 
-customSearchFn(term: string, item: any): boolean {
-  term = term.toLowerCase();
-  return (
-    item.subjectCode.toLowerCase().includes(term) ||
-    item.subjectName.toLowerCase().includes(term)
-  );
-}
+  customSearchFn(term: string, item: any): boolean {
+    term = term.toLowerCase();
+    return (
+      item.subjectCode.toLowerCase().includes(term) ||
+      item.subjectName.toLowerCase().includes(term)
+    );
+  }
 
-customSearchFn_SearchLan(term: string, item: any): boolean {
-  return this.searchTranslateService.searchFn(term, item);
-}
+  customSearchFn_SearchLan(term: string, item: any): boolean {
+    return this.searchTranslateService.searchFn(term, item);
+  }
 
   ngOnInit() {
-    const role = this.UserService.role
-    const teacher_code = this.UserService.teacherCode
-    console.log(role)
-    console.log("MyteacherCode", teacher_code)
+    const role = this.UserService.role;
+    const teacher_code = this.UserService.teacherCode;
+    console.log(role);
+    console.log('MyteacherCode', teacher_code);
     this.form = this.fb.group({
-      subject_id: [null , Validators.required],
-      academic_year: [null  , Validators.required],
-      semester: [null , Validators.required],
-      section: [null , Validators.required],
+      subject_id: [null, Validators.required],
+      academic_year: [null, Validators.required],
+      semester: [null, Validators.required],
+      section: [null, Validators.required],
       score_type: [null, Validators.required],
     });
 
-    this.resetAndDisableFields(['academic_year', 'semester', 'section', 'score_type']);
+    this.resetAndDisableFields([
+      'academic_year',
+      'semester',
+      'section',
+      'score_type',
+    ]);
     this.dashboardData = this.resetScores(this.dashboardData);
     this.dashboardDataUpdated.emit(this.dashboardData);
     this.cardRequested.emit(null);
-  
+
     this.loadMajor();
     this.LoadScoreType();
     this.loadSection();
@@ -117,15 +133,25 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
     this.form.get('subject_id')?.valueChanges.subscribe((value) => {
       if (!value) {
         // Reset the form fields and disable them
-        this.resetAndDisableFields(['academic_year', 'semester', 'section', 'score_type']);
-        
+        this.resetAndDisableFields([
+          'academic_year',
+          'semester',
+          'section',
+          'score_type',
+        ]);
+
         // Reset dashboardData
         this.dashboardData = this.resetScores(this.dashboardData);
         this.dashboardDataUpdated.emit(this.dashboardData);
         this.cardRequested.emit(null);
       } else {
         // Enable the fields
-        this.enableFields(['academic_year', 'semester', 'section', 'score_type']);
+        this.enableFields([
+          'academic_year',
+          'semester',
+          'section',
+          'score_type',
+        ]);
       }
     });
 
@@ -142,7 +168,7 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
 
   resetScores(data: any): any {
     if (!data) return null; // ตรวจสอบหากไม่มีข้อมูล
-    
+
     return Object.keys(data).reduce((acc, key) => {
       if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
         acc[key] = this.resetScores(data[key]);
@@ -154,7 +180,7 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
       return acc;
     }, {} as any);
   }
-  
+
   resetAndDisableFields(fields: string[]) {
     fields.forEach((field) => {
       const control = this.form.get(field);
@@ -164,34 +190,49 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
       }
     });
   }
-  
+
   areRequiredFieldsValid(): boolean {
-    const { subject_id, academic_year, semester, section, score_type } = this.form.value;
-    return subject_id !== null && academic_year !== null && semester !== null && section !== null && score_type !== null;
+    const { subject_id, academic_year, semester, section, score_type } =
+      this.form.value;
+    return (
+      subject_id !== null &&
+      academic_year !== null &&
+      semester !== null &&
+      section !== null &&
+      score_type !== null
+    );
   }
 
   disableFields(fields: string[]) {
     fields.forEach((field) => this.form.get(field)?.disable());
   }
-  
+
   // Enable ฟิลด์
   enableFields(fields: string[]) {
     fields.forEach((field) => this.form.get(field)?.enable());
   }
-  
+
   // อัปเดตสถานะปุ่ม Export
   updateExportButtonState() {
     // ตรวจสอบแค่ฟิลด์ที่จำเป็น (ไม่รวม `score_type`)
-    const { subject_id, academic_year, semester, section, score_type } = this.form.value;
-    const allRequiredFieldsValid = subject_id !== null && academic_year !== null && semester !== null && section !== null && score_type !== null;
-    
-    const exportButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
-    
+    const { subject_id, academic_year, semester, section, score_type } =
+      this.form.value;
+    const allRequiredFieldsValid =
+      subject_id !== null &&
+      academic_year !== null &&
+      semester !== null &&
+      section !== null &&
+      score_type !== null;
+
+    const exportButton = document.querySelector(
+      'button[type="submit"]'
+    ) as HTMLButtonElement;
+
     if (exportButton) {
       exportButton.disabled = !allRequiredFieldsValid;
     }
   }
-  
+
   ngAfterViewInit() {
     if (this.bellcurve) {
       console.log('BellCurveComponent is available');
@@ -201,32 +242,34 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
   exportExcel() {
     const requestData = this.form.value;
     console.log('Exporting with data:', requestData);
-  
-    this.ExcelExportService.getBase64Excel(requestData).subscribe(response => {
-      console.log('Response from API:', response);
-      if (response && response.file) {
 
-        // ดึงวันที่และเวลาปัจจุบันในรูปแบบ "ปี-เดือน-วัน-ชั่วโมง-นาที"
-        const now = new Date();
+    this.ExcelExportService.getBase64Excel(requestData).subscribe(
+      (response) => {
+        console.log('Response from API:', response);
+        if (response && response.file) {
+          // ดึงวันที่และเวลาปัจจุบันในรูปแบบ "ปี-เดือน-วัน-ชั่วโมง-นาที"
+          const now = new Date();
 
-        // const formattedDateTime = format(now, "yyyy-MM-dd_HH-mm");
+          // const formattedDateTime = format(now, "yyyy-MM-dd_HH-mm");
 
-        const formattedDate = format(now, "yyyy-MM-dd");
-        
-        const formattedTime = format(now, "HH-mm");
+          const formattedDate = format(now, 'yyyy-MM-dd');
 
-        console.log("My formatTIME!!!: ",formattedTime);
-        // const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDateTime}`;
+          const formattedTime = format(now, 'HH-mm');
 
-        const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDate}_${formattedTime}`;
-  
-        this.downloadExcel(response.file, fileName);
-      } else {
-        console.error('No base64 data received');
+          console.log('My formatTIME!!!: ', formattedTime);
+          // const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDateTime}`;
+
+          const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDate}_${formattedTime}`;
+
+          this.downloadExcel(response.file, fileName);
+        } else {
+          console.error('No base64 data received');
+        }
+      },
+      (error) => {
+        console.error('Error exporting Excel:', error);
       }
-    }, error => {
-      console.error('Error exporting Excel:', error);
-    });    
+    );
   }
 
   downloadExcel(base64Data: string, fileName: string) {
@@ -236,7 +279,9 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const blob = new Blob([byteArray], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -246,7 +291,7 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
     document.body.removeChild(link);
   }
 
-  loadDashboardStats = (): void => { 
+  loadDashboardStats = (): void => {
     // const requestData = this.form.value;
 
     this.DashboardService.getDashboardStats({}).subscribe((response) => {
@@ -257,7 +302,7 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
     });
   };
 
-  LoadSubjectDashboard(): void{
+  LoadSubjectDashboard(): void {
     this.selectBoxService.getSubjectDashboard().subscribe((resp) => {
       this.sectionList = resp;
     });
@@ -292,7 +337,7 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
     this.cardValue = this.form.getRawValue();
     this.SubmitData = this.form.getRawValue();
     console.log('Form Data:', this.SubmitData);
-  
+
     // ตรวจสอบฟิลด์ที่จำเป็นก่อนยิง API
     if (
       !this.form.get('subject_id')?.value ||
@@ -304,22 +349,26 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
       console.log('Cannot submit form, required fields are missing');
       return;
     }
-  
+
     if (!this.form.get('subject_id')?.value) {
       console.log('subject_id is empty. Resetting dashboard data.');
       this.dashboardData = this.resetScores(this.dashboardData);
       this.dashboardDataUpdated.emit(this.dashboardData);
       this.cardRequested.emit(this.SubmitData.score_type);
-      console.log("Emitting SubmitData:", this.SubmitData.score_type);
+      console.log('Emitting SubmitData:', this.SubmitData.score_type);
       return;
-    }    
-  
-    if (Object.values(this.SubmitData).every(value => value === null || value === '')) {
+    }
+
+    if (
+      Object.values(this.SubmitData).every(
+        (value) => value === null || value === ''
+      )
+    ) {
       console.log('Form is empty, setting dashboard data to 0.');
-  
+
       function resetScores(data: any) {
         return Object.keys(data).reduce((acc, key) => {
-          if (typeof data[key] === "object" && !Array.isArray(data[key])) {
+          if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
             acc[key] = resetScores(data[key]);
           } else if (Array.isArray(data[key])) {
             acc[key] = [];
@@ -329,27 +378,29 @@ customSearchFn_SearchLan(term: string, item: any): boolean {
           return acc;
         }, {} as any);
       }
-  
+
       this.dashboardData = resetScores(this.dashboardData);
       this.dashboardDataUpdated.emit(this.dashboardData);
       this.cardRequested.emit(this.SubmitData.SubmitData);
-      console.log("Emitting SubmitData:", this.SubmitData.score_type);
-  
+      console.log('Emitting SubmitData:', this.SubmitData.score_type);
+
       return;
     }
-  
-    this.DashboardService.getDashboardStats(this.SubmitData).subscribe((response) => {
-      if (response.isSuccess) {
-        this.dashboardData = response.objectResponse;
-        this.dashboardDataUpdated.emit(this.dashboardData);
-        this.cardRequested.emit(this.SubmitData.score_type);
-        console.log("Emitting SubmitData:", this.SubmitData.score_type);
-      } else {
-        this.dashboardData = null;
-        this.dashboardDataUpdated.emit(this.dashboardData);
-        this.cardRequested.emit(this.SubmitData.score_type);
-        console.log("Emitting SubmitData:", this.SubmitData.score_type);
+
+    this.DashboardService.getDashboardStats(this.SubmitData).subscribe(
+      (response) => {
+        if (response.isSuccess) {
+          this.dashboardData = response.objectResponse;
+          this.dashboardDataUpdated.emit(this.dashboardData);
+          this.cardRequested.emit(this.SubmitData.score_type);
+          console.log('Emitting SubmitData:', this.SubmitData.score_type);
+        } else {
+          this.dashboardData = null;
+          this.dashboardDataUpdated.emit(this.dashboardData);
+          this.cardRequested.emit(this.SubmitData.score_type);
+          console.log('Emitting SubmitData:', this.SubmitData.score_type);
+        }
       }
-    });  
+    );
   }
 }

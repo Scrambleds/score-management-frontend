@@ -53,11 +53,16 @@ export class LoginPageComponent {
     // const tokenExpiration = localStorage.getItem('tokenExpiration');
     // const redirectUrl =
     //   this.activatedRoute.snapshot.queryParams['redirectUrl'] || '/Dashboard'; // Use activatedRoute
-
-    // if (token && tokenExpiration && new Date() < new Date(tokenExpiration)) {
-    //   const redirectPath = localStorage.getItem('redirectPath') || '/Dashboard';
-    //   this.router.navigate([redirectPath]); // Redirect to a specific path if token is valid
-    // }
+    let redirectUrl = '';
+    if (token && tokenExpiration && new Date() < new Date(tokenExpiration)) {
+      // const redirectPath = localStorage.getItem('redirectPath') || '/Dashboard';
+      if (this.UserService.role !== null && this.UserService.role === 1) {
+        redirectUrl = '/UserManagement';
+      } else {
+        redirectUrl = '/UploadScore';
+      }
+      this.router.navigate([redirectUrl]); // Redirect to a specific path if token is valid
+    }
   }
 
   // usernameInput: string = ''; // เก็บค่าที่ผู้ใช้พิมพ์
@@ -92,14 +97,11 @@ export class LoginPageComponent {
 
         let redirectUrl = '';
         console.log('Role:', this.UserService.role);
-        if (this.UserService.role == '1') {
-          redirectUrl =
-            this.activatedRoute.snapshot.queryParams['redirectUrl'] ||
-            '/UserManagement';
+
+        if (this.UserService.role !== null && this.UserService.role === 1) {
+          redirectUrl = '/UserManagement';
         } else {
-          redirectUrl =
-            this.activatedRoute.snapshot.queryParams['redirectUrl'] ||
-            '/UploadScore';
+          redirectUrl = '/UploadScore';
         }
 
         await this.router.navigate([redirectUrl]);

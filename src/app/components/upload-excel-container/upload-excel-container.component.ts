@@ -55,12 +55,12 @@ export class UploadExcelContainerComponent implements OnInit {
   };
 
   requiredFields = [
-    'ลำดับ',
+    'ลำดับที่',
     'รหัสนิสิต',
-    'คำนำหน้า',
+    // 'คำนำหน้า',
     'ชื่อ-นามสกุล',
     'รหัสสาขา',
-    'อีเมล',
+    'Email Google',
     // 'คะแนนระหว่างเรียน',
     // 'คะแนนกลางภาค',
     // 'คะแนนปลายภาค',
@@ -252,8 +252,10 @@ export class UploadExcelContainerComponent implements OnInit {
       if (this.validateData(jsonData)) {
         // เปลี่ยน jsonData จากอาร์เรย์ 2 มิติให้เป็นอาร์เรย์ของอ็อบเจ็กต์
         const mappedData = this.mapJsonData(jsonData);
+        console.log('mappedData', mappedData);
         // ถ้าไม่มีข้อผิดพลาด ทำการประมวลผลข้อมูล
         const modifiedData = this.processData(mappedData);
+        console.log('modifiedData', modifiedData);
         this.loadGridData(modifiedData); // โหลดข้อมูลลงใน ag-Grid
         this.isFileUploaded = true; // ตั้งค่า flag เมื่อไฟล์อัปโหลดแล้ว
         this.isUploaded.emit(true); // แจ้ง Parent ว่าไฟล์ถูกอัปโหลดสำเร็จ
@@ -278,12 +280,12 @@ export class UploadExcelContainerComponent implements OnInit {
 
       // คืนค่าข้อมูลในรูปแบบที่ต้องการ
       return {
-        ลำดับ: rowData['ลำดับ'] || '',
+        ลำดับ: rowData['ลำดับที่'] || '',
         รหัสนิสิต: rowData['รหัสนิสิต'] || '',
-        คำนำหน้า: rowData['คำนำหน้า'] || '',
+        // คำนำหน้า: rowData['คำนำหน้า'] || '',
         'ชื่อ-นามสกุล': rowData['ชื่อ-นามสกุล'] || '',
         รหัสสาขา: rowData['รหัสสาขา'] || '',
-        อีเมล: rowData['อีเมล'] || '',
+        อีเมล: rowData['Email Google'] || '',
         คะแนนระหว่างเรียน: this.parseScore(rowData['คะแนนระหว่างเรียน']),
         คะแนนกลางภาค: this.parseScore(rowData['คะแนนกลางภาค']),
         คะแนนปลายภาค: this.parseScore(rowData['คะแนนปลายภาค']),
@@ -323,7 +325,6 @@ export class UploadExcelContainerComponent implements OnInit {
 
     // ตรวจสอบ headers ว่ามีฟีลด์ที่ต้องการครบหรือไม่
     const missingFields = this.requiredFields.filter(
-      // (field) => !headers.includes(field)
       (field) => !headers.includes(field)
     );
 
@@ -362,18 +363,6 @@ export class UploadExcelContainerComponent implements OnInit {
             errorMessages.push(`${missingValueText}`); //`ฟีลด์ "${field}" ในแถวที่ ${rowIndex + 1} เป็นค่าว่าง`
           }
         });
-        // // เติมค่า 0 ในฟิลด์ optionalFields ที่ไม่มีข้อมูล
-        // this.optionalFields.forEach((field) => {
-        //   const fieldIndex = headers.indexOf(field);
-        //   if (
-        //     fieldIndex >= 0 &&
-        //     (row[fieldIndex] == null ||
-        //       row[fieldIndex] == undefined ||
-        //       row[fieldIndex] === '')
-        //   ) {
-        //     row[fieldIndex] = null; // เติมค่า 0 ให้ฟิลด์ที่ไม่มีข้อมูล
-        //   }
-        // });
       }
     }
 
@@ -381,7 +370,6 @@ export class UploadExcelContainerComponent implements OnInit {
     if (errorMessages.length > 0) {
       Swal.fire({
         title: fail_title,
-        // text: errorMessages.join('\n'), // แสดงข้อความ error ทั้งหมดใน swal
         html: errorMessages.join('<br>'), // ใช้ <br> แทน \n เพื่อแสดงผลในบรรทัดใหม่
         icon: 'error',
         confirmButtonColor: 'var(--secondary-color)',
@@ -395,7 +383,41 @@ export class UploadExcelContainerComponent implements OnInit {
 
   processData(data: any[]): any[] {
     return data.map((row) => {
-      const [firstName, lastName] = (row['ชื่อ-นามสกุล'] || '').split(' '); // แยกชื่อและนามสกุล
+      // example row['ชื่อ-นามสกุล'] is นายสมชาย ใจดี
+      const fullName = (row['ชื่อ-นามสกุล'] || '').trim();
+      const prefixes = ['นาย', 'นาง', 'นางสาว', 'Mr.', 'Mrs.', 'Miss']; // คำนำหน้าที่อนุญาติให้ใช้
+
+      let prefix = '';
+      let namePart = fullName;
+
+      for (const pre of prefixes) {
+        if (fullName.startsWith(pre)) {
+          prefix = pre;
+          namePart = fullName.substring(pre.length).trim();
+          break;
+        }
+      }
+
+      const nameParts = namePart.split(/\s+/);
+      let firstName = '';
+      let lastName = '';
+      if (nameParts.length > 1) {
+        if (nameParts.length === 2) {
+          // กรณีมีแค่่ชื่อจริง และ นามสกุล
+          firstName = nameParts[0];
+          lastName = nameParts[1];
+        } else {
+          //กรณีมีชื่อจริง ชื่อกลาง และ นามสกุล
+          //Miss May Thet TIN MOE => prefix:"Miss"	First Name: "May Thet	TIN" Last Name: "MOE"
+          firstName = nameParts.slice(0, -1).join(' '); // รวมชื่อจริง + ชื่อกลาง
+          lastName = nameParts.slice(-1).join(''); // นามสกุล
+        }
+      } else {
+        // กรณีไม่มีนามสกุล
+        firstName = nameParts[0];
+        lastName = '';
+      }
+
       const totalScore =
         (row['คะแนนระหว่างเรียน'] || 0) +
         (row['คะแนนกลางภาค'] || 0) +
@@ -403,13 +425,13 @@ export class UploadExcelContainerComponent implements OnInit {
 
       // จัดเรียงข้อมูลตามลำดับที่กำหนด
       return {
-        ลำดับ: row['ลำดับ'] || '',
-        รหัสนิสิต: row['รหัสนิสิต'] || '',
-        คำนำหน้า: row['คำนำหน้า'] || '',
-        ชื่อ: firstName || '',
-        นามสกุล: lastName || '',
-        รหัสสาขา: row['รหัสสาขา'],
-        อีเมล: row['อีเมล'],
+        ลำดับ: row['ลำดับ'] || null,
+        รหัสนิสิต: row['รหัสนิสิต'] || null,
+        คำนำหน้า: prefix.trim().length > 0 ? prefix : null,
+        ชื่อ: firstName || null,
+        นามสกุล: lastName.trim().length > 0 ? lastName : null,
+        รหัสสาขา: row['รหัสสาขา'] || null,
+        อีเมล: row['อีเมล'] || null,
         คะแนนระหว่างเรียน: row['คะแนนระหว่างเรียน'],
         คะแนนกลางภาค: row['คะแนนกลางภาค'],
         คะแนนปลายภาค: row['คะแนนปลายภาค'],
@@ -439,36 +461,64 @@ export class UploadExcelContainerComponent implements OnInit {
           customWidth = 71;
           flexValue = 0.8;
           fieldNameKey = 'uploadscore_tableFieldSeatNo';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.TextNullCellRenderer(value);
+          };
           break;
         case 'รหัสนิสิต':
           customWidth = 113;
           flexValue = 1.5;
           fieldNameKey = 'uploadscore_tableFieldStudentId';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.TextNullCellRenderer(value);
+          };
           break;
         case 'คำนำหน้า':
           customWidth = 88;
           flexValue = 1.2;
           fieldNameKey = 'uploadscore_tableFieldPrefix';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.TextNullCellRenderer(value);
+          };
           break;
         case 'ชื่อ':
           customWidth = 161;
           flexValue = 1.8;
           fieldNameKey = 'uploadscore_tableFieldFirstName';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.TextNullCellRenderer(value);
+          };
           break;
         case 'นามสกุล':
           customWidth = 161;
           flexValue = 1.8;
           fieldNameKey = 'uploadscore_tableFieldLastName';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.TextNullCellRenderer(value);
+          };
           break;
         case 'รหัสสาขา':
           customWidth = 90;
           flexValue = 1.2;
           fieldNameKey = 'uploadscore_tableFieldMajor';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.TextNullCellRenderer(value);
+          };
           break;
         case 'อีเมล':
           customWidth = 210;
           flexValue = 2;
           fieldNameKey = 'uploadscore_tableFieldEmail';
+          cellRenderer = (params: any) => {
+            const value = params.value;
+            return this.TextNullCellRenderer(value);
+          };
           break;
         case 'คะแนนระหว่างเรียน':
           customWidth = 125;
@@ -538,6 +588,16 @@ export class UploadExcelContainerComponent implements OnInit {
       return `<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>`;
     }
     return value.toFixed(2);
+  }
+  private TextNullCellRenderer(value: any): string {
+    if (
+      value === null ||
+      value === undefined ||
+      value.toString().trim() === ''
+    ) {
+      return `<span style="color: red; font-weight: bold; background-color: #ffcccc; padding: 2px 5px; border-radius: 3px;">NULL</span>`;
+    }
+    return value;
   }
 
   // ฟังก์ชันสำหรับโหลดข้อมูลใน grid
@@ -773,7 +833,12 @@ export class UploadExcelContainerComponent implements OnInit {
           );
           Swal.fire({
             title: failTitle,
-            text: failText || response.message.messageDescription,
+            // text: failText || response.message.messageDescription,
+            html: (failText || response.message.messageDescription).replace(
+              /\n/g,
+              '<br>'
+            ),
+
             icon: 'error',
             confirmButtonColor: 'var(--secondary-color)',
             confirmButtonText: closeBtnText,

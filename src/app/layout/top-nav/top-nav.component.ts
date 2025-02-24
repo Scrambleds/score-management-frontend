@@ -85,28 +85,31 @@ export class TopNavComponent implements OnInit {
     this.notifyTemplate.getTemplates().subscribe();
 
     //notify
-    this.waitForUserInfo().then(() => {
-      this.notifyTemplate
-        .getNotifications(this.UserService.username)
-        .subscribe((data) => {
-          if (data && data.length > 0) {
-            this.notifications = data.map((item) => {
-              const notificationList = document.getElementById('notify-list');
-              if (notificationList) {
-                notificationList.innerHTML = ''; // ลบรายการเดิม
+    // this.waitForUserInfo().then(() => {
+    this.notifyTemplate
+      .getNotifications(this.UserService.username)
+      .subscribe((data) => {
+        if (data && data.length > 0) {
+          // notifications เก็บ รายการ notifications ทั้งหมด ไว้ใช้ re-render
+          this.notifications = data;
+          console.log('notifications => ', this.notifications);
+          data.map((item) => {
+            const notificationList = document.getElementById('notify-list');
+            if (notificationList) {
+              notificationList.innerHTML = ''; // ลบรายการเดิม
 
-                data.forEach((item) => {
-                  const newItem = this.renderNotification(item); // Render Notification
-                  notificationList.appendChild(newItem); // เพิ่มรายการใน notify-list
-                });
-              }
-            });
-          } else {
-            // หากไม่มีข้อมูลการแจ้งเตือน
-            this.notifications = [];
-          }
-        });
-    });
+              data.forEach((item) => {
+                const newItem = this.renderNotification(item); // Render Notification
+                notificationList.appendChild(newItem); // เพิ่มรายการใน notify-list
+              });
+            }
+          });
+        } else {
+          // หากไม่มีข้อมูลการแจ้งเตือน
+          this.notifications = [];
+        }
+      });
+    // });
     //notify signalR
     this.signalRService.startConnection(); // เริ่มการเชื่อมต่อกับ SignalR Hub
     this.signalRService.onNotification((notification: any) => {
@@ -172,7 +175,10 @@ export class TopNavComponent implements OnInit {
 
   //notify
   private renderNotification(item: any): HTMLElement {
-    const htmlContent = this.notifyTemplate.getTemplateById(item.templateId); // ดึง Template จาก ID
+    // console.log('renderNotificatio => ', item);
+    const htmlContent = this.notifyTemplate.getTemplateById(
+      Number(item.templateId)
+    ); // ดึง Template จาก ID
     const template = Handlebars.compile(htmlContent); // คอมไพล์ Handlebars template
     const parsedData = JSON.parse(item.data); // แปลง JSON data
     const calculatedTime = this.notifyTemplate.calculateTime(item.createDate); // คำนวณเวลาที่ผ่านมา

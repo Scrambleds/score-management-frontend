@@ -18,7 +18,7 @@ export class UserService {
       userInfo.role = role;
       this.userInfoSubject.next(userInfo);
     }
-  }  
+  }
 
   private loadUserInfo(): void {
     const userInfoJson = localStorage.getItem('userInfo');
@@ -36,9 +36,9 @@ export class UserService {
     return userInfo ? userInfo.username : '';
   }
 
-  get role(): string {
+  get role(): number | null {
     const userInfo = this.userInfoSubject.getValue();
-    return userInfo ? userInfo.role : '';
+    return userInfo ? userInfo.role : null;
   }
 
   get teacherCode(): string {

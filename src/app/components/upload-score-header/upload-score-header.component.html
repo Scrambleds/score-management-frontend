@@ -5,7 +5,12 @@
       {{ "uploadscore_header_remark" | translate }}
     </div>
     <!-- parent will submit this form instead -->
-    <form [formGroup]="form" class="w-100">
+    <form
+      #formSubject="ngForm"
+      (ngSubmit)="onSubmit($event)"
+      [formGroup]="form"
+      class="w-100"
+    >
       <div class="row">
         <!-- Subject Code -->
         <div class="col-6 col-sm-5 col-md-4 col-xxl-2">
@@ -15,35 +20,54 @@
             [appRequiredMarker]="form.get('subjectCode')"
             >{{ "subject_code" | translate }}
           </label>
-          <div class="input-group-autocomplete mb-2">
-            <app-autocomplete
-              #subjectCode
+          <!-- <div class="input-group-autocomplete mb-2"> -->
+          <div class="autocomplete-container">
+            <input
+              type="text"
+              class="form-control"
               id="subjectCode"
-              [name]="'subjectCode'"
               formControlName="subjectCode"
               [placeholder]="'placeholder_text' | translate"
-              [suggestions]="filteredSubjects"
-              [displayKey]="'subjectCode'"
-              [displayFormat]="customFormat"
-              [widthAuto]="true"
-              (search)="searchCode($event)"
-              (select)="selectCode($event)"
-              [value]="form.get('subjectCode')?.value"
-              [disabled]="!isUploaded"
-            ></app-autocomplete>
-
-            <ng-template #customFormat let-item>
-              {{ item.subjectCode }} - {{ item.subjectName }}
-            </ng-template>
+              autocomplete="off"
+              (input)="searchCode()"
+              (keydown)="onKeyDown($event)"
+              (focus)="onFocus()"
+              (blur)="hideSuggestions()"
+              maxlength="11"
+            />
+            <!-- (blur)="hideSuggestions()" -->
+            <ul
+              *ngIf="filteredSubjects.length > 0 && showSuggestions"
+              class="autocomplete-list"
+            >
+              <li
+                *ngFor="let item of filteredSubjects"
+                (click)="selectCode(item)"
+              >
+                {{ item.subjectCode }} - {{ item.subjectName }}
+              </li>
+            </ul>
           </div>
+
           <div
             *ngIf="
               form.get('subjectCode')?.touched &&
-              form.get('subjectCode')?.invalid
+              form.get('subjectCode')?.hasError('required')
             "
             class="text-danger ps-2"
           >
             {{ "alert_enterData" | translate }}
+          </div>
+          <div
+            *ngIf="
+              (form.get('subjectCode')?.touched &&
+                form.get('subjectCode')?.hasError('pattern')) ||
+              (form.get('subjectCode')?.touched &&
+                form.get('subjectCode')?.hasError('minlength'))
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterSubjectCodePattern" | translate }}
           </div>
         </div>
 
@@ -62,29 +86,17 @@
             formControlName="subjectName"
             [placeholder]="'placeholder_text' | translate"
             autocomplete="off"
-          />
-          <!-- <app-autocomplete
-            id="subjectName"
-            [name]="'subjectName'"
-            formControlName="subjectName"
-            [placeholder]="'placeholder_text' | translate"
-            [suggestions]="filteredSubjects"
-            [displayKey]="'subjectName'"
-            [displayFormat]="customFormat"
-            (search)="searchSubject($event)"
-            (select)="selectSubject($event)"
             [readonly]="isSubjectNameReadonly"
-            [value]="form.get('subjectName')!.value"
-            [disabled]="!isUploaded"
-          ></app-autocomplete>
-
-          <ng-template #customFormat let-item>
-            {{ item.subjectCode }} - {{ item.subjectName }}
-          </ng-template> -->
-          <!-- (select)="
-          !isSubjectNameReadonly &&
-            selectSubject($event.subjectCode, $event.subjectName)
-        " -->
+          />
+          <div
+            *ngIf="
+              form.get('subjectName')?.touched &&
+              form.get('subjectName')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
         </div>
 
         <!-- Academic Year -->

@@ -113,3 +113,13 @@ input::-webkit-contacts-auto-fill-button {
 .no-border {
   border: 0 !important;
 }
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 38px !important; /* ปรับความสูงของ ng-select ให้สูงเท่า tag input */
+}
+
+input.form-control[readonly] {
+  background-color: var(--bs-secondary-bg);
+  opacity: 1;
+  cursor: default;
+}
