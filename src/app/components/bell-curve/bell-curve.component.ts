@@ -27,11 +27,8 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   jsonArray: any = [25, 15, 20, 15, 20, 10];
   chartLabels: any = 
   [
-    '0-9', 
-    '10-19', 
-    '20-29', 
-    '30-39', 
-    '40+',
+    'คะแนนมากกว่าค่าเฉลี่่ย', 
+    'คะแนนน้อยกว่าค่าเฉลี่ย',
   ];
   chartLabels_ScoreType: any = [
     '0-39',
@@ -263,11 +260,10 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       ];
     } else {
       doughnutData = [
-        scoreRanges['0-9'] || 0,
-        scoreRanges['10-19'] || 0,
-        scoreRanges['20-29'] || 0,
-        scoreRanges['30-39'] || 0,
-        scoreRanges['40+'] || 0,
+        // 'คะแนนมากกว่าค่าเฉลี่่ย', 
+        // 'คะแนนน้อยกว่าค่าเฉลี่ย',
+        scoreRanges['คะแนนมากกว่าค่าเฉลี่่ย'] || 0,
+        scoreRanges['คะแนนน้อยกว่าค่าเฉลี่ย'] || 0,
       ];
     }
 
@@ -367,11 +363,8 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
             scoreRanges['80+'] || 0,
           ]
         : [
-            scoreRanges['0-9'] || 0,
-            scoreRanges['10-19'] || 0,
-            scoreRanges['20-29'] || 0,
-            scoreRanges['30-39'] || 0,
-            scoreRanges['40+'] || 0,
+          scoreRanges['คะแนนมากกว่าค่าเฉลี่่ย'] || 0,
+          scoreRanges['คะแนนน้อยกว่าค่าเฉลี่ย'] || 0,
           ];
 
     this.avgScore = totalScore.avgTotalScore;
@@ -400,9 +393,11 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       };
     } else {
       ranges = {
+        // scoreRanges['คะแนนมากกว่าค่าเฉลี่่ย'] || 0,
+        // scoreRanges['คะแนนน้อยกว่าค่าเฉลี่ย'] || 0,
         '0-9': 0,
-        '10-19': 0,
-        '20-29': 0,
+        'คะแนนมากกว่าค่าเฉลี่่ย': 0,
+        'คะแนนน้อยกว่าค่าเฉลี่ย': 0,
         '30-39': 0,
         '40+': 0,
       };
@@ -438,16 +433,15 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
         else if (totalScore >= 70 && totalScore < 80) ranges['70-79']++;
         else if (totalScore >= 80) ranges['80+']++;
       } else {
-        if (totalScore >= 0 && totalScore < 10) ranges['0-9']++;
-        else if (totalScore >= 10 && totalScore < 20) ranges['10-19']++;
-        else if (totalScore >= 20 && totalScore < 30)
-          ranges['20-29']++; // Fix range
-        else if (totalScore >= 30 && totalScore < 40)
-          ranges['30-39']++; // Fix range
-        else if (totalScore >= 40) ranges['40+']++;
+        if (totalScore > this.avgScore) ranges['คะแนนมากกว่าค่าเฉลี่่ย']++;
+        else if (totalScore < this.avgScore) ranges['คะแนนน้อยกว่าค่าเฉลี่ย']++;
+        // else if (totalScore >= 20 && totalScore < 30)
+        //   ranges['20-29']++; // Fix range
+        // else if (totalScore >= 30 && totalScore < 40)
+        //   ranges['30-39']++; // Fix range
+        // else if (totalScore >= 40) ranges['40+']++;
       }
     });
-
     return ranges;
   }
 
