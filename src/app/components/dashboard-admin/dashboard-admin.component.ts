@@ -1,7 +1,12 @@
 import {
   Component,
+  EventEmitter,
   Input,
+  Output,
+  ViewChild,
   OnInit,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
 import {
@@ -28,19 +33,20 @@ export class DashboardAdminComponent implements OnInit {
   isRowSelected = false;
   pagination = true;
   paginationPageSize = 100;
-  Data: any[] = []; 
+  Data: any[] = [];
   columnDefs: any[] = [];
 
   defaultColDef = {
     resizable: true,
     sortable: true,
     filter: false,
+    // checkboxSelection: (params: any) => params.node?.group !== true,
     // flex: 1,
   };
 
   constructor(private dashboardService: DashboardService, private TranslationService: TranslationService) {
     this.gridOptions = {
-      suppressRowClickSelection: true, 
+      suppressRowClickSelection: false, // อนุญาตให้เลือกแถวโดยคลิกที่ใดก็ได้
       suppressAggFuncInHeader: true,
       columnDefs: this.generateColumnDefs(),
       defaultColDef: this.defaultColDef,
@@ -53,11 +59,35 @@ export class DashboardAdminComponent implements OnInit {
         sortable: true,
         pinned: 'left',
       },
-      onRowSelected: this.onRowSelected.bind(this),
-      onGridReady: this.onGridReady.bind(this),
+      onRowSelected: this.onRowSelected.bind(this), // ผูกฟังก์ชันกับอีเวนต์ selectRow
     };
   }
+
+  onRowClicked(event: any) {
+    if (!event.node) return;
+    const isCurrentlySelected = event.node.isSelected();
+    event.node.setSelected(!isCurrentlySelected, false); // Toggle สถานะ
+  }
+
+  onCellClicked(event: any) {
+    if (!event.node || event.column.getColId() === 'checkbox') {
+      return; // ไม่ทำอะไรถ้าคลิกที่ checkbox โดยตรง
+    }
   
+    setTimeout(() => {
+      const isSelected = event.node.isSelected();
+      event.node.setSelected(!isSelected, true); // Toggle สถานะ
+    }, 50); // หน่วงเวลาเล็กน้อยให้ ag-Grid ประมวลผล
+  }  
+
+  ngOnChanges(changes: SimpleChanges): void {
+    //check @Input() gridData: any[] = []; ถ้าค่าเปลี่ยนให้ทำการเรียกใช้โค้ดนี้
+    if (changes['gridData']) {
+      console.log('gridData changed:', changes['gridData'].currentValue);
+      this.isRowSelected = false;
+    }
+  }
+
   generateColumnDefs() {
     return [
       {
@@ -67,10 +97,10 @@ export class DashboardAdminComponent implements OnInit {
         minWidth: 55,
       },
       {
-        headerName: 
-        this.TranslationService.getTranslation(
-          'uploadscore_tableFieldSeatNo'
-        ) || 'เลขที่',
+        headerName:
+          this.TranslationService.getTranslation(
+            'uploadscore_tableFieldSeatNo'
+          ) || 'เลขที่',
         valueGetter: 'node.rowIndex + 1',
         flex: 0.1,
         minWidth: 100,
@@ -144,15 +174,22 @@ export class DashboardAdminComponent implements OnInit {
   }
 
   updateIsRowSelected() {
-    if (this.gridApi) {
-      this.isRowSelected = this.gridApi.getSelectedNodes().length > 0;
-    }
+    const selectedRowsCount = this.gridApi!.getSelectedRows().length;
+    this.isRowSelected = selectedRowsCount > 0;
+    console.log('isSelectRow => ', this.isRowSelected);
   }
 
-  onGridReady(params: GridReadyEvent) {
+  onGridReady(params: GridReadyEvent<any>) {
     this.gridApi = params.api;
-    console.log('Grid is ready');
+    if (this.gridApi) {
+      console.log('gridReady api work');
+      this.refreshHeaderNames();
+    } else {
+      console.log('gridReady api not work');
+    }
+    this.updateIsRowSelected();
   }
+
 
   ngOnInit() {
     console.log('ACTIVATE ngOnInit');
