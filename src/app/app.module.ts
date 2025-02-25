@@ -73,6 +73,8 @@ import { ErrorLayoutComponent } from './layout/error-layout/error-layout.compone
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { NgHttpLoaderComponent } from 'ng-http-loader';
 import { pendingRequestsInterceptor$ } from 'ng-http-loader';
+import { DashboardAdminComponent } from './components/dashboard-admin/dashboard-admin.component';
+import { AdminSearchComponent } from './components/admin-search/admin-search.component';
 
 @NgModule({
   declarations: [
@@ -115,6 +117,8 @@ import { pendingRequestsInterceptor$ } from 'ng-http-loader';
     Page404Component,
     ErrorLayoutComponent,
     LoadingSpinnerComponent,
+    DashboardAdminComponent,
+    AdminSearchComponent,
   ],
   imports: [
     BrowserModule,

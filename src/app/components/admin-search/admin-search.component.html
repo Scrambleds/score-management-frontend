@@ -1,0 +1,70 @@
+<div class="card p-3 mb-3">
+    <div class="form-container">
+        <form [formGroup]="form" class="mb-0">
+            <div class="row g-2">
+                <!-- Input Field -->
+                <div class="row mb-0 g-3 mt-1">
+                    <!-- Column 1 -->
+                    <div class="col-12 col-md-6 col-lg-2">
+                        <label class="fw-bold mb-0 ps-2"
+                            [appRequiredMarker]="form.get('academic_year')">{{ "academic_year" | translate }} </label>
+                        <div class="select-group">
+                            <ng-select class="w-100" name="academic_year" formControlName="academic_year"
+                                [items]="academicYearList" [searchFn]="customSearchFn_SearchLan.bind(this)"
+                                bindValue="byte_desc_th" bindLabel="byte_desc_th"
+                                [placeholder]="'placeholder_select' | translate" [searchable]="true" [clearable]="true">
+                                <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                                    {{ item | translateDropdown }}
+                                </ng-template>
+                            </ng-select>
+                            <!-- <div *ngIf="form.get('academic_year')?.touched && form.get('academic_year')?.invalid"
+                                class="text-danger ps-1">
+                                {{ "alert_enterData" | translate }}
+                            </div> -->
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-2">
+                        <label class="fw-bold mb-0 ps-2" [appRequiredMarker]="form.get('semester')">
+                            {{ "semester" | translate }} </label>
+                        <div class="select-group">
+                            <ng-select class="w-100" name="semester" formControlName="semester" [items]="semesterList"
+                                [searchFn]="customSearchFn_SearchLan.bind(this)" bindValue="byte_desc_th"
+                                bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate"
+                                [searchable]="true" [clearable]="true">
+                                <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                                    {{ item | translateDropdown }}
+                                </ng-template>
+                            </ng-select>
+                            <!-- <div *ngIf="form.get('semester')?.touched && form.get('semester')?.invalid"
+                                class="text-danger ps-1">
+                                {{ "alert_enterData" | translate }}
+                            </div> -->
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary custom-btn" (click)="onSearch()">
+                          <i class="bi bi-search"></i> 
+                          <!-- ค้นหา -->
+                           {{ "user_manage_search" | translate }}
+                        </button>
+                        <button type="button" class="btn btn-secondary custom-btn" (click)="onReset()">
+                          <i class="bi bi-arrow-repeat"></i> 
+                          <!-- รีเซ็ต -->
+                          {{ "user_manage_reset" | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="col-12 d-flex justify-content-end">
+    <!-- <button type="submit" class="btn btn-primary" (click)="exportExcel()" [disabled]="!form.valid">
+      <i class="bi bi-download"></i>
+      {{ 'dashboard_excel_export' | translate }}
+    </button> -->
+</div>

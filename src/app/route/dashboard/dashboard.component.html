@@ -3,5 +3,11 @@
     (dashboardDataUpdated)="updateDashboardData($event)"
     (cardRequested)="cardRequest($event)">
 </app-search-dashboard>
+
+<!-- <app-admin-search (tableDataEvent)="tableData = $event" (isSearchTriggered)="$event"></app-admin-search>  -->
+
+<app-dashboard-admin [tableData]="tableData"></app-dashboard-admin>
+
+
     <app-bell-curve [dashboardData]="dashboardData" [cardValue]="cardValue"></app-bell-curve>
 </div>

@@ -1,0 +1,44 @@
+<ng-container *ngIf="Data.length > 0; else noDataMessage">
+  <div class="card custom-card-table p-0 mb-2">
+    <!-- Card Header -->
+    <div class="card-header bg-light border-bottom">
+      <div class="row ms-1 mt-2">
+        <p class="mb-2" style="font-size: 0.8rem; color: #838383; font-weight: 600">
+          ข้อมูลรายวิชา
+        </p>
+        <div class="d-flex justify-content-between align-items-end">
+          <h4 class="text-title fw-bold mb-2 mt-0">{{ "add_masterdata_total" | translate }} {{ Data.length }} วิชา</h4>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-3 mb-3">
+      <ag-grid-angular
+        style="width: 97%; height: 490px;"
+        class="ag-theme-quartz"
+        [rowData]="Data"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [overlayNoRowsTemplate]="
+          '<span>' + ('no_row_show' | translate) + '</span>'
+        "
+        rowSelection="multiple"
+        [rowMultiSelectWithClick]="true"
+        [gridOptions]="gridOptions"
+        (gridReady)="onGridReady($event)"
+      >
+      </ag-grid-angular>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #noDataMessage>
+  <div *ngIf="SearchTriggered && Data.length === 0" class="row justify-content-center my-4">
+    <div class="col-12 text-center">
+      <div class="alert alert-warning text-body fw-bold p-3" style="font-size: 1.2rem; border-radius: 0.5rem;">
+        <i class="bi bi-exclamation-circle-fill" style="color: #ffcc00;"></i>
+        {{ "notfound_adduser" | translate }}
+      </div>
+    </div>
+  </div>
+</ng-template>

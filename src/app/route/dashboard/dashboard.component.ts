@@ -10,6 +10,7 @@ import { Component } from '@angular/core';
 export class DashboardComponent {
   dashboardData: any;
   cardValue: any;
+  tableData: any[] = []; // เก็บข้อมูลจาก AdminSearchComponent
 
   updateDashboardData(data: any) {
     this.dashboardData = data;

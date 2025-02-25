@@ -1,0 +1,67 @@
+.custom-card {
+  border-radius: 0.75rem;
+  box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.2);
+  padding: 0.625rem;
+  min-width: 5rem;
+  border-color: #ddd;
+  position: relative;
+}
+
+.custom-btn {
+  height: 2.5rem;
+  min-width: 5rem;
+  font-size: 0.875rem;
+}
+
+.ng-dropdown-panel {
+  position: absolute !important;
+  z-index: 1050;
+}
+
+.card-body {
+  overflow: visible;
+}
+
+.card {
+  z-index: 1;
+}
+
+.breadcrumb {
+  border-radius: 0.25rem;
+  /* padding: 0.5rem 1rem; */
+  display: flex;
+  align-items: center;
+  /* gap: 0.4rem; */
+}
+
+.breadcrumb-item a {
+  color: #000; /* สีดำ */
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.breadcrumb-item a:hover {
+  color: #555; /* สีเทาเข้ม */
+  /* text-decoration: underline; */
+}
+
+.breadcrumb-item.active a {
+  font-weight: bold;
+  color: #03a96b; /* สีเขียว */
+}
+
+.breadcrumb-separator {
+  /* color: #555; */
+  color: #03a96b;
+  font-size: 1.2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-separator i {
+  font-size: 1.8rem;
+  color: #03a96b;
+  transform: scale(0.8);
+}
