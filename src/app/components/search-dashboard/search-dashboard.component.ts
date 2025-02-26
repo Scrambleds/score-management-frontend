@@ -85,6 +85,11 @@ export class SearchDashboardComponent implements OnInit {
     }
   }
 
+  onRowSelected(selectedRow: any) {
+    console.log('Selected Row Data:', selectedRow);
+  }
+  
+
   customSearchFn(term: string, item: any): boolean {
     term = term.toLowerCase();
     return (
@@ -239,38 +244,64 @@ export class SearchDashboardComponent implements OnInit {
     }
   }
 
-  exportExcel() {
-    const requestData = this.form.value;
-    console.log('Exporting with data:', requestData);
+  // exportExcel() {
+  //   const requestData = [this.form.value];
+  //   console.log('Exporting with data:', requestData);
 
+  //   this.ExcelExportService.getBase64Excel(requestData).subscribe(
+  //     (response) => {
+  //       console.log('Response from API:', response);
+  //       if (response && response.file) {
+  //         // ดึงวันที่และเวลาปัจจุบันในรูปแบบ "ปี-เดือน-วัน-ชั่วโมง-นาที"
+  //         const now = new Date();
+
+  //         // const formattedDateTime = format(now, "yyyy-MM-dd_HH-mm");
+
+  //         const formattedDate = format(now, 'yyyy-MM-dd');
+
+  //         const formattedTime = format(now, 'HH-mm');
+
+  //         console.log('My formatTIME!!!: ', formattedTime);
+  //         // const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDateTime}`;
+
+  //         // const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDate}_${formattedTime}`;
+
+  //         const fileName = 'test';
+  //         const base64Data = response.file[0];
+  //         console.log('My Base64',base64Data);
+  //         this.downloadExcel(base64Data, fileName);
+  //       } else {
+  //         console.error('No base64 data received');
+  //       }
+  //     },
+  //     (error) => {
+  //       console.error('Error exporting Excel:', error);
+  //     }
+  //   );
+  // }
+
+  exportExcel() {
+    const requestData = [this.form.value];
+    console.log('Exporting with data:', requestData);
+  
     this.ExcelExportService.getBase64Excel(requestData).subscribe(
       (response) => {
         console.log('Response from API:', response);
-        if (response && response.file) {
-          // ดึงวันที่และเวลาปัจจุบันในรูปแบบ "ปี-เดือน-วัน-ชั่วโมง-นาที"
-          const now = new Date();
-
-          // const formattedDateTime = format(now, "yyyy-MM-dd_HH-mm");
-
-          const formattedDate = format(now, 'yyyy-MM-dd');
-
-          const formattedTime = format(now, 'HH-mm');
-
-          console.log('My formatTIME!!!: ', formattedTime);
-          // const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDateTime}`;
-
-          const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDate}_${formattedTime}`;
-
-          this.downloadExcel(response.file, fileName);
+  
+        // ตรวจสอบว่า response เป็น array หรือไม่ และมี file อยู่ในโครงสร้าง
+        if (response && response.length > 0 && response[0]?.file) {
+          const base64Data = response[0].file;
+          console.log('Base64 data:', base64Data);
+          this.downloadExcel(base64Data, 'test');
         } else {
-          console.error('No base64 data received');
+          console.error('No base64 data found in response');
         }
       },
       (error) => {
         console.error('Error exporting Excel:', error);
       }
     );
-  }
+  }  
 
   downloadExcel(base64Data: string, fileName: string) {
     const byteCharacters = atob(base64Data);
