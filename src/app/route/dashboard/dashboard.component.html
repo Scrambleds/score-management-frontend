@@ -1,13 +1,13 @@
 <div class="route-container">
     <app-search-dashboard 
     (dashboardDataUpdated)="updateDashboardData($event)"
-    (cardRequested)="cardRequest($event)">
+    (cardRequested)="cardRequest($event)"
+    (RequestTable)="requestTable($event)">
 </app-search-dashboard>
 
 <!-- <app-admin-search (tableDataEvent)="tableData = $event" (isSearchTriggered)="$event"></app-admin-search>  -->
 
-<app-dashboard-admin [tableData]="tableData"></app-dashboard-admin>
-
+<app-dashboard-admin [tableData]="tableData" [reqtable]="reqtable"></app-dashboard-admin>
 
     <app-bell-curve [dashboardData]="dashboardData" [cardValue]="cardValue"></app-bell-curve>
 </div>

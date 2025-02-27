@@ -31,6 +31,7 @@ export class SearchDashboardComponent implements OnInit {
   @Output() dashboardDataUpdated = new EventEmitter<any>();
   @Output() cardRequested = new EventEmitter<any>();
   @Output() ScoreType = new EventEmitter<any>();
+  @Output() RequestTable = new EventEmitter<any>();
   form!: FormGroup;
   sectionList: any[] = [];
   semesterList: any[] = [];
@@ -102,73 +103,171 @@ export class SearchDashboardComponent implements OnInit {
     return this.searchTranslateService.searchFn(term, item);
   }
 
+  // ngOnInit() {
+  //   const role = this.UserService.role;
+  //   const teacher_code = this.UserService.teacherCode;
+  //   console.log(role);
+  //   console.log('MyteacherCode', teacher_code);
+  //   this.form = this.fb.group({
+  //     subject_id: [null, Validators.required],
+  //     academic_year: [null, Validators.required],
+  //     semester: [null, Validators.required],
+  //     section: [null, Validators.required],
+  //     score_type: [null, Validators.required],
+  //   });
+
+  //   this.resetAndDisableFields([
+  //     'academic_year',
+  //     'semester',
+  //     'section',
+  //     'score_type',
+  //   ]);
+  //   this.dashboardData = this.resetScores(this.dashboardData);
+  //   this.dashboardDataUpdated.emit(this.dashboardData);
+  //   this.cardRequested.emit(null);
+
+  //   this.loadMajor();
+  //   this.LoadScoreType();
+  //   this.loadSection();
+  //   this.loadSemester();
+  //   this.loadAcademicYear();
+
+  //   this.form.statusChanges.subscribe(() => {
+  //     this.updateExportButtonState();
+  //   });
+
+  //   this.form.get('subject_id')?.valueChanges.subscribe((value) => {
+  //     if (!value) {
+  //       // Reset the form fields and disable them
+  //       this.resetAndDisableFields([
+  //         'academic_year',
+  //         'semester',
+  //         'section',
+  //         'score_type',
+  //       ]);
+
+  //       // Reset dashboardData
+  //       this.dashboardData = this.resetScores(this.dashboardData);
+  //       this.dashboardDataUpdated.emit(this.dashboardData);
+  //       this.cardRequested.emit(null);
+
+  //       this.RequestTable.emit(null);
+  //     } else {
+  //       // Enable the fields
+  //       this.enableFields([
+  //         'academic_year',
+  //         'semester',
+  //         'section',
+  //         'score_type',
+  //       ]);
+  //     }
+  //   });
+
+  //   this.form.valueChanges.subscribe((values) => {
+  //     if (this.areRequiredFieldsValid()) {
+  //       console.log('All required fields are valid, calling onSubmit');
+  //       this.onSubmit();
+  //       this.bellcurve?.refreshDashboard();
+  //     } else {
+  //       console.log('Required fields are not valid yet');
+  //     }
+  //   });
+  // }
+
   ngOnInit() {
     const role = this.UserService.role;
     const teacher_code = this.UserService.teacherCode;
     console.log(role);
     console.log('MyteacherCode', teacher_code);
+  
     this.form = this.fb.group({
-      subject_id: [null, Validators.required],
-      academic_year: [null, Validators.required],
-      semester: [null, Validators.required],
-      section: [null, Validators.required],
-      score_type: [null, Validators.required],
+      subject_id: [null],
+      academic_year: [null],
+      semester: [null],
+      section: [null],
+      score_type: [null], // ไม่ต้องใส่ default ที่นี่
     });
-
-    this.resetAndDisableFields([
+  
+    this.resetFields([
       'academic_year',
       'semester',
       'section',
       'score_type',
     ]);
+  
     this.dashboardData = this.resetScores(this.dashboardData);
     this.dashboardDataUpdated.emit(this.dashboardData);
     this.cardRequested.emit(null);
-
+  
     this.loadMajor();
-    this.LoadScoreType();
+    this.LoadScoreType(); // เรียกใช้งาน LoadScoreType() ที่นี่
     this.loadSection();
     this.loadSemester();
     this.loadAcademicYear();
-
-    this.form.statusChanges.subscribe(() => {
-      this.updateExportButtonState();
-    });
-
-    this.form.get('subject_id')?.valueChanges.subscribe((value) => {
-      if (!value) {
-        // Reset the form fields and disable them
-        this.resetAndDisableFields([
-          'academic_year',
-          'semester',
-          'section',
-          'score_type',
-        ]);
-
-        // Reset dashboardData
-        this.dashboardData = this.resetScores(this.dashboardData);
-        this.dashboardDataUpdated.emit(this.dashboardData);
-        this.cardRequested.emit(null);
-      } else {
-        // Enable the fields
-        this.enableFields([
-          'academic_year',
-          'semester',
-          'section',
-          'score_type',
-        ]);
-      }
-    });
-
+  
+    // เรียก API ทันทีเมื่อหน้าเว็บโหลด
+    this.onSubmit(); // หรือคุณสามารถเรียกใช้ API ในฟังก์ชันนี้ได้ทันที
+    
     this.form.valueChanges.subscribe((values) => {
-      if (this.areRequiredFieldsValid()) {
-        console.log('All required fields are valid, calling onSubmit');
-        this.onSubmit();
-        this.bellcurve?.refreshDashboard();
-      } else {
-        console.log('Required fields are not valid yet');
+      this.onSubmit(); // ทุกการเปลี่ยนแปลงจะส่ง API ทันที
+    });
+  }  
+  
+  LoadScoreType(): void {
+    console.log('LOAD SCORE TYPE!!!!!!!!!!!!!!!!!!!!!!!')
+    this.selectBoxService.getSystemParamScoreType().subscribe((resp) => {
+      this.scoreTypeList = resp;
+  
+      // ตั้งค่า default value เป็น "คะแนนรวม"
+      const defaultScoreType = this.scoreTypeList.find(
+        (item) => item.byte_desc_th === 'คะแนนรวม'
+      );
+
+      console.log("MY DEFAULT SCORE TYPE", defaultScoreType);
+  
+      if (defaultScoreType) {
+        this.form.patchValue({
+          score_type: defaultScoreType.byte_desc_th
+        });
       }
     });
+  }
+  
+  // ฟังก์ชันนี้ไม่ต้อง disable ฟิลด์แล้ว
+  resetFields(fields: string[]) {
+    fields.forEach((field) => {
+      const control = this.form.get(field);
+      if (control) {
+        control.reset(); // รีเซ็ตค่า
+        control.enable(); // ทำให้ฟิลด์สามารถใช้งานได้
+      }
+    });
+  }
+
+  onSubmit() {
+    // ส่ง API โดยไม่สนใจว่า field อะไรขาดหาย
+    this.cardValue = this.form.getRawValue();
+    this.SubmitData = this.form.getRawValue();
+    console.log('Form Data:', this.SubmitData);
+
+    // ส่ง API โดยใช้ค่าในฟอร์ม
+    this.DashboardService.getDashboardStats(this.SubmitData).subscribe(
+      (response) => {
+        if (response.isSuccess) {
+          this.dashboardData = response.objectResponse;
+          this.dashboardDataUpdated.emit(this.dashboardData);
+          this.cardRequested.emit(this.SubmitData.score_type);
+          this.RequestTable.emit(this.SubmitData);
+          console.log('Emitting SubmitData:', this.SubmitData.score_type);
+        } else {
+          this.dashboardData = null;
+          this.dashboardDataUpdated.emit(this.dashboardData);
+          this.cardRequested.emit(this.SubmitData.score_type);
+          this.RequestTable.emit(this.SubmitData);
+          console.log('Emitting SubmitData:', this.SubmitData.score_type);
+        }
+      }
+    );
   }
 
   resetScores(data: any): any {
@@ -243,42 +342,6 @@ export class SearchDashboardComponent implements OnInit {
       console.log('BellCurveComponent is available');
     }
   }
-
-  // exportExcel() {
-  //   const requestData = [this.form.value];
-  //   console.log('Exporting with data:', requestData);
-
-  //   this.ExcelExportService.getBase64Excel(requestData).subscribe(
-  //     (response) => {
-  //       console.log('Response from API:', response);
-  //       if (response && response.file) {
-  //         // ดึงวันที่และเวลาปัจจุบันในรูปแบบ "ปี-เดือน-วัน-ชั่วโมง-นาที"
-  //         const now = new Date();
-
-  //         // const formattedDateTime = format(now, "yyyy-MM-dd_HH-mm");
-
-  //         const formattedDate = format(now, 'yyyy-MM-dd');
-
-  //         const formattedTime = format(now, 'HH-mm');
-
-  //         console.log('My formatTIME!!!: ', formattedTime);
-  //         // const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDateTime}`;
-
-  //         // const fileName = `${requestData.subject_id}_${requestData.academic_year}_${requestData.semester}_${requestData.section}_${formattedDate}_${formattedTime}`;
-
-  //         const fileName = 'test';
-  //         const base64Data = response.file[0];
-  //         console.log('My Base64',base64Data);
-  //         this.downloadExcel(base64Data, fileName);
-  //       } else {
-  //         console.error('No base64 data received');
-  //       }
-  //     },
-  //     (error) => {
-  //       console.error('Error exporting Excel:', error);
-  //     }
-  //   );
-  // }
 
   exportExcel() {
     const requestData = [this.form.value];
@@ -357,81 +420,79 @@ export class SearchDashboardComponent implements OnInit {
     });
   }
 
-  LoadScoreType(): void {
-    this.selectBoxService.getSystemParamScoreType().subscribe((resp) => {
-      this.scoreTypeList = resp;
-    });
-  }
+  // onSubmit() {
+  //   // const formData = this.form.value;
+  //   this.cardValue = this.form.getRawValue();
+  //   this.SubmitData = this.form.getRawValue();
+  //   console.log('Form Data:', this.SubmitData);
 
-  onSubmit() {
-    // const formData = this.form.value;
-    this.cardValue = this.form.getRawValue();
-    this.SubmitData = this.form.getRawValue();
-    console.log('Form Data:', this.SubmitData);
+  //   // ตรวจสอบฟิลด์ที่จำเป็นก่อนยิง API
+  //   if (
+  //     !this.form.get('subject_id')?.value ||
+  //     !this.form.get('academic_year')?.value ||
+  //     !this.form.get('semester')?.value ||
+  //     !this.form.get('section')?.value
+  //     // !this.form.get('score_type')?.value
+  //   ) {
+  //     console.log('Cannot submit form, required fields are missing');
+  //     return;
+  //   }
 
-    // ตรวจสอบฟิลด์ที่จำเป็นก่อนยิง API
-    if (
-      !this.form.get('subject_id')?.value ||
-      !this.form.get('academic_year')?.value ||
-      !this.form.get('semester')?.value ||
-      !this.form.get('section')?.value
-      // !this.form.get('score_type')?.value
-    ) {
-      console.log('Cannot submit form, required fields are missing');
-      return;
-    }
+  //   if (!this.form.get('subject_id')?.value) {
+  //     console.log('subject_id is empty. Resetting dashboard data.');
+  //     this.dashboardData = this.resetScores(this.dashboardData);
+  //     this.dashboardDataUpdated.emit(this.dashboardData);
+  //     this.cardRequested.emit(this.SubmitData.score_type);
+  //     this.RequestTable.emit(null);
+  //     console.log('Emitting SubmitData:', this.SubmitData.score_type);
+  //     return;
+  //   }
 
-    if (!this.form.get('subject_id')?.value) {
-      console.log('subject_id is empty. Resetting dashboard data.');
-      this.dashboardData = this.resetScores(this.dashboardData);
-      this.dashboardDataUpdated.emit(this.dashboardData);
-      this.cardRequested.emit(this.SubmitData.score_type);
-      console.log('Emitting SubmitData:', this.SubmitData.score_type);
-      return;
-    }
+  //   if (
+  //     Object.values(this.SubmitData).every(
+  //       (value) => value === null || value === ''
+  //     )
+  //   ) {
+  //     console.log('Form is empty, setting dashboard data to 0.');
 
-    if (
-      Object.values(this.SubmitData).every(
-        (value) => value === null || value === ''
-      )
-    ) {
-      console.log('Form is empty, setting dashboard data to 0.');
+  //     function resetScores(data: any) {
+  //       return Object.keys(data).reduce((acc, key) => {
+  //         if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
+  //           acc[key] = resetScores(data[key]);
+  //         } else if (Array.isArray(data[key])) {
+  //           acc[key] = [];
+  //         } else {
+  //           acc[key] = 0;
+  //         }
+  //         return acc;
+  //       }, {} as any);
+  //     }
 
-      function resetScores(data: any) {
-        return Object.keys(data).reduce((acc, key) => {
-          if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
-            acc[key] = resetScores(data[key]);
-          } else if (Array.isArray(data[key])) {
-            acc[key] = [];
-          } else {
-            acc[key] = 0;
-          }
-          return acc;
-        }, {} as any);
-      }
+  //     this.dashboardData = resetScores(this.dashboardData);
+  //     this.dashboardDataUpdated.emit(this.dashboardData);
+  //     this.cardRequested.emit(this.SubmitData.SubmitData);
+  //     this.RequestTable.emit(this.SubmitData);
+  //     console.log('Emitting SubmitData:', this.SubmitData.score_type);
 
-      this.dashboardData = resetScores(this.dashboardData);
-      this.dashboardDataUpdated.emit(this.dashboardData);
-      this.cardRequested.emit(this.SubmitData.SubmitData);
-      console.log('Emitting SubmitData:', this.SubmitData.score_type);
+  //     return;
+  //   }
 
-      return;
-    }
-
-    this.DashboardService.getDashboardStats(this.SubmitData).subscribe(
-      (response) => {
-        if (response.isSuccess) {
-          this.dashboardData = response.objectResponse;
-          this.dashboardDataUpdated.emit(this.dashboardData);
-          this.cardRequested.emit(this.SubmitData.score_type);
-          console.log('Emitting SubmitData:', this.SubmitData.score_type);
-        } else {
-          this.dashboardData = null;
-          this.dashboardDataUpdated.emit(this.dashboardData);
-          this.cardRequested.emit(this.SubmitData.score_type);
-          console.log('Emitting SubmitData:', this.SubmitData.score_type);
-        }
-      }
-    );
-  }
+  //   this.DashboardService.getDashboardStats(this.SubmitData).subscribe(
+  //     (response) => {
+  //       if (response.isSuccess) {
+  //         this.dashboardData = response.objectResponse;
+  //         this.dashboardDataUpdated.emit(this.dashboardData);
+  //         this.cardRequested.emit(this.SubmitData.score_type);
+  //         this.RequestTable.emit(this.SubmitData);
+  //         console.log('Emitting SubmitData:', this.SubmitData.score_type);
+  //       } else {
+  //         this.dashboardData = null;
+  //         this.dashboardDataUpdated.emit(this.dashboardData);
+  //         this.cardRequested.emit(this.SubmitData.score_type);
+  //         this.RequestTable.emit(this.SubmitData);
+  //         console.log('Emitting SubmitData:', this.SubmitData.score_type);
+  //       }
+  //     }
+  //   );
+  // }
 }

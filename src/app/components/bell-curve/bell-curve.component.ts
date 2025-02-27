@@ -379,7 +379,7 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
 
   calculateScoreRanges(data: any[], scoreType: string): any {
     let ranges: any = {};
-    console.log("This is 1: ", data)
+    // console.log("This is 1: ", data)
     console.log("This is", scoreType)
 
     if (scoreType === 'คะแนนรวม') {
@@ -409,7 +409,7 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       data.find((item) => Array.isArray(item.studentScore))?.studentScore || [];
 
     studentData.forEach((student) => {
-     console.log("student:", student);
+    //  console.log("student:", student);
       let totalScore = 0;
 
       if (scoreType === 'คะแนนกลางภาค') {

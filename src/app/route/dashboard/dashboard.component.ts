@@ -11,6 +11,7 @@ export class DashboardComponent {
   dashboardData: any;
   cardValue: any;
   tableData: any[] = []; // เก็บข้อมูลจาก AdminSearchComponent
+  reqtable: any;
 
   updateDashboardData(data: any) {
     this.dashboardData = data;
@@ -18,5 +19,9 @@ export class DashboardComponent {
 
   cardRequest(data: any){
     this.cardValue = data
+  }
+
+  requestTable(data: any){
+    this.reqtable = data
   }
 }

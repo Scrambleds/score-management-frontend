@@ -8,8 +8,10 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
 import { ExcelExportService } from '../../services/excel-export/excel-export';
+import { UserService } from '../../services/sharedService/userService/userService.service';
 import {
   GridApi,
   GridOptions,
@@ -25,10 +27,13 @@ import { format } from 'date-fns';
   templateUrl: './dashboard-admin.component.html',
   styleUrls: ['./dashboard-admin.component.css']
 })
-export class DashboardAdminComponent implements OnInit {
-  @Input() tableData: any[] = [];
+export class DashboardAdminComponent implements OnInit, OnChanges {
+  @Input() tableData: any;
   @Input() SearchTriggered: boolean = false;
+  @Input() reqtable: any;
+  @Input() RequestTable: EventEmitter<any> = new EventEmitter();
   @Output() rowSelected = new EventEmitter<any>();
+  form!: FormGroup;
   gridApi?: GridApi<any>;
   gridOptions: GridOptions;
 
@@ -37,6 +42,7 @@ export class DashboardAdminComponent implements OnInit {
   paginationPageSize = 100;
   Data: any[] = [];
   columnDefs: any[] = [];
+  isSearchTriggered = false;
 
   defaultColDef = {
     resizable: true,
@@ -46,7 +52,7 @@ export class DashboardAdminComponent implements OnInit {
     // flex: 1,
   };
 
-  constructor(private dashboardService: DashboardService, private TranslationService: TranslationService
+  constructor(private fb: FormBuilder,private dashboardService: DashboardService, private TranslationService: TranslationService, private UserService: UserService
     ,private ExcelExportService: ExcelExportService,
   ) {
     this.gridOptions = {
@@ -90,14 +96,12 @@ convertToSnakeCase(data: any): any {
 // ฟังก์ชันสำหรับการ export ข้อมูลจากแถวที่เลือก
 exportExcel() {
   if (this.gridApi) {
-    // ดึงข้อมูลแถวที่เลือกจาก ag-Grid
     const selectedRows = this.gridApi.getSelectedRows();
     if (selectedRows.length === 0) {
       console.error("No rows selected.");
-      return;  // ถ้าไม่มีแถวที่เลือก ไม่ส่ง Request
+      return;
     }
 
-    // แปลงข้อมูลแถวที่เลือกเป็น snake_case
     const requestData = selectedRows.map(row => {
       return {
         subject_id: row.subjectId,
@@ -105,18 +109,32 @@ exportExcel() {
         academic_year: row.academicYear,
         semester: row.semester,
         section: row.section,
-        score_type: 'คะแนนรวม',
+        score_type: this.reqtable?.score_type || 'คะแนนรวม',
+        username: this.UserService.username,
       };
-    }).map(row => this.convertToSnakeCase(row));  // แปลงเป็น snake_case
+    }).map(row => this.convertToSnakeCase(row)); 
 
-    console.log('Request Data in snake_case:', requestData);  // ตรวจสอบข้อมูลที่แปลงแล้ว
+    console.log('Request Data with username:', requestData);
 
     this.ExcelExportService.getBase64Excel(requestData).subscribe(
       (response) => {
-        console.log('Full Response from API:', response);  // Log the full response
+        console.log('Full Response from API:', response);
         if (response && response.file) {
+          const now = new Date();
           const base64Data = response.file;
-          this.downloadExcel(base64Data, 'test');
+          const formattedDate = format(now, 'yyyy-MM-dd');
+          const formattedTime = format(now, 'HH-mm');
+        
+          let fileName = '';
+
+          if (selectedRows.length === 1) {
+            const row = selectedRows[0];
+            fileName = `${row.subjectId}_${row.academicYear}_${row.semester}_${row.section}_${formattedDate}_${formattedTime}`;
+          } else {
+            fileName = `${this.reqtable?.score_type || 'คะแนนรวม'}_${formattedDate}_${formattedTime}`;
+          }
+
+          this.downloadExcel(base64Data, fileName);
         } else {
           console.error("No base64 data received or wrong response format");
         }
@@ -127,6 +145,7 @@ exportExcel() {
     );
   }
 }
+
 
   // ฟังก์ชันดาวน์โหลดไฟล์ Excel
   downloadExcel(base64Data: string, fileName: string) {
@@ -162,14 +181,6 @@ exportExcel() {
     }, 50); // หน่วงเวลาเล็กน้อยให้ ag-Grid ประมวลผล
   }  
 
-  ngOnChanges(changes: SimpleChanges): void {
-    //check @Input() gridData: any[] = [];
-    if (changes['gridData']) {
-      console.log('gridData changed:', changes['gridData'].currentValue);
-      this.isRowSelected = false;
-    }
-  }
-
   getSelectedRowData() {
     if (this.gridApi) {
       const selectedRows = this.gridApi.getSelectedRows();
@@ -177,33 +188,6 @@ exportExcel() {
     }
     return [];
   }  
-
-  // sendSelectedRowsToApi() {
-  //   const selectedRows = this.getSelectedRowData();
-  //   if (selectedRows.length === 0) {
-  //     console.warn("No rows selected.");
-  //     return;
-  //   }
-  
-  //   const requestData = {
-  //     score_type: "คะแนนรวม",
-  //     selectedData: selectedRows,
-  //   };
-  
-  //   this.ExcelExportService.getBase64Excel(requestData).subscribe(
-  //     (response) => {
-  //       if (response && response.file) {
-  //         const fileName = "SelectedRowsReport";
-  //         this.downloadExcel(response.file, fileName);
-  //       } else {
-  //         console.error("No base64 data received");
-  //       }
-  //     },
-  //     (error) => {
-  //       console.error("Error exporting Excel:", error);
-  //     }
-  //   );
-  // }  
 
   generateColumnDefs() {
     return [
@@ -308,38 +292,87 @@ exportExcel() {
     this.updateIsRowSelected();
   }
 
+  loadTableData() {
+    let requestData = { ...this.reqtable };  // สร้างสำเนาของ reqtable เพื่อไม่ให้แก้ไขโดยตรง
+    const role = this.UserService.role;
+    const username = this.UserService.username;
+  
+    requestData.teacher_code = role === 2 ? this.UserService.teacherCode : '';
+    requestData.username = username;  // เพิ่ม username ลงไปใน requestData
+    
+    this.dashboardService.getTableData(requestData).subscribe(
+      (resp) => {
+        if (resp) {
+          console.log("API Response:", resp);
+          this.Data = resp.map(item => ({
+            ...item,
+            scoreType: item.scoreType || 'คะแนนรวม', // ตั้งค่า default
+          }));
+        } else {
+          console.error("Received empty response");
+          this.Data = [];
+        }
+      },
+      (error: any) => {
+        console.error("API Error:", error);
+        if (error.status === 404) {
+          console.warn("No data found, setting empty table.");
+          this.Data = [];
+        }
+      }
+    );
+  }  
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('ngOnChanges triggered:', changes);
+
+    if (changes['reqtable'] && !changes['reqtable'].firstChange) {
+      this.isSearchTriggered = true;
+      console.log('reqtable changed:', changes['reqtable'].currentValue);
+  
+      if (!changes['reqtable'].currentValue) {
+        this.reqtable = null; // รีเซ็ตค่าให้เป็น null
+        console.log("RESET!!!!!!!!!!!!!!!!!");
+      }
+      
+      this.loadTableData(); // โหลดข้อมูลใหม่
+    }
+  }
 
   ngOnInit() {
-    console.log('ACTIVATE ngOnInit');
 
+    const role = this.UserService.role;
+    const teacher_code = this.UserService.teacherCode;
+    const username = this.UserService.username;
+
+    console.log('POND', role)
+    console.log('POND1', teacher_code)
+
+    this.form = this.fb.group({
+      subject_id: '',
+      academic_year: '',
+      semester: '',
+      section: '',
+      score_type: 'คะแนนรวม',
+      // teacher_code: 'S2042',
+    });
+
+    this.RequestTable.subscribe((data) => {
+      console.log('DATA FROM SEARCH:', data);
+      this.reqtable = data || null; // ถ้า data เป็น null ก็รีเซ็ตค่า
+      this.loadTableData(); // โหลดข้อมูลใหม่
+    });
+  
     if (this.tableData.length > 0) {
       this.Data = [...this.tableData];
       console.log('Data from @Input tableData:', this.Data);
+    } else {
+      this.loadTableData(); // โหลดข้อมูลเมื่อไม่มีข้อมูล
     }
-
-    if (this.Data.length === 0) {
-      this.dashboardService.getTableData({}).subscribe(
-        (resp) => {
-          if (resp) {
-            console.log("API Response:", resp);
-            this.Data = resp;
-          } else {
-            console.error("Received empty response");
-          }
-        },
-        (error: any) => {
-          console.error("API Error:", error);
-        }
-      );
-
-      this.TranslationService.getTranslations().subscribe(() => {
-        console.log('change lang done!');
-        console.log(
-          this.TranslationService.getTranslation('uploadscore_tableFieldSeatNo')
-        );
-
-        this.refreshHeaderNames();
-      });
-    }
+  
+    this.TranslationService.getTranslations().subscribe(() => {
+      console.log('change lang done!');
+      this.refreshHeaderNames();
+    });
   }
-}
+}  
