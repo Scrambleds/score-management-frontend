@@ -87,7 +87,7 @@
                 {{ item | translateDropdown }}
               </ng-template>
             </ng-select>
-            <div *ngIf="form.get('score_type')?.touched && form.get('score_type')?.invalid" class="text-danger ps-1">
+            <div *ngIf="form.get('score_type')?.dirty && form.get('score_type')?.invalid" class="text-danger ps-1">
               <!-- กรุณากรอกข้อมูล -->
               {{ "alert_enterData" | translate }}
             </div>

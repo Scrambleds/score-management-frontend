@@ -40,16 +40,6 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
     '80+',
   ];
 
-  // chartLabels_ScoreType: any = ['0-39', '40+'];
-
-  // cutOut: number = 75;
-  // backgroundColors: any = [
-  //   '#A3C8FF',
-  //   '#A4E6A4',
-  //   '#F5E06D',
-  //   '#FF7F3A',
-  //   '#D0021B',
-  // ];
   backgroundColors: any = [
     '#264653',
     '#2A9D8F',
@@ -93,7 +83,6 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
           '#F4A261',
           '#E76F51',
         ],
-        
       },
     ],
   };
@@ -331,7 +320,6 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
 
   updateChartData() {
     if (!this.dashboardData || this.dashboardData.length === 0) {
-    console.log('MY TYPE:',this.cardValue)
       this.jsonArray = [0, 0, 0, 0, 0, 0];
       this.doughnutChartData.datasets[0].data = [0, 0, 0, 0, 0, 0];
       this.avgScore = 0;
@@ -351,7 +339,7 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
     }
 
     const scoreRanges = this.calculateScoreRanges(
-      this.dashboardData,
+      this.dashboardData.filter((item:any) => item !== null),
       this.cardValue
     );
 
@@ -366,8 +354,8 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
             scoreRanges['80+'] || 0,
           ]
         : [
-          scoreRanges['คะแนนมากกว่าค่าเฉลี่่ย'] || 0,
-          scoreRanges['คะแนนน้อยกว่าค่าเฉลี่ย'] || 0,
+            scoreRanges['คะแนนมากกว่าค่าเฉลี่่ย'] || 0,
+            scoreRanges['คะแนนน้อยกว่าค่าเฉลี่ย'] || 0,
           ];
 
     this.avgScore = totalScore.avgTotalScore;
@@ -382,9 +370,7 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
 
   calculateScoreRanges(data: any[], scoreType: string): any {
     let ranges: any = {};
-    // console.log("This is 1: ", data)
-    console.log("This is", scoreType)
-
+  
     if (scoreType === 'คะแนนรวม') {
       ranges = {
         '0-39': 0,
@@ -396,58 +382,50 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
       };
     } else {
       ranges = {
-        // scoreRanges['คะแนนมากกว่าค่าเฉลี่่ย'] || 0,
-        // scoreRanges['คะแนนน้อยกว่าค่าเฉลี่ย'] || 0,
-        '0-9': 0,
         'คะแนนมากกว่าค่าเฉลี่่ย': 0,
         'คะแนนน้อยกว่าค่าเฉลี่ย': 0,
-        '30-39': 0,
-        '40+': 0,
       };
     }
-
+  
     if (!Array.isArray(data)) return ranges;
-
+  
     const studentData: any[] =
-      data.find((item) => Array.isArray(item.studentScore))?.studentScore || [];
-
+      data.find((item) => Array.isArray(item?.studentScore))?.studentScore.filter((s: any) => s !== null) || [];
+  
     studentData.forEach((student) => {
-    //  console.log("student:", student);
-      let totalScore = 0;
-
+      let totalScore: number | null = 0;
+  
       if (scoreType === 'คะแนนกลางภาค') {
-        totalScore = student.midterm_score || 0;
+        totalScore = student.midterm_score ?? null;
       } else if (scoreType === 'คะแนนปลายภาค') {
-        totalScore = student.final_score || 0;
+        totalScore = student.final_score ?? null;
       } else if (scoreType === 'คะแนนระหว่างเรียน') {
-        totalScore = student.accumulated_score || 0;
+        totalScore = student.accumulated_score ?? null;
       } else {
         totalScore =
-          (student.accumulated_score || 0) +
-          (student.midterm_score || 0) +
-          (student.final_score || 0);
+          (student.accumulated_score ?? 0) +
+          (student.midterm_score ?? 0) +
+          (student.final_score ?? 0);
       }
 
-      if (scoreType === 'คะแนนรวม') {
-        if (totalScore >= 0 && totalScore < 40) ranges['0-39']++;
-        else if (totalScore >= 40 && totalScore < 50) ranges['40-49']++;
-        else if (totalScore >= 50 && totalScore < 60) ranges['50-59']++;
-        else if (totalScore >= 60 && totalScore < 70) ranges['60-69']++;
-        else if (totalScore >= 70 && totalScore < 80) ranges['70-79']++;
-        else if (totalScore >= 80) ranges['80+']++;
-      } else {
-        if (totalScore > this.avgScore) ranges['คะแนนมากกว่าค่าเฉลี่่ย']++;
-        else if (totalScore < this.avgScore) ranges['คะแนนน้อยกว่าค่าเฉลี่ย']++;
-        // else if (totalScore >= 20 && totalScore < 30)
-        //   ranges['20-29']++; // Fix range
-        // else if (totalScore >= 30 && totalScore < 40)
-        //   ranges['30-39']++; // Fix range
-        // else if (totalScore >= 40) ranges['40+']++;
+      if (totalScore !== null && totalScore) {
+        if (scoreType === 'คะแนนรวม') {
+          if (totalScore >= 0 && totalScore < 40) ranges['0-39']++;
+          else if (totalScore >= 40 && totalScore < 50) ranges['40-49']++;
+          else if (totalScore >= 50 && totalScore < 60) ranges['50-59']++;
+          else if (totalScore >= 60 && totalScore < 70) ranges['60-69']++;
+          else if (totalScore >= 70 && totalScore < 80) ranges['70-79']++;
+          else if (totalScore >= 80) ranges['80+']++;
+        } else {
+          if (totalScore > this.avgScore) ranges['คะแนนมากกว่าค่าเฉลี่่ย']++;
+          else if (totalScore < this.avgScore) ranges['คะแนนน้อยกว่าค่าเฉลี่ย']++;
+        }
       }
     });
+  
     return ranges;
   }
-
+  
   updateBellCurve() {
     if (this.bellCurveChart) {
       this.bellCurveChart.data.datasets[0].data = this.generateBellCurveData();

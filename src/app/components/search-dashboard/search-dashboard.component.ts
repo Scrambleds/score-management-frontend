@@ -187,7 +187,7 @@ export class SearchDashboardComponent implements OnInit {
       academic_year: [null],
       semester: [null],
       section: [null],
-      score_type: [null], // ไม่ต้องใส่ default ที่นี่
+      score_type: [null, Validators.required], // ไม่ต้องใส่ default ที่นี่
       teacher_code: teacher_code,
     });
 
@@ -197,7 +197,7 @@ export class SearchDashboardComponent implements OnInit {
       academic_year: [null],
       semester: [null],
       section: [null],
-      score_type: [null], // ไม่ต้องใส่ default ที่นี่
+      score_type: [null, Validators.required], // ไม่ต้องใส่ default ที่นี่
       teacher_code: [null],
     });
   }

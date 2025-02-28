@@ -7,11 +7,11 @@
           class="mb-2"
           style="font-size: 0.8rem; color: #838383; font-weight: 600"
         >
-          ข้อมูลรายวิชา
+          {{ 'dashboard_info_subjects' | translate}}
         </p>
         <div class="d-flex justify-content-between align-items-end">
           <h4 class="text-title fw-bold mb-2 mt-0">
-            {{ "add_masterdata_total" | translate }} {{ Data.length }} วิชา
+            {{ "add_masterdata_total" | translate }} {{ Data.length }} {{ "dashboard_header_subjects" | translate}}
           </h4>
           <button
             type="submit"
