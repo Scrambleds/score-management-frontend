@@ -13,6 +13,7 @@ import {
 import * as chartJS from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-bell-curve',
@@ -60,7 +61,8 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
 
   constructor(
     private DashboardService: DashboardService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private TranslationService: TranslationService,
   ) {}
   @Input() dashboardData: any;
   @Input() cardValue: any;
@@ -137,6 +139,7 @@ export class BellCurveComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    
     let cvs: any = this.dChart?.nativeElement;
     console.log('DATA!!!!: ', this.cardValue);
     if (cvs) {

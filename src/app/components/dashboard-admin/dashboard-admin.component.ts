@@ -44,6 +44,8 @@ export class DashboardAdminComponent implements OnInit, OnChanges {
   columnDefs: any[] = [];
   isSearchTriggered = false;
 
+  originalScoreType: any;
+
   defaultColDef = {
     resizable: true,
     sortable: true,
@@ -200,7 +202,7 @@ exportExcel() {
       {
         headerName:
           this.TranslationService.getTranslation(
-            'uploadscore_tableFieldSeatNo'
+            'user_manage_number'
           ) || 'เลขที่',
         valueGetter: 'node.rowIndex + 1',
         flex: 0.1,
@@ -209,49 +211,63 @@ exportExcel() {
         filter: false
       },
       {
-        headerName: 'รหัสวิชา',
+        headerName: this.TranslationService.getTranslation(
+          'subject_code',
+        )  || 'รหัสรายวิชา',
         field: 'subjectId',
         flex: 0.8,
         minWidth: 70,
         sortable: true,
       },
       {
-        headerName: 'ชื่อวิชา',
+        headerName: this.TranslationService.getTranslation(
+          'subject_name',
+        )  || 'ขื่อรายวิชา',
         field: 'subjectName',
         flex: 1,
         minWidth: 100,
         sortable: true,
       },
       {
-        headerName: 'ปีการศึกษา',
+        headerName: this.TranslationService.getTranslation(
+          'academic_year',
+        )  || 'ปีการศึกษา',
         field: 'academicYear',
         flex: 0.6,
         minWidth: 100,
         sortable: true,
       },
       {
-        headerName: 'ภาคการศึกษา',
+        headerName: this.TranslationService.getTranslation(
+          'semester',
+        )  || 'ภาคเรียน',
         field: 'semester',
         flex: 0.6,
         minWidth: 100,
         sortable: true,
       },
       {
-        headerName: 'หมู่เรียน',
+        headerName: this.TranslationService.getTranslation(
+          'section',
+        )  || 'หมู่เรียน',
         field: 'section',
         flex: 0.6,
         minWidth: 100,
         sortable: true,
       },
       {
-        headerName: 'ประเภทคะแนน',
+        headerName: this.TranslationService.getTranslation(
+          'dashboard_scoretype',
+        )  || 'ประเภทคะแนน',
         field: 'scoreType',
         flex: 0.6,
         minWidth: 100,
         sortable: true,
       },
       {
-        headerName: 'จำนวนนิสิต',
+        headerName: this.TranslationService.getTranslation(
+          'dashboard_number_student',
+        )  || 'จำนวนนิสิต',
         field: 'studentCount',
         flex: 0.6,
         minWidth: 100,
@@ -296,17 +312,19 @@ exportExcel() {
     let requestData = { ...this.reqtable };  // สร้างสำเนาของ reqtable เพื่อไม่ให้แก้ไขโดยตรง
     const role = this.UserService.role;
     const username = this.UserService.username;
+    const teachercode = this.UserService.teacherCode;
   
     requestData.teacher_code = role === 2 ? this.UserService.teacherCode : '';
     requestData.username = username;  // เพิ่ม username ลงไปใน requestData
     
     this.dashboardService.getTableData(requestData).subscribe(
       (resp) => {
-        if (resp) {
+        this.isSearchTriggered = true;
+        if (resp && resp.length > 0) {
           console.log("API Response:", resp);
           this.Data = resp.map(item => ({
             ...item,
-            scoreType: item.scoreType || 'คะแนนรวม', // ตั้งค่า default
+            scoreType: item.scoreType || 'คะแนนรวม',
           }));
         } else {
           console.error("Received empty response");
@@ -315,6 +333,7 @@ exportExcel() {
       },
       (error: any) => {
         console.error("API Error:", error);
+        this.isSearchTriggered = true;
         if (error.status === 404) {
           console.warn("No data found, setting empty table.");
           this.Data = [];
@@ -322,28 +341,28 @@ exportExcel() {
       }
     );
   }  
-
+  
   ngOnChanges(changes: SimpleChanges): void {
     console.log('ngOnChanges triggered:', changes);
 
     if (changes['reqtable'] && !changes['reqtable'].firstChange) {
-      this.isSearchTriggered = true;
-      console.log('reqtable changed:', changes['reqtable'].currentValue);
-  
-      if (!changes['reqtable'].currentValue) {
-        this.reqtable = null; // รีเซ็ตค่าให้เป็น null
-        console.log("RESET!!!!!!!!!!!!!!!!!");
+      // Check if score_type has changed
+      if (this.reqtable?.score_type !== this.originalScoreType) {
+        this.isRowSelected = false; // Reset row selection state
+        console.log('score_type changed, disabling export button');
       }
-      
-      this.loadTableData(); // โหลดข้อมูลใหม่
+      this.originalScoreType = this.reqtable?.score_type || ''; // Update the original score_type
+      this.loadTableData();
     }
   }
 
   ngOnInit() {
 
+    this.originalScoreType = this.reqtable?.score_type || '';
+    this.isSearchTriggered = false;
     const role = this.UserService.role;
     const teacher_code = this.UserService.teacherCode;
-    const username = this.UserService.username;
+    // const username = this.UserService.username;
 
     console.log('POND', role)
     console.log('POND1', teacher_code)
@@ -360,6 +379,7 @@ exportExcel() {
     this.RequestTable.subscribe((data) => {
       console.log('DATA FROM SEARCH:', data);
       this.reqtable = data || null; // ถ้า data เป็น null ก็รีเซ็ตค่า
+      this.isSearchTriggered = true;
       this.loadTableData(); // โหลดข้อมูลใหม่
     });
   
@@ -375,4 +395,4 @@ exportExcel() {
       this.refreshHeaderNames();
     });
   }
-}  
+}

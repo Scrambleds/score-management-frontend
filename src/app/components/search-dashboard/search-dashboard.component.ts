@@ -180,14 +180,29 @@ export class SearchDashboardComponent implements OnInit {
     console.log(role);
     console.log('MyteacherCode', teacher_code);
   
+    if (role === 2) {
+    
     this.form = this.fb.group({
       subject_id: [null],
       academic_year: [null],
       semester: [null],
       section: [null],
       score_type: [null], // ไม่ต้องใส่ default ที่นี่
+      teacher_code: teacher_code,
     });
-  
+
+  } else{
+    this.form = this.fb.group({
+      subject_id: [null],
+      academic_year: [null],
+      semester: [null],
+      section: [null],
+      score_type: [null], // ไม่ต้องใส่ default ที่นี่
+      teacher_code: [null],
+    });
+  }
+
+    teacher_code
     this.resetFields([
       'academic_year',
       'semester',
