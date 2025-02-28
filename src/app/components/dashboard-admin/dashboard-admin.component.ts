@@ -20,6 +20,7 @@ import {
 } from 'ag-grid-community';
 import { TranslationService } from '../../core/services/translation.service';
 import { format } from 'date-fns';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dashboard-admin',
@@ -167,6 +168,16 @@ exportExcel() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+      Swal.fire({
+          icon: 'success',
+          title: this.TranslationService.getTranslation(
+            'swal_downloadTemplateSuccess_title'
+          ),
+          text: this.TranslationService.getTranslation('swal_downloadTemplateSuccess_text'),
+          confirmButtonColor: '#0d6efd',
+          confirmButtonText: this.TranslationService.getTranslation('btn_ok'),
+        });
   }
 
   onCellClicked(event: any) {
