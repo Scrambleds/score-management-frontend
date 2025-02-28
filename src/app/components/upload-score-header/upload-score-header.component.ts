@@ -74,10 +74,10 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
         ],
       ],
       subjectName: ['', Validators.required],
-      academicYearCode: [{ value: null }, Validators.required],
-      semesterCode: [{ value: null }, Validators.required],
-      sectionCode: [{ value: null }, Validators.required],
-      teacher: [{ value: null }, Validators.required],
+      academicYearCode: [null, Validators.required],
+      semesterCode: [null, Validators.required],
+      sectionCode: [null, Validators.required],
+      teacher: [null, Validators.required],
     });
 
     // ตรวจจับการเปลี่ยนแปลงของฟอร์ม
@@ -345,8 +345,8 @@ export class UploadScoreHeaderComponent implements OnInit, OnChanges {
   }
 
   onFocus() {
-    if (this.filteredSubjects.length > 0) {
-      this.showSuggestions = true; // แสดง dropdown เมื่อมีข้อมูล
-    }
+    // if (this.filteredSubjects.length > 0) {
+    this.showSuggestions = true; // แสดง dropdown เมื่อมีข้อมูล
+    // }
   }
 }
