@@ -385,7 +385,7 @@ export class UploadExcelContainerComponent implements OnInit {
     return data.map((row) => {
       // example row['ชื่อ-นามสกุล'] is นายสมชาย ใจดี
       const fullName = (row['ชื่อ-นามสกุล'] || '').trim();
-      const prefixes = ['นาย', 'นาง', 'นางสาว', 'Mr.', 'Mrs.', 'Miss']; // คำนำหน้าที่อนุญาติให้ใช้
+      const prefixes = ['นาย', 'นางสาว', 'นาง', 'Mr.', 'Miss', 'Mrs.']; // คำนำหน้าที่อนุญาติให้ใช้
 
       let prefix = '';
       let namePart = fullName;
