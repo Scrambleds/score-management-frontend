@@ -5,10 +5,10 @@
     <div class="card-header bg-light border-bottom">
       <div class="row ms-1 mt-2">
         <p class="mb-2" style="font-size: 0.8rem; color: #838383; font-weight: 600">
-          ข้อมูลบัญชีผู้ใช้</p>
+          {{ "edit_user_info" | translate }}</p>
         <div class="d-flex justify-content-between align-items-end">
           <h4 class="text-title fw-bold mb-2 mt-0">{{ "add_masterdata_total" | translate }} {{ filteredData.length }}
-            บัญชี</h4>
+           {{ "edit_user_acc" | translate }}</h4>
             <button type="submit" class="btn btn-primary mb-2" (click)="onAddUserClick()">
               <i class="bi bi-person-fill-add"></i>
               {{ "user_manage_adduser" | translate }}
