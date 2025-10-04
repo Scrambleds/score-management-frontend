@@ -1,1 +1,18 @@
-<p>upload-score works!</p>
+<div class="route-container">
+  <!-- 9. call fn: handleFormSubmitted with formData -->
+  <app-upload-score-header
+    #scoreHeader
+    [isUploaded]="isFileUploaded"
+    (formSubmitted)="handleFormSubmitted($event)"
+    (formStatusChange)="onFormStatusChange($event)"
+  ></app-upload-score-header>
+  <!-- 4. call fn: handleSubmitRequest()-->
+  <app-upload-excel-container
+    #scoreContent
+    [titleName]="'uploadscore_uploadStudentScore' | translate"
+    [buttonName]="'uploadscore_uploadExcelFile' | translate"
+    (isUploaded)="handleUploadEvent($event)"
+    (submitRequest)="handleSubmitRequest()"
+    [isButtonDisabled]="isButtonDisabled"
+  ></app-upload-excel-container>
+</div>

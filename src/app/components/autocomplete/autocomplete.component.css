@@ -1,0 +1,113 @@
+/* ------------ auto complete ---------------- */
+.autocomplete-container {
+  position: absolute;
+  width: 100%;
+  z-index: 1050;
+  -webkit-overflow-scrolling: touch;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top-color: hsl(0, 0%, 90%);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  left: 0;
+  /* border-radius: var(--bs-border-radius); */
+  box-sizing: border-box;
+}
+
+.autocomplete-container.width-auto {
+  width: auto;
+  white-space: nowrap;
+}
+
+.autocomplete-list {
+  position: relative;
+  display: block;
+  background: white;
+  max-height: 200px;
+  overflow-y: auto;
+  /* border-bottom-right-radius: var(--bs-border-radius);
+  border-bottom-left-radius: var(--bs-border-radius); */
+}
+
+.autocomplete-container.top .autocomplete-list {
+  border-top-right-radius: var(--bs-border-radius);
+  border-top-left-radius: var(--bs-border-radius);
+}
+
+.autocomplete-container.bottom .autocomplete-list {
+  border-bottom-right-radius: var(--bs-border-radius);
+  border-bottom-left-radius: var(--bs-border-radius);
+}
+
+.autocomplete-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.autocomplete-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* Adjust position based on dropdownPosition */
+.autocomplete-container.bottom {
+  top: 100%; /* Display below the input */
+  border-bottom-right-radius: var(--bs-border-radius);
+  border-bottom-left-radius: var(--bs-border-radius);
+}
+
+.autocomplete-container.top {
+  bottom: 100%; /* Display above the input */
+  border-top-right-radius: var(--bs-border-radius);
+  border-top-left-radius: var(--bs-border-radius);
+}
+
+.input-group-autocomplete {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.input-group-autocomplete > .form-control,
+.input-group-autocomplete > .form-floating,
+.input-group-autocomplete > .form-select {
+  position: relative;
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+}
+
+.input-group-autocomplete .form-control {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%;
+}
+.input-group-autocomplete input.form-control[readonly] {
+  background-color: #e9ecef;
+  opacity: 1;
+}
+
+.input-group-autocomplete.dropdown-top .form-control:not(:last-child) {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+
+/* สำหรับ dropdown ที่แสดงลงด้านล่าง */
+.input-group-autocomplete.dropdown-bottom .form-control:not(:last-child) {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-control[readonly] {
+  background-color: #e9ecef;
+  opacity: 1;
+}
+/* Responsive handling */
+@media (max-width: 768px) {
+  .autocomplete-container {
+    max-width: 80vw;
+  }
+
+  .autocomplete-list {
+    max-height: 150px;
+  }
+}

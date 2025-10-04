@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ScoreAnnouncementService } from '../../services/score-announcement/score-announcement.service';
+import { SearchFormScoreAnnouncementComponent } from '../../components/score-announcement/search-form/search-form-search-form-score-announcemen.component';
 
 @Component({
   selector: 'app-score-announcement',
@@ -8,37 +11,63 @@ import { Component } from '@angular/core';
   styleUrl: './score-announcement.component.css',
 })
 export class ScoreAnnouncementComponent {
-  //สำหรับตัวอย่าง response ของ language
-  jsonString = JSON.stringify(
-    {
-      isSuccess: false,
-      message: {
-        messageKey: '',
-        messageDescription: '',
+  gridData: any[] = [];
+  scoreForm!: FormGroup;
+  teacherCode: string | null = null;
+  rowData: any[] = []; // ข้อมูลสำหรับ ag-grid
+  currentSubjectData: any = null;
+  @ViewChild('scoreHeader') header!: SearchFormScoreAnnouncementComponent;
+
+  constructor(
+    private scoreService: ScoreAnnouncementService,
+    private fb: FormBuilder
+  ) {
+    this.scoreForm = this.fb.group({
+      subjectId: [''],
+      academicYearCode: [''],
+      semesterCode: [''],
+    });
+  }
+  onReset() {
+    this.gridData = [];
+  }
+
+  ngOnInit() {}
+
+  updateGridData(newData: any[]): void {
+    this.gridData = newData;
+  }
+
+  onSearchSubmit(requestData: any) {
+    this.scoreService.getScoreAnnouncementByCondition(requestData).subscribe(
+      (response) => {
+        // ตรวจสอบ response ว่ามีข้อมูลที่ต้องการ
+        if (response.objectResponse && response.objectResponse.length > 0) {
+          this.gridData = response.objectResponse; // อัปเดต gridData
+          console.log('Data received:', this.gridData); // ดูข้อมูลที่ได้รับจาก API
+        } else {
+          console.warn('No data found for the given search criteria');
+          this.gridData = [];
+        }
       },
-      objectResponse: {
-        welcome_message: 'Welcome {username}',
-        logout: 'Logout',
-        home: 'Home',
-        insert_product: 'Insert a Product',
-        language: 'Language',
-        list: 'List',
-        login: 'Login',
-        login_user_not_found: '{username} not found',
-        login_success: 'Welcome {username}',
-        login_failed: 'username / password incorrect',
-        chat: 'Chat',
-        noti_template1:
-          'There was an error sending. email to {student_name}\\ndetail : {error_detail}',
-        menu_masterdata: 'Master Data management',
-        menu_usermanage: 'User management',
-        menu_uploadscore: 'Import student scores',
-        menu_searchscore: 'Search score',
-        menu_scoreannounce: 'Score announcements',
-        menu_dashboard: 'Dashboard',
-      },
-    },
-    null,
-    2
-  ); // Null, 2 for pretty-printing
+      (error) => {
+        console.error('Error fetching scores:', error);
+      }
+    );
+  }
+
+  onCurrentSubjectHandle(subjectData: any) {
+    this.currentSubjectData = subjectData;
+  }
+
+  handleEmailStatus(status: boolean) {
+    // เมื่อได้รับ event จาก A Component (ซึ่ง bubbled มาจาก app-send-email)
+    console.log('Received email status from child:', status);
+
+    if (status) {
+      // หากส่งอีเมลสำเร็จ เรียกใช้ onSubmit() ใน B Component
+      this.header.onSubmit();
+    }
+    // หากต้องการจัดการกรณีไม่สำเร็จก็สามารถทำได้ที่นี่
+  }
 }

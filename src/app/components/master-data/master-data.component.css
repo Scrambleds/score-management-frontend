@@ -1,0 +1,29 @@
+.card {
+  border-radius: 0.75rem;
+  box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.2);
+  padding: 0.625rem;
+  border-color: #ddd;
+  overflow: hidden;
+  position: relative;
+}
+
+.badge {
+  background-color: #6184FF;
+  color: white;
+  padding: 0.313rem 0.625rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.custom-icon {
+  font-weight: bold;
+  color: #007bff; 
+  font-size: 1.5rem;
+}
+
+.collapsing{
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.35s ease;
+}

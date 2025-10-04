@@ -1,49 +1,129 @@
-<div class="card custom-card mb- animate__animated animate__fadeIn">
-  <div class="card-body p-2">
-    <form
-      [formGroup]="form"
-      (ngSubmit)="onSubmit()"
-      class="d-flex justify-content-between align-items-center mb-2 ms-2 px-2" style="margin-top: 0.625rem;"
-    >
-      <p class="text-title fw-bold mb-0 d-flex justify-content-between align-items-center">{{ "menu_usermanage_account" | translate }}</p>
-      <button type="submit" class="btn btn-primary">
-        <i class="bi bi-person-fill-add"></i>
-        เพิ่มบัญชีผู้ใช้
-      </button>
-    </form>
+<ng-container *ngIf="filteredData.length > 0; else noDataMessage">
+  <div class="card custom-card p-0 mb-2">
 
-    <div *ngFor="let value of data" class="card custom-card mb-3 p-4">
-      <!-- <div class="container"> -->
-        <div class="row">
-          <div class="col-12 col-md-5">
-            <div class="row">
-              <div class="col-12 col-sm-5 text-start ps-5">{{ value.citizenId }}</div>
-              <div class="col-12 col-sm-7 text-start ps-5">{{ value.prospectFullName }}</div>
-            </div>
-          </div>
-          <div class="col-12 col-md-4">
-            <div class="row">
-              <div class="col-12 col-sm-7 text-start ps-5">{{ value.corpStatus }}</div>
-              <div class="col-12 col-sm-5 text-center">{{ value.saleType }}</div>
-            </div>
-          </div>
-          <div class="col-12 col-md-3">
-            <div class="row">
-              <div class="col-12 col-sm-6 text-end">{{ value.createDate }}</div>
-              <div class="col-12 col-sm-6 d-flex justify-content-end align-items-center">
-                <a [routerLink]="['#', value.prospectId]">
-                  <button
-                    type="button"
-                    class="btn btn-text-blue min-w-1.25rem p-0"
-                  >
-                    <i class="bi bi-pencil-square" style="color: #0d00ff"></i>
-                  </button>
-                </a>
-              </div>
-            </div>
-          </div>
+    <!-- Card Header -->
+    <div class="card-header bg-light border-bottom">
+      <div class="row ms-1 mt-2">
+        <p class="mb-2" style="font-size: 0.8rem; color: #838383; font-weight: 600">
+          {{ "edit_user_info" | translate }}</p>
+        <div class="d-flex justify-content-between align-items-end">
+          <h4 class="text-title fw-bold mb-2 mt-0">{{ "add_masterdata_total" | translate }} {{ filteredData.length }}
+           {{ "edit_user_acc" | translate }}</h4>
+            <button type="submit" class="btn btn-primary mb-2" (click)="onAddUserClick()">
+              <i class="bi bi-person-fill-add"></i>
+              {{ "user_manage_adduser" | translate }}
+            </button>
         </div>
       </div>
     </div>
+
+    <div class="card-body p-2">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()"
+        class="d-flex justify-content-end align-items-center mb-2 ms-2 px-2" style="margin-top: 0.625rem">
+
+        <!-- <p class="text-title fw-bold mb-0 d-flex justify-content-between align-items-center">
+          {{ "user_management" | translate }}
+        </p> -->
+
+        <!-- <button type="submit" class="btn btn-primary" (click)="onAddUserClick()">
+          <i class="bi bi-person-fill-add"></i>
+          {{ "user_manage_adduser" | translate }}
+        </button> -->
+        
+      </form>
+
+      <!-- <div *ngFor="let value of filteredData" class="card custom-card mb-3 p-4">
+      <div class="d-flex justify-content-between flex-wrap flex-row">
+        <div class="col-6 col-sm-2 col-md-2 text-start ">
+          {{ value.email }}
+        </div>
+        <div class="col-6 col-sm-2 col-md-2 text-start ">
+          {{ value.teacher_code }}
+        </div>
+        <div class="col-6 col-sm-4 col-md-2 text-start">
+          {{ value.prefix }} {{ value.firstname }} {{ value.lastname }}
+        </div>
+        <div class="col-6 col-sm-2 col-md-2 text-start ">{{ getRoleTitle(value.role) }}</div>
+        <div class="d-flex flex-row col-12 col-sm-1 col-md-2">
+          <div class="col-6 col-sm-11 text-start">{{ getStatusTitle(value.active_status) }}</div>
+          <div class="d-flex justify-content-start align-items-center">
+            <a>
+              <button
+                type="button"
+                class="btn btn-text-blue min-w-1.25rem p-0"
+                (click)="openModal(value)"
+              >
+                <i class="bi bi-pencil-square" style="color: #0d00ff; font-size: 1.2rem;"></i>
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <div class="d-flex justify-content-center">
+      <div class="table-responsive custom-table-container">
+        <table class="table table-bordered table-hover table-striped custom-table">
+          <thead>
+            <tr>
+              <th scope="col">{{ "user_manage_number" | translate}}</th>
+              <th scope="col">{{ "user_manage_email" | translate }}</th>
+              <th scope="col">{{ "user_manage_teachercode" | translate }}</th>
+              <th scope="col">{{ "user_manage_name" | translate }} - {{ "user_manage_surname" | translate }}</th>
+              <th scope="col">{{ "user_manage_role" | translate}}</th>
+              <th scope="col">{{ "user_manage_status" | translate }}</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+    
+          <tbody class="table-fixed-column h-75vh">
+            <tr *ngFor="let value of pagedData; let i = index">
+              <td scope="col"  style="width: 90px;">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+              <td scope="col">{{ value.email }}</td>
+              <td scope="col">{{ value.teacher_code }}</td>
+              <td scope="col">{{ value.prefix }} {{ value.firstname }} {{ value.lastname }}</td>
+              <td scope="col">{{ getRoleTitle(value.role) }}</td>
+              <td scope="col">{{ getStatusTitle(value.active_status) }}</td>
+              <td scope="col" style="width: 90px; text-align: center;">
+                <button type="button" class="btn btn-text-blue p-0" (click)="openModal(value)">
+                  <i class="bi bi-pencil-square" style="color: #0d00ff; font-size: 1.2rem;"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+      <nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="changePage(currentPage - 1)">{{"user_manage_prev" | translate}}</a>
+          </li>
+          <li class="page-item" *ngFor="let page of totalPagesArray" [class.active]="page === currentPage">
+            <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" (click)="changePage(currentPage + 1)">{{ "user_manage_next" | translate}}</a>
+          </li>
+        </ul>
+      </nav>
+
+    </div>
   </div>
-<!-- </div> -->
+</ng-container>
+
+<ng-template #noDataMessage>
+  <div *ngIf="isSearchTriggered && pagedData.length === 0" class="row justify-content-center my-4">
+    <div class="col-12 text-center">
+      <div class="alert alert-warning text-body fw-bold p-3" style="font-size: 1.2rem; border-radius: 0.5rem;">
+        <i class="bi bi-exclamation-circle-fill" style="color: #ffcc00;"></i>
+        {{ "notfound_adduser" | translate }}
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<app-modal-edit [show]="isModalVisible" [selectedRowData]="selectedRowData" [statusData]="statusData"
+  [prefixData]="prefixData" [roleData]="roleData" (hide)="closeModal()" (submit)="handleModalSubmit($event)">
+</app-modal-edit>

@@ -1,12 +1,13 @@
-<p>score-announcement works!</p>
-<br />
-<p>ตัวอย่างการใช้ Translate ปกติ</p>
-<p>{{ "menu_masterdata" | translate }}</p>
-<br />
-<p>ตัวอย่างการใช้ Translate + parameter</p>
-<p>{{ "welcome_message" | translate : { username: "Admin" } }}</p>
-<br />
-<p>ตัวอย่าง reponse language ของภาษา อังกฤษ</p>
-<pre>
-     {{ jsonString }}
-</pre>
+<div class="route-container">
+  <search-form-score-announcemen
+    #scoreHeader
+    (searchSubmit)="onSearchSubmit($event)"
+    (resetForm)="onReset()"
+    (currentSubject)="onCurrentSubjectHandle($event)"
+  />
+  <table-score-announcemen
+    [gridData]="gridData"
+    [currentSubject]="currentSubjectData"
+    (emailStatusChanged)="handleEmailStatus($event)"
+  />
+</div>

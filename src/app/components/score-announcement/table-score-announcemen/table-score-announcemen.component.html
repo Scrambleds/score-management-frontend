@@ -1,0 +1,86 @@
+<app-modal-send-mail
+  (emailStatusChanged)="onChildEmailStatus($event)"
+></app-modal-send-mail>
+<div class="custom-card">
+  <div class="card-body w-100 gx-0">
+    <div class="row gx-0 w-100">
+      <div class="col-12 col-md-8">
+        <div
+          class="d-flex justify-content-start align-items-start flex-column w-100"
+        >
+          <div class="w-100 mt-2">
+            <div class="fw-bold text-start">
+              {{ "student_grades_announcement" | translate }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="col-12 col-md ms-auto d-flex justify-content-end align-items-end"
+      >
+        <div class="button-container mb-2 d-flex gap-2">
+          <!-- 1. click save data -->
+          <!-- data-bs-toggle="modal"
+          data-bs-target="#announceScoreModal" -->
+          <!-- (click)="onSendMailModal(false)" -->
+          <button
+            *ngIf="isRowSelected"
+            type="button"
+            class="btn btn-primary"
+            (click)="sendMultiple()"
+            [disabled]="gridData.length === 0"
+          >
+            <i
+              class="bi bi-send"
+              style="color: white; font-size: 22px; cursor: pointer"
+              title="ส่งคะแนน"
+            ></i>
+            {{ "scoreAnnouncement_sendSelected" | translate }}
+          </button>
+          <button
+            *ngIf="!isRowSelected"
+            type="button"
+            class="btn btn-primary"
+            (click)="sendAll()"
+            [disabled]="gridData.length === 0"
+          >
+            <i
+              class="bi bi-send"
+              style="color: white; font-size: 22px; cursor: pointer"
+              title="ส่งคะแนน"
+            ></i>
+            {{ "scoreAnnouncement_sendAll" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- ag-Grid -->
+    <ag-grid-angular
+      style="width: 100%; height: calc(100vh - 100px)"
+      class="ag-theme-quartz"
+      [rowData]="gridData"
+      [pagination]="pagination"
+      [paginationPageSize]="paginationPageSize"
+      [overlayNoRowsTemplate]="
+        '<span>' + ('no_row_show' | translate) + '</span>'
+      "
+      [gridOptions]="gridOptions"
+      (gridReady)="onGridReady($event)"
+    >
+      <!-- <ag-grid-angular
+      style="width: 100%; height: 55rem"
+      class="ag-theme-quartz"
+      [rowData]="gridData"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [pagination]="pagination"
+      [paginationPageSize]="paginationPageSize"
+      [overlayNoRowsTemplate]="
+        '<span>' + ('no_row_show' | translate) + '</span>'
+      "
+      rowSelection="multiple"
+      [rowMultiSelectWithClick]="true"
+    > -->
+    </ag-grid-angular>
+  </div>
+</div>

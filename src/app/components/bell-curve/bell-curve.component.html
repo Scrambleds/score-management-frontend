@@ -1,0 +1,117 @@
+<div class="dashboard">
+  <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 gx-4" style="display: flex; justify-content: center;">
+
+    <!-- คะแนนเฉลี่ย -->
+    <div class="col-12">
+      <div class="card p-4">
+        <div class="col-12 d-flex justify-content-start">
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_avg_score' | translate }}</p>
+        </div>
+        <div class="col-12 d-flex justify-content-center mb-3">
+          <h1 class="fw-bold">{{ avgScore! }}</h1>
+        </div>
+        <div class="col-12 d-flex justify-content-center">
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_avg_description' | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- คะแนนต่ำสุด -->
+    <div class="col-12">
+      <div class="card p-4">
+        <div class="col-12 d-flex justify-content-start">
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_min_score' | translate }}</p>
+        </div>
+        <div class="col-12 d-flex justify-content-center mb-3">
+          <h1 class="fw-bold">{{ minScore! }}</h1>
+        </div>
+        <div class="col-12 d-flex justify-content-center">
+          <p class="opacity-55" style="color: #5B5B5B;"> {{ 'dashboard_min_description' | translate}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- คะแนนสูงสุด -->
+    <div class="col-12">
+      <div class="card p-4">
+        <div class="col-12 d-flex justify-content-start">
+          <p class="opacity-55" style="color: #5B5B5B;"> {{ 'dashboard_max_score' | translate }}</p>
+        </div>
+        <div class="col-12 d-flex justify-content-center mb-3">
+          <h1 class="fw-bold">{{ maxScore! }}</h1>
+        </div>
+        <div class="col-12 d-flex justify-content-center">
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_max_description' | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ค่าเบี่ยงเบนมาตรฐาน -->
+    <div class="col-12">
+      <div class="card p-4">
+        <div class="col-12 d-flex justify-content-start">
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_std_score' | translate }}</p>
+        </div>
+        <div class="col-12 d-flex justify-content-center mb-3">
+          <h1 class="fw-bold">{{ stdDev! }}</h1>
+        </div>
+        <div class="col-12 d-flex justify-content-center">
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_std_description' | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- จำนวนนิสิต -->
+    <div class="col-12">
+      <div class="card p-4">
+        <div class="col-12 d-flex justify-content-start">
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_number_student' | translate }}</p>
+        </div>
+        <div class="col-12 d-flex justify-content-center mb-3">
+          <h1 class="fw-bold">{{ studentCount! }}</h1>
+        </div>
+        <div class="col-12 d-flex justify-content-center">
+          <p class="opacity-55" style="color: #5B5B5B;">{{ 'dashboard_stu_description' | translate }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--สัดส่วนช่วงคะแนนนิสิตที่ได้รับคะแนน-->
+<!-- <div class="canvas-container mb-4"> -->
+<div class="row">
+  <div class="col-12 col-md-6 col-lg-6 d-flex justify-content-start">
+    <div class="card bell-curve-card">
+      <div class="card-body">
+        <h5 class="card-title ps-4 mt-4 fw-bold mb-5">{{ 'dashboard_range' | translate }}</h5>
+        <div class="col-12 d-flex justify-content-center align-items-center">
+          <!-- <div style="max-width: 80.5rem; width: 100%;"> -->
+          <!-- <canvas baseChart
+          [data]="doughnutChartData"
+          [options]="doughnutChartOptions"
+          [type]="'doughnut'" style="height: 21.875rem;">
+          </canvas> -->
+          <!-- </div> -->
+          <canvas #dChart>
+          </canvas>
+          <!-- <div style="display:flex; justify-content:center;"><button (click)="updateData()">Click Me</button></div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!---การแจกแจงคะแนนนิสิต-->
+  <div class="col-12 col-md-6 col-lg-6 d-flex justify-content-start">
+    <div class="card bell-curve-card">
+      <div class="card-body">
+        <h5 class="card-title ps-4 mt-4 fw-bold mb-5">{{ 'dashboard_distribution_score' | translate }}</h5>
+        <div class="col-12 d-flex justify-content-start align-items-center" style="height: 400px;">
+          <!-- <canvas #bChart baseChart [data]="bellCurveData" [labels]="bellCurveLabels" [type]="'line'">
+        </canvas> -->
+          <canvas style="display: block; box-sizing: border-box; height: 400px; width: 862px;" #bChart></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

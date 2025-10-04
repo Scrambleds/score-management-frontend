@@ -1,0 +1,64 @@
+<ng-container *ngIf="Data.length > 0; else noDataMessage">
+  <div class="card custom-card-table p-0 mb-2">
+    <!-- Card Header -->
+    <div class="card-header bg-light border-bottom">
+      <div class="row ms-1 mt-2">
+        <p
+          class="mb-2"
+          style="font-size: 0.8rem; color: #838383; font-weight: 600"
+        >
+          {{ 'dashboard_info_subjects' | translate}}
+        </p>
+        <div class="d-flex justify-content-between align-items-end">
+          <h4 class="text-title fw-bold mb-2 mt-0">
+            {{ "add_masterdata_total" | translate }} {{ Data.length }} {{ "dashboard_header_subjects" | translate}}
+          </h4>
+          <button
+            type="submit"
+            class="btn btn-primary mb-2"
+            (click)="exportExcel()"
+            [disabled]="
+              !isRowSelected || reqtable?.score_type !== originalScoreType
+            "
+          >
+            <i class="bi bi-download"></i>
+            {{ "dashboard_excel_export" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-3 mb-3">
+      <ag-grid-angular
+        style="width: 97%; height: 490px"
+        class="ag-theme-quartz"
+        [rowData]="Data"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [overlayNoRowsTemplate]="
+          '<span>' + ('no_row_show' | translate) + '</span>'
+        "
+        [gridOptions]="gridOptions"
+        (gridReady)="onGridReady($event)"
+      >
+      </ag-grid-angular>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #noDataMessage>
+  <div
+    *ngIf="isSearchTriggered && Data.length === 0"
+    class="row justify-content-center my-4"
+  >
+    <div class="col-12 text-center">
+      <div
+        class="alert alert-warning text-body fw-bold p-3"
+        style="font-size: 1.2rem; border-radius: 0.5rem"
+      >
+        <i class="bi bi-exclamation-circle-fill" style="color: #ffcc00"></i>
+        {{ "dashboard_notfound" | translate }}
+      </div>
+    </div>
+  </div>
+</ng-template>

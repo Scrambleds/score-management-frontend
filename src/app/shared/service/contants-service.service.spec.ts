@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { UserManageService } from './user-manage.service';
+import { ContantService } from './contants-service.service';
 
-describe('UserManageService', () => {
-  let service: UserManageService;
+describe('ScoreAnnouncementService', () => {
+  let service: ContantService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(UserManageService);
+    service = TestBed.inject(ContantService);
   });
 
   it('should be created', () => {

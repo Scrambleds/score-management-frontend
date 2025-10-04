@@ -10,13 +10,6 @@ export class TranslatePipe implements PipeTransform {
   constructor(private translationService: TranslationService) {}
 
   transform(value: string, variables?: Record<string, string>): string {
-    let translation = this.translationService.getTranslation(value) || value;
-
-    if (variables) {
-      Object.keys(variables).forEach((key) => {
-        translation = translation.replace(`{${key}}`, variables[key]);
-      });
-    }
-    return translation;
+    return this.translationService.transform(value, variables);
   }
 }

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-master-data',
+  selector: 'app-route-masterdata',
   standalone: false,
   
   templateUrl: './master-data.component.html',

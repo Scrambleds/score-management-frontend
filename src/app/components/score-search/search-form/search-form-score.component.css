@@ -1,0 +1,126 @@
+.custom-card {
+  --bs-card-spacer-y: 1.5rem;
+  --bs-card-spacer-x: 1.5rem;
+  --bs-card-title-spacer-y: 0.5rem;
+  --bs-card-title-color: ;
+  --bs-card-subtitle-color: ;
+  --bs-card-border-width: var(--bs-border-width);
+  --bs-card-border-color: var(--bs-border-color-translucent);
+  --bs-card-border-radius: var(--bs-border-radius);
+  --bs-card-box-shadow: ;
+  --bs-card-inner-border-radius: calc(
+    var(--bs-border-radius) - (var(--bs-border-width))
+  );
+  --bs-card-cap-padding-y: 0.5rem;
+  --bs-card-cap-padding-x: 1rem;
+  --bs-card-cap-bg: rgba(var(--bs-body-color-rgb), 0.03);
+  --bs-card-cap-color: ;
+  --bs-card-height: ;
+  --bs-card-color: ;
+  --bs-card-bg: var(--bs-body-bg);
+  --bs-card-img-overlay-padding: 1rem;
+  --bs-card-group-margin: 0.75rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  min-width: 0;
+  height: var(--bs-card-height);
+  color: var(--bs-body-color);
+  word-wrap: break-word;
+  background-color: var(--bs-card-bg);
+  background-clip: border-box;
+  border: var(--bs-card-border-width) solid var(--bs-card-border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.2);
+}
+
+.card-body {
+  width: 100%;
+  flex: 1 1 auto;
+  padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+  color: var(--bs-card-color);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+ng-select {
+  width: 100%;
+}
+.d-flex {
+  flex-wrap: wrap;
+}
+
+.custom-btn {
+  height: 40px;
+  width: 120px;
+  font-size: 18px;
+  margin-left: 0.5rem;
+}
+
+/* @media (min-width: 1600px) {
+  .custom-btn {
+    margin-top: 1rem;
+  }
+} */
+@media (max-width: 1366px) {
+  .custom-btn {
+    width: fit-content;
+    font-size: 16px;
+  }
+}
+@media (max-width: 1200px) {
+  .custom-btn {
+    width: 100px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .custom-btn {
+    width: 90px;
+    font-size: 14px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .custom-btn {
+    width: 6rem;
+    font-size: 16px;
+    height: 2.5rem;
+  }
+}
+
+.test {
+  padding-right: 0;
+  padding-left: 0;
+}
+div {
+  position: relative;
+}
+
+ul {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  z-index: 10;
+}
+
+li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+li:hover {
+  background: #f0f0f0;
+}

@@ -1,0 +1,69 @@
+<div *ngIf="!isFileUploaded" class="custom-card"
+  style="border: 1px dashed; width: 100%; height: 100%">
+  <div class="card-body w-100" (dragover)="onDragOver($event)"
+    (drop)="onDrop($event)">
+
+    <!-- <div class="col-12 d-flex justify-content-between align-items-center">
+        <label class="fw-bold text-danger">*หากยังไม่มีรูปไฟล์ Excel กรุณาลิงก์เพื่อดาวน์โหลดรูปแบบไฟล์ Excel</label>
+        <a class="btn btn-link" (click)="onDownloadTemplate()" style="text-decoration: none; cursor: pointer;">
+          <i class="bi bi-download" style="font-size: var(--icon-size); color: var(--primary-color)"></i>
+          ดาวน์โหลดตัวอย่างรูปแบบไฟล์
+        </a>
+      </div> -->
+
+    <div class="fw-bold text-center">{{ "add_user_label" | translate }}</div>
+    <label for="uploadfile" class="btn btn-primary">
+      <i class="bi bi-box-arrow-in-down" style="font-size: var(--icon-size); color: var(--white-color)"></i>
+      {{ "add_user_upload" | translate }}
+    </label>
+    <input id="uploadfile" type="file" class="d-none" accept=".xls,.xlsx" (change)="onFileSelected($event)" />
+
+    <label class="fw-bold text-danger dashed-line">
+      <span>*{{ "condition_format_excel" | translate }}</span>
+    </label>
+    <a class="btn btn-link" (click)="onDownloadTemplate()" style="cursor: pointer; text-decoration: none;">
+      <i class="bi bi-download" style="font-size: var(--icon-size); color: var(--primary-color); text-decoration: none; margin-right: 0.313rem;"></i>
+      <span style="text-decoration: underline;">{{ "example_format_excel" | translate}}</span>
+    </a>
+    
+  </div>
+</div>
+
+<div *ngIf="isFileUploaded" class="custom-card">
+  <div class="card-body w-100 gx-0">
+    <div class="row gx-0 w-100">
+      <div class="col-12 col-md-8 col-sm-12">
+        <div class="d-flex justify-content-start align-items-start flex-column w-100">
+          <div class="d-flex align-items-center fw-bold text-start ms-3" style="width: 25%; height: 68px">
+            <!-- ตารางข้อมูลผู้ใช้งาน -->
+            {{ "add_user_info" | translate }}
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md ms-auto d-flex justify-content-end align-items-end">
+        <div class="button-container mb-2 d-flex gap-2">
+          <!-- 1. click save data -->
+          <button class="btn btn-primary" (click)="onSaveData()">
+            <i class="bi bi-floppy-fill" style="font-size: var(--icon-size); color: var(--white-color)"></i>
+            <!-- บันทึกข้อมูล -->
+            {{ "user_manage_save" | translate }}
+          </button>
+          <button class="btn btn-secondary" (click)="onDelete()">
+            <i class="bi bi-trash-fill" style="font-size: var(--icon-size); color: var(--white-color)"></i>
+            <!-- ลบข้อมูล -->
+            {{ "add_user_delete" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 text-danger ps-3 mb-0">
+      *{{ "add_user_caution" | translate }}
+    </div>
+    <!-- ag-Grid -->
+    <ag-grid-angular *ngIf="isFileUploaded" style="width: 100%; height: 30.375rem" class="ag-theme-quartz"
+      [rowData]="rowData" [gridOptions]="gridOptions" [columnDefs]="columnDefs" [defaultColDef]="defaultColDef"
+      (gridReady)="onGridReady($event)">
+    </ag-grid-angular>
+  </div>
+</div>

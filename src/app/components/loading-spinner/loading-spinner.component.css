@@ -1,0 +1,47 @@
+@keyframes dimBounce {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-15px);
+  }
+}
+@keyframes dim {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  } /* เด้งขึ้น */
+}
+
+/* .loading-logo {
+  width: clamp(40px, calc(100vw * (80 / 1280)), 80px);
+} */
+
+.dimBounce-effect {
+  animation: dimBounce 1.5s ease-in-out infinite;
+}
+
+.dim-effect {
+  animation: dim 1.5s ease-in-out infinite;
+}
+
+.bounce-effect {
+  animation: bounce 1s ease-in-out infinite;
+}

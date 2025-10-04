@@ -43,29 +43,31 @@
               "node_modules/ag-grid-community/styles/ag-grid.css",
               "node_modules/ag-grid-community/styles/ag-theme-quartz.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
-              "node_modules/@ng-select/ng-select/themes/default.theme.css"
+              "node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "node_modules/animate.css/animate.min.css"
             ],
             "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+
+            ]
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "3mb",
+                  "maximumError": "5mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "300kb",
+                  "maximumError": "500kb"
                 }
               ],
               "outputHashing": "all"

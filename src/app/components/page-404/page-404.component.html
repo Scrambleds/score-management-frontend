@@ -1,0 +1,45 @@
+<div
+  class="authentication-wrapper authentication-2 ui-bg-cover ui-bg-overlay-container px-4"
+  style="
+    background-image: url('assets/background/workspace_bg_ku.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  "
+>
+  <div class="ui-bg-overlay bg-dark opacity-25"></div>
+  <div class="authentication-inner py-5">
+    <div class="card">
+      <div class="p-sm-5 card-body">
+        <div class="align-items-center media">
+          <div class="ml-3 media-body">
+            <div
+              class="d-flex justify-content-center align-items-center logo-container"
+            >
+              <div>
+                <div class="position-relative">
+                  <img
+                    src="assets/background/KU_Logo_PNG.png"
+                    alt="Brand"
+                    class="login-logo"
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              class="text-large font-weight-bolder line-height-1 d-flex justify-content-center"
+            >
+              <!-- 404 Page Not Found -->
+              {{ "page_notfound_404" | translate }}
+            </div>
+          </div>
+        </div>
+        <hr class="my-4" />
+        <div class="fw-bold">
+          <!-- หน้านี้ไม่มีอยู่หรือถูกนำออกจากระบบแล้ว -->
+          {{ "page_notfound_desc" | translate }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

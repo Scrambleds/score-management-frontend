@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
 })
 export class TranslationService {
   private translations = new BehaviorSubject<Record<string, string>>({});
-  private defaultLanguage = 'th'; // กำหนดภาษาเริ่มต้นเป็นภาษาไทย
+  private currentLang = 'th'; // ตั้งค่าภาษาเริ่มต้นเป็น 'th'
 
   constructor(private http: HttpClient) {
     this.setInitialLanguage(); // เรียกใช้เพื่อโหลดภาษาที่เก็บไว้
@@ -19,47 +19,34 @@ export class TranslationService {
   }
 
   private setInitialLanguage(): void {
-    let lang = this.defaultLanguage;
-
     // ถ้าเป็นการเรียกใน browser และมีการเก็บภาษาใน localStorage
     if (this.isBrowser()) {
       const savedLang = localStorage.getItem('language');
-      lang = savedLang || this.defaultLanguage; // ใช้ภาษาที่เก็บไว้ ถ้าไม่มีใช้ภาษาเริ่มต้น
+      if (savedLang) {
+        this.currentLang = savedLang;
+      }
     }
-
-    this.loadTranslations(lang);
+    this.loadTranslations(this.currentLang);
   }
 
   loadTranslations(language: string): void {
     // เช็คว่าโค้ดนี้ทำงานใน browser หรือไม่
     if (typeof window !== 'undefined') {
-      const savedTranslations = localStorage.getItem(
-        `translations_${language}`
-      );
+      // ถ้าไม่มีคำแปลใน localStorage ให้ดึงจาก API
+      this.http
+        .get<Record<string, string>>(
+          `${environment.apiUrl}/api/MasterData/Language?language=${language}`
+        )
+        .subscribe((data: any) => {
+          const translations = data.objectResponse;
+          this.currentLang = language;
+          this.translations.next(translations);
 
-      if (savedTranslations) {
-        // ถ้ามีคำแปลใน localStorage ใช้คำแปลเหล่านั้นเลย
-        this.translations.next(JSON.parse(savedTranslations));
-      } else {
-        // ถ้าไม่มีคำแปลใน localStorage ให้ดึงจาก API
-        this.http
-          .get<Record<string, string>>(
-            `${environment.apiUrl}/api/MasterData/Language?language=${language}`
-          )
-          .subscribe((data: any) => {
-            const translations = data.objectResponse;
-            this.translations.next(translations);
-
-            // เก็บคำแปลที่ได้รับจาก API ไว้ใน localStorage
-            if (this.isBrowser()) {
-              localStorage.setItem(
-                `translations_${language}`,
-                JSON.stringify(translations)
-              );
-              localStorage.setItem('language', language); // เก็บภาษาปัจจุบัน
-            }
-          });
-      }
+          if (this.isBrowser()) {
+            localStorage.setItem('language', language); // เก็บภาษาปัจจุบัน
+          }
+        });
+      // }
     }
   }
 
@@ -77,46 +64,40 @@ export class TranslationService {
     return template;
   }
 
+  // ฟังก์ชันเพื่อดึงค่าภาษา
+  getCurrentLanguage(): string {
+    return this.currentLang;
+  }
+
   changeLanguage(lang: string): void {
     // เมื่อมีการเปลี่ยนภาษา จะโหลดคำแปลใหม่และเก็บไว้ใน localStorage
     this.loadTranslations(lang);
   }
-}
-//   // Mock Data สำหรับแต่ละภาษา
-//   private getMockTranslations(lang: string): Record<string, any> {
-//     const mockTranslations: { [key: string]: Record<string, any> } = {
-//       en: {
-//         welcome_message: 'Welcome {username}',
-//         logout: 'Logout',
-//         home: 'Home',
-//         insert_product: 'Insert a Product',
-//         language: 'Language',
-//         list: 'list',
-//         login: 'Login',
-//         login_user_not_found: '{username} not found',
-//         login_success: 'Welcome {username}',
-//         login_failed: 'username / password incorrect',
-//         chat: 'Chat',
-//         mail_template1:
-//           'There was an error sending. email to {student_name}\ndetail : {error_detail}',
-//       },
-//       th: {
-//         welcome_message: 'ยินดีต้อนรับ {username}',
-//         logout: 'ออกจากระบบ',
-//         home: 'หน้าแรก',
-//         insert_product: 'เพิ่มสินค้า',
-//         language: 'ภาษา',
-//         list: 'รายการ',
-//         login: 'เข้าสู่ระบบ',
-//         login_user_not_found: '{username} ไม่พบผู้ใช้งาน',
-//         login_success: 'ยินดีต้อนรับ {username}',
-//         login_failed: 'บัญชีผู้ใช้ / รหัสผ่านไม่ถูกต้อง',
-//         chat: 'สนทนา',
-//         mail_template1:
-//           'เกิดข้อผิดพลาดในการส่ง อีเมลไปยัง {student_name}\nรายละเอียด : {error_detail}',
-//       },
-//     };
 
-//     return mockTranslations[lang] || {};
-//   }
-// }
+  //for pipe translate
+  transform(value: string, variables?: Record<string, string>): string {
+    let translation = this.getTranslation(value) || value;
+
+    if (variables) {
+      Object.keys(variables).forEach((key) => {
+        translation = translation.replace(`{${key}}`, variables[key]);
+      });
+    }
+    return translation;
+  }
+
+  //for search Ng-select
+  searchFn(
+    term: string,
+    item: any,
+    fields: { th: string; en: string } = {
+      th: 'byte_desc_th',
+      en: 'byte_desc_en',
+    }
+  ): boolean {
+    term = term.toLowerCase();
+    const lang = this.getCurrentLanguage();
+    const field = lang === 'th' ? fields['th'] : fields['en'];
+    return item[field]?.toLowerCase().includes(term);
+  }
+}

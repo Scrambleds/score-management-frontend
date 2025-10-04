@@ -3,10 +3,12 @@
   style="background-color: var(--green-color)"
 >
   <div class="container-fluid">
-    <div class="burger-icon" [ngClass]="{ 'd-none': isOpen }">
+    <!-- Burger icon for mobile -->
+    <div class="burger-icon">
       <i class="bi bi-list" (click)="toggleNav()"></i>
     </div>
-    <!-- title menu -->
+
+    <!-- Title menu -->
     <div
       class="title-menu"
       [ngClass]="{ 'nav-opened': isOpen }"
@@ -14,18 +16,47 @@
     >
       {{ currentTitle | translate }}
     </div>
+
     <div class="d-flex ms-auto">
-      <!-- switch language -->
-      <div class="dropdown">
+      <!-- Notify -->
+      <div class="dropdown d-flex align-items-center">
+        <button
+          class="btn btn-link notify"
+          type="button"
+          id="notificationDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          (click)="clearBadge()"
+        >
+          <i
+            class="bi bi-bell-fill"
+            style="font-size: var(--icon-size); color: var(--white-color)"
+          ></i>
+          <span *ngIf="showBadge" class="notify-badge rounded-circle"></span>
+        </button>
+        <ul
+          class="notify-container dropdown-menu dropdown-menu-end"
+          aria-labelledby="notificationDropdown"
+        >
+          <li><h6 class="dropdown-header">Notifications</h6></li>
+          <ul *ngIf="notifications.length === 0" class="no-notifications">
+            <li>{{ "navbar_notifyNoMessage" | translate }}</li>
+          </ul>
+          <div id="notify-list" class="notify-list"></div>
+        </ul>
+      </div>
+
+      <!-- Language switch (desktop only) -->
+      <div class="dropdown d-flex align-items-center desktop-only">
         <a
-          class="btn btn-secondary dropdown-toggle"
+          class="swithLang-btn btn-link dropdown-toggle"
           href="#"
           role="button"
           id="languageMenu"
           data-bs-toggle="dropdown"
           aria-expanded="false"
         >
-          {{ "language" | translate }}
+          <span id="currentLanguage">{{ currentLang.toUpperCase() }}</span>
         </a>
         <ul class="dropdown-menu" aria-labelledby="languageMenu">
           <li>
@@ -33,7 +64,7 @@
               class="dropdown-item d-flex justify-content-center"
               href="#"
               (click)="changeLanguage($event, 'en')"
-              >English</a
+              >EN</a
             >
           </li>
           <li>
@@ -41,29 +72,67 @@
               class="dropdown-item d-flex justify-content-center"
               href="#"
               (click)="changeLanguage($event, 'th')"
-              >ไทย</a
+              >TH</a
             >
           </li>
         </ul>
       </div>
-      <!-- profile menu -->
-      <div class="dropdown">
+
+      <!-- Profile menu -->
+      <div class="dropdown d-flex align-items-center dropdown-toggle">
         <button
-          class="btn btn-secondary dropdown-toggle"
+          class="btn btn-link profile-btn"
           type="button"
           id="dropdownMenuButton"
           data-bs-toggle="dropdown"
           aria-expanded="false"
         >
-          User Profile
+          <div class="profile-container">
+            <div class="">
+              <i class="user-icon bi bi-person-fill"></i>
+            </div>
+            <div class="d-flex flex-column text-end profile-info desktop-only">
+              <div style="font-size: 12px">
+                {{ prefix }} {{ firstname }} {{ lastname }}
+              </div>
+              <div style="font-size: 10px">
+                {{ "nav_teacherCode" | translate }} {{ teacher_code }}
+              </div>
+            </div>
+          </div>
         </button>
         <ul
-          class="dropdown-menu dropdown-menu-end"
+          class="dropdown-menu dropdown-menu-end profile-dropdown"
           aria-labelledby="dropdownMenuButton"
         >
-          <li><a class="dropdown-item" href="#">Profile</a></li>
-          <li><a class="dropdown-item" href="#">Settings</a></li>
-          <li><a class="dropdown-item" href="#">Logout</a></li>
+          <li>
+            <div
+              class="profileDropdown-container d-flex flex-column align-items-center justify-content-center"
+            >
+              <div>{{ prefix }} {{ firstname }} {{ lastname }}</div>
+              <div>{{ "nav_teacherCode" | translate }} {{ teacher_code }}</div>
+              <div>{{ "nav_role" | translate }} {{ role }}</div>
+            </div>
+          </li>
+          <li>
+            <a
+              class="profile-dropdown-changePassword dropdown-item text-center"
+              href="#"
+              routerLink="/ChangePWD"
+              ><i class="bi bi-key-fill"></i>
+              {{ "nav_chagePassword" | translate }}</a
+            >
+          </li>
+          <li><hr class="dropdown-divider" style="margin: 0" /></li>
+          <li>
+            <a
+              class="profile-dropdown-logout dropdown-item text-center"
+              href="#"
+              (click)="onLogout()"
+              ><i class="bi bi-box-arrow-right"></i>
+              {{ "nav_logout" | translate }}</a
+            >
+          </li>
         </ul>
       </div>
     </div>

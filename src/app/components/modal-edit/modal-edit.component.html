@@ -1,0 +1,243 @@
+<div class="modal-overlay" (click)="onBackdropClick($event)"></div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" #modalElementAdd>
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document" (click)="onModalDialogClick($event)">
+    <div class="modal-content">
+      <!-- Header -->
+      <div class="modal-header bg-dark-blue text-white">
+        <h5 class="modal-title fw-bold" id="modalLabel">
+          <!-- จัดการผู้ใช้งาน -->
+           {{ "user_manage_page" | translate }}
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body overflow-auto p-0">
+        <div class="bg-light-green">
+          <p class="fw-bold mb-3 ps-3">
+            <!-- ข้อมูลบัญชีผู้ใช้ -->
+            {{ "user_management" | translate }}
+          </p>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <!-- Row 1 -->
+          <div class="container">
+            <div class="row g-2 mb-3">
+              <div class="col-6 col-md-4">
+                <label for="teacher_code" class="form-label ps-2"
+                  [appRequiredMarker]="form.get('teacher_code')">
+                  <!-- รหัสอาจารย์ -->
+                  {{ "user_manage_teachercode" | translate }}
+                </label>
+                <input type="text" id="teacher_code" class="form-control" formControlName="teacher_code"
+                [placeholder]="'placeholder_text' | translate" />
+                <div *ngIf="form.get('teacher_code')?.touched && form.get('teacher_code')?.invalid"
+                  class="text-danger ps-2">
+                  <!-- กรุณากรอกข้อมูล -->
+                  {{ "alert_enterData" | translate }}
+                </div>
+              </div>
+
+              <div class="col-6 col-md-4">
+                <label for="email" class="form-label ps-2" [appRequiredMarker]="form.get('email')">
+                  <!-- อีเมล -->
+                  {{ "user_manage_email" | translate }}
+                </label>
+                <input type="text" id="email" class="form-control" formControlName="email"               
+                  [placeholder]="'placeholder_text' | translate" />
+                <div *ngIf="form.get('email')?.touched && form.get('email')?.hasError('email')"
+                  class="text-danger ps-2">
+                  <!-- กรุณากรอกอีเมลที่ถูกต้อง -->
+                  {{ "user_manage_validatemail" | translate }}
+                </div>
+              </div>
+
+              <div class="col-6 col-md-4">
+                <label for="role" class="form-label ps-2" [appRequiredMarker]="form.get('role')">
+                  <!-- หน้าที่ -->
+                  {{ "user_manage_role" | translate }}
+                </label>
+                <ng-select [items]="roleData" bindLabel="byte_desc_th" bindValue="byte_desc_th" [searchFn]="customSearchFn_SearchLan.bind(this)"
+                [placeholder]="'placeholder_select' | translate"
+                  formControlName="role" [searchable]="true">
+                  <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                    {{ item | translateDropdown }}
+                  </ng-template>
+                </ng-select>
+                <div *ngIf="form.get('role')?.touched && form.get('role')?.invalid" class="text-danger ps-2">
+                  <!-- กรุณากรอกข้อมูล -->
+                   {{ "alert_enterData" | translate }}
+                </div>
+              </div>
+
+              <div class="col-6 col-md-4">
+                <label for="prefix" class="form-label ps-2"
+                  [appRequiredMarker]="form.get('prefix')">
+                  <!-- คำนำหน้าชื่อ -->
+                  {{ "user_manage_prefix" | translate }}
+                </label>
+                <ng-select 
+                class="custom-select custom-dropdown"
+                [items]="prefixData"
+                bindLabel="byte_desc_th"
+                bindValue="byte_desc_th"
+                [searchFn]="customSearchFn_SearchLan.bind(this)"
+                [placeholder]="'placeholder_select' | translate"
+                formControlName="prefix"
+                [searchable]="true">
+              
+                <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                  {{ item | translateDropdown }}
+                </ng-template>
+              
+              </ng-select>
+              
+                <div *ngIf="form.get('prefix')?.touched && form.get('prefix')?.invalid"
+                  class="text-danger ps-2">
+                  <!-- กรุณากรอกข้อมูล -->
+                  {{ "alert_enterData" | translate }}
+                </div>
+              </div>
+
+              <div class="col-6 col-md-4">
+                <label for="firstname" class="form-label ps-2" [appRequiredMarker]="form.get('firstname')">
+                  <!-- ชื่อ -->
+                  {{ "user_manage_name" | translate }}
+                </label>
+                <input type="text" id="firstname" class="form-control" formControlName="firstname"
+                autocomplete="given-name"
+                [placeholder]="'placeholder_text' | translate" />
+                <div *ngIf="form.get('firstname')?.touched && form.get('firstname')?.invalid" class="text-danger ps-2">
+                  <!-- กรุณากรอกข้อมูล -->
+                  {{ "alert_enterData" | translate }}
+                </div>
+              </div>
+
+              <div class="col-6 col-md-4">
+                <label for="lastname" class="form-label ps-2" [appRequiredMarker]="form.get('lastname')">
+                  <!-- นามสกุล -->
+                  {{ "user_manage_surname" | translate }}
+                </label>
+                <input type="text" id="lastname" class="form-control" formControlName="lastname"
+                  autocomplete="family-name"
+                [placeholder]="'placeholder_text' | translate" />
+                <div *ngIf="form.get('lastname')?.touched && form.get('lastname')?.invalid" class="text-danger ps-2">
+                  <!-- กรุณากรอกข้อมูล -->
+                  {{ "alert_enterData" | translate }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-light-green">
+            <p class="fw-bold mb-3 ps-3">
+              <!-- ข้อมูลเพิ่มเติม -->
+              {{ "user_manage_more" | translate }}
+            </p>
+          </div>
+
+          <div class="container">
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-4">
+                <label for="password" class="form-label ps-2">
+                  <!-- รหัสผ่าน -->
+                  {{ "password" | translate }}
+                </label>
+          
+                <div class="input-group">
+                  <input 
+                    [type]="showPassword ? 'text' : 'password'" 
+                    id="password" 
+                    class="form-control" 
+                    formControlName="password"
+                    autocomplete="current-password"
+
+                    [ngClass]="{'is-valid': form.get('password')?.valid && form.get('password')?.dirty && form.get('password')?.value.length > 0}"
+                    [placeholder]="'placeholder_text' | translate"/>
+                  
+                  <!-- ปุ่มเปิด/ซ่อนรหัสผ่าน (ใช้ showPassword) -->
+                  <button type="button" class="btn btn-outline-secondary" (click)="showPassword = !showPassword">
+                    <i class="bi" [ngClass]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                  </button>
+                </div>
+          
+                <!-- <div *ngIf="form.get('password')?.invalid && form.get('password')?.dirty" class="text-danger ps-2">
+                  <div *ngIf="form.get('password')?.hasError('errorMessage')">
+                    {{ form.get('password')?.getError('errorMessage') | translate }}
+                  </div>
+                </div> -->
+              </div>
+
+              <div *ngIf="form.contains('confirm_password')" class="col-6 col-md-4">
+                <label for="confirm_password" class="form-label ps-2">
+                  <!-- ยืนยันรหัสผ่าน -->
+                  {{ "user_manage_confirm" | translate }}
+                </label>
+          
+                <div class="input-group">
+                  <input 
+                    [type]="showConfirmPassword ? 'text' : 'password'" 
+                    id="confirm_password" 
+                    class="form-control"
+                    [ngClass]="{'is-valid': form.get('confirm_password')?.valid && form.get('password')?.valid && form.get('password')?.value === form.get('confirm_password')?.value, 
+                    'is-invalid': form.get('confirm_password')?.touched && form.get('confirm_password')?.invalid && form.get('password')?.valid && form.get('password')?.value !== form.get('confirm_password')?.value}"
+                    formControlName="confirm_password" 
+                    autocomplete="current-password"
+                    [placeholder]="'user_manage_validatepassword' | translate"
+                    (blur)="onBlurConfirmPassword()" />
+          
+                  <!-- ปุ่มเปิด/ซ่อนรหัสผ่าน (ใช้ showConfirmPassword) -->
+                  <button type="button" class="btn btn-outline-secondary" (click)="showConfirmPassword = !showConfirmPassword">
+                    <i class="bi" [ngClass]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                  </button>
+                </div>
+          
+                <div *ngIf="form.get('confirm_password')?.touched" class="text-danger ps-2">
+                  <div *ngIf="form.get('confirm_password')?.hasError('required')">
+                    <!-- กรุณากรอกข้อมูล -->
+                    {{ "alert_enterData" | translate }}
+                  </div>
+                  <div
+                    *ngIf="!form.get('confirm_password')?.hasError('required') && form.get('password')?.touched && form.get('password')?.value !== form.get('confirm_password')?.value">
+                    <!-- รหัสผ่านไม่ตรงกัน -->
+                    {{ "user_manage_mismatch" | translate }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-6 col-md-4">
+                <label for="active_status" class="form-label ps-2"
+                  [appRequiredMarker]="form.get('active_status')">
+                  <!-- สถานะการใช้งาน -->
+                   {{ "user_manage_status" | translate }}
+                </label>
+                <ng-select [items]="statusData" bindLabel="byte_desc_en" bindValue="byte_desc_en" [searchFn]="customSearchFn_SearchLan.bind(this)"
+                [placeholder]="'placeholder_select' | translate"
+                  formControlName="active_status" [searchable]="true">
+                  <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                    {{ item | translateDropdown }}
+                  </ng-template>
+                </ng-select>
+                <div *ngIf="form.get('active_status')?.touched && form.get('active_status')?.invalid"
+                  class="text-danger ps-2">
+                  <!-- กรุณากรอกข้อมูล -->
+                  {{ "alert_enterData" | translate }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-flex justify-content-center pt-3">
+            <button type="button" class="btn btn-primary" (click)="onSubmit()">
+              <i class="bi bi-floppy-fill me-2"></i>
+              <!-- บันทึกข้อมูล -->
+               {{ "user_manage_save" | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

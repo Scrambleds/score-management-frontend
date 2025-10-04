@@ -1,15 +1,46 @@
 .custom-card {
-  /* margin-bottom: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-    border-color: #ddd; 
-    border-width: 1px;
-    border-radius: 8px; */
   border-radius: 0.75rem;
   box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.2);
   padding: 0.625rem;
-  /* margin: 1.25rem; */
-  /* top: 1.25rem;  */ /* ter remove for fix top conflict */
   border-color: #ddd;
   overflow: hidden;
   position: relative;
+}
+
+.custom-table {
+  overflow: hidden;
+  min-width: 800px;
+  white-space: nowrap;
+}
+
+.custom-table thead {
+  font-weight: bold;
+  /* text-align: center; */
+  /* border: none; */
+}
+
+.custom-table thead th {
+  background-color: #03a96b !important;
+  color: white !important;
+  padding: 12px;
+  /* border: none; */
+}
+
+.custom-table tbody tr {
+  background-color: #f8f9fa;
+}
+
+.custom-table-container {
+  width: 98%;
+  overflow-x: auto;
+  max-width: 98%;
+  border-radius: 0.5rem;
+}
+
+.custom-table tbody tr:nth-child(even) {
+  background-color: #e9ecef;
+}
+
+.page-link {
+  cursor: pointer;
 }

@@ -1,0 +1,194 @@
+/* เพิ่มไอคอน bi-chevron-right ที่ขวาสุดของแต่ละ dropdown-item */
+.dropdown-item-container:has(.dropdown-submenu) > .dropdown-item::after {
+  content: "\f285"; /* Unicode สำหรับ bi-chevron-right */
+  font-family: "bootstrap-icons"; /* ใช้ Bootstrap Icons */
+  position: absolute; /* ตำแหน่งแบบ absolute */
+  right: 10px; /* ระยะห่างจากด้านขวา */
+  color: var(--grey-color, #6c757d); /* สีเทา, สามารถเปลี่ยนได้ */
+  font-size: 1rem; /* ขนาดไอคอน */
+}
+
+/* ปรับ dropdown-item ให้รองรับ position: relative */
+.dropdown-item {
+  position: relative; /* ทำให้ ::after ใช้ absolute ภายในได้ */
+  padding-right: 30px; /* เพิ่ม padding ขวาให้ไม่ทับกับไอคอน */
+}
+
+/* ซ่อน Sub Menu ย่อย */
+.dropdown-submenu {
+  display: none;
+  position: absolute;
+  left: 100%; /* ชิดขวาของเมนูหลัก */
+  top: 0; /* ชิดด้านบน */
+  min-width: 200px; /* กำหนดความกว้าง */
+  background-color: #fff; /* สีพื้นหลัง */
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  z-index: 1000;
+  padding: 8px 0;
+  list-style: none;
+  /* scroller */
+}
+
+/* แสดง Sub Menu เมื่อ Hover เมนูหลัก */
+.dropdown-item-container:hover > .dropdown-submenu {
+  display: block;
+}
+
+/* ตกแต่ง dropdown-item */
+.dropdown-item-container {
+  position: relative; /* เพื่อรองรับ Sub Menu */
+}
+
+.dropdown-item-container > .dropdown-item:hover {
+  background-color: var(--active-color);
+  color: var(--white-color);
+}
+.dropdown-item-container > .dropdown-item:active {
+  background-color: var(--active-color);
+  color: var(--white-color);
+}
+
+/* Sub Menu แต่ละรายการ */
+.dropdown-submenu .dropdown-item {
+  padding: 4px auto 4px 16px;
+  color: #333;
+  text-decoration: none;
+  display: block;
+}
+
+/* สไตล์เมื่อ Hover บน Sub Menu */
+.dropdown-submenu .dropdown-item:hover {
+  background-color: var(--active-color);
+  color: var(--white-color);
+}
+
+textarea {
+  font-size: 13px;
+}
+
+@media (min-width: 992px) {
+  .modal-custom {
+    --bs-modal-width: 46.875rem;
+  }
+}
+
+/* solve dropdown can't overlay outside container of modal */
+.modal-dialog-scrollable .modal-content {
+  max-height: 100%;
+  overflow: visible;
+}
+
+.custom-select {
+  max-height: 150px; /* หรือความสูงที่คุณต้องการ */
+  overflow-y: auto !important; /* ทำให้มี scroll bar */
+}
+
+/* กำหนด max-height และ overflow-y สำหรับรายการ template เท่านั้น */
+.template-list-container {
+  max-height: 178px; /* กำหนดความสูงสูงสุด */
+  overflow-y: auto; /* เปิด scroll bar แนวตั้ง */
+}
+
+.dropdown-header {
+  padding-bottom: 4px;
+  padding-top: 0;
+}
+
+.custom-overlay {
+  /* position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1060;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px 20px;
+  width: auto; */
+  /* width: 30%;
+  min-width: 400px; */
+  /* max-width: 400px; */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1055; /* สูงกว่า Bootstrap Modal */
+}
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* สีโปร่งแสง */
+  z-index: 1045; /* อยู่ด้านล่าง overlay-content */
+}
+/* .overlay-content {
+  z-index: 1061;
+} */
+.overlay-content {
+  position: relative;
+  z-index: 1050;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-width: 300px;
+  max-width: 600px;
+  width: 100%;
+}
+@media (max-width: 768px) {
+  .gap-1 {
+    flex-wrap: wrap; /* Allow wrapping */
+  }
+  .gap-1 > .ms-auto {
+    width: 100%; /* Buttons take full width on small screens */
+    justify-content: flex-end; /* Align to the right */
+    text-align: right;
+  }
+  .gap-1 > .ms-auto button {
+    margin-left: 0;
+  }
+}
+/* Animation for showing the modal */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10%);
+  }
+}
+.overlay-content.fade-in {
+  animation: slideDown 0.5s;
+}
+
+.overlay-content.fade-out {
+  animation: slideUp 0.5s;
+}
+/*
+.overlay-content {
+  animation: slideUp 0.5s;
+} */
+/* .overlay-content {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+} */

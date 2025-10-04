@@ -1,0 +1,31 @@
+<div class="custom-card">
+  <div class="card-body w-100 gx-0">
+    <div class="row gx-0 w-100">
+      <div class="col-12 col-md-8">
+        <div
+          class="d-flex justify-content-start align-items-start flex-column w-100"
+        >
+          <div class="w-100 my-3">
+            <div class="fw-bold text-start">
+              {{ "table_score_title" | translate }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ag-Grid -->
+    <ag-grid-angular
+      style="width: 100%; height: 55rem"
+      class="ag-theme-quartz"
+      [rowData]="gridData"
+      [defaultColDef]="defaultColDef"
+      [pagination]="pagination"
+      [overlayNoRowsTemplate]="
+        '<span>' + ('no_row_show' | translate) + '</span>'
+      "
+      [gridOptions]="gridOptions"
+      (gridReady)="onGridReady($event)"
+    >
+    </ag-grid-angular>
+  </div>
+</div>

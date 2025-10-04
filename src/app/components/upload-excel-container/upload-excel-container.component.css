@@ -1,0 +1,92 @@
+.custom-card {
+  --bs-card-spacer-y: 1.5rem;
+  --bs-card-spacer-x: 1.5rem;
+  --bs-card-title-spacer-y: 0.5rem;
+  --bs-card-title-color: ;
+  --bs-card-subtitle-color: ;
+  --bs-card-border-width: var(--bs-border-width);
+  --bs-card-border-color: var(--bs-border-color-translucent);
+  --bs-card-border-radius: var(--bs-border-radius);
+  --bs-card-box-shadow: ;
+  --bs-card-inner-border-radius: calc(
+    var(--bs-border-radius) - (var(--bs-border-width))
+  );
+  --bs-card-cap-padding-y: 0.5rem;
+  --bs-card-cap-padding-x: 1rem;
+  --bs-card-cap-bg: rgba(var(--bs-body-color-rgb), 0.03);
+  --bs-card-cap-color: ;
+  --bs-card-height: ;
+  --bs-card-color: ;
+  --bs-card-bg: var(--bs-body-bg);
+  --bs-card-img-overlay-padding: 1rem;
+  --bs-card-group-margin: 0.75rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  min-width: 0;
+  height: var(--bs-card-height);
+  color: var(--bs-body-color);
+  word-wrap: break-word;
+  background-color: var(--bs-card-bg);
+  background-clip: border-box;
+  border: var(--bs-card-border-width) solid var(--bs-card-border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.2);
+}
+
+.card-body {
+  flex: 1 1 auto;
+  padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+  color: var(--bs-card-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 0;
+}
+
+.input-group-autocomplete[_ngcontent-ng-c1926015072] {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.button-container {
+  flex-wrap: wrap;
+}
+
+/*CSS สำหรับหน้าอัปโหลดและดาวน์โหลดไฟล์ Excel*/
+.dashed-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+  /* padding: 0 1.25rem; */
+}
+
+.dashed-line::before,
+.dashed-line::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  /* border-bottom: 0.113rem dashed #615d5d; */
+  z-index: -1;
+}
+
+.dashed-line::before {
+  left: 0;
+}
+
+.dashed-line::after {
+  right: 0;
+}
+
+/* เพิ่ม clip-path เพื่อให้เส้นประหายไปบริเวณข้อความ */
+.dashed-line span {
+  position: relative;
+  background-color: white;
+  padding: 0 0.313rem;
+}

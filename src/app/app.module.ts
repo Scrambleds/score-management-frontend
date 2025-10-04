@@ -32,9 +32,49 @@ import { SearchScoreComponent } from './route/search-score/search-score.componen
 import { UploadScoreComponent } from './route/upload-score/upload-score.component';
 import { ScoreAnnouncementComponent } from './route/score-announcement/score-announcement.component';
 import { DashboardComponent } from './route/dashboard/dashboard.component';
+import { AddUserRoute } from './route/add-user/add-user.component';
 
-import { provideHttpClient } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  HttpClientModule,
+  provideHttpClient,
+  withInterceptorsFromDi,
+  withInterceptors,
+} from '@angular/common/http';
 import { TranslatePipe } from './shared/pipes/translate.pipe';
+import { UploadScoreHeaderComponent } from './components/upload-score-header/upload-score-header.component';
+import { UploadExcelContainerComponent } from './components/upload-excel-container/upload-excel-container.component';
+import { ModalEditComponent } from './components/modal-edit/modal-edit.component';
+import { LoginPageComponent } from './route/login-page/login-page.component';
+import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component';
+import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
+import { RequiredMarkerDirective } from '../../src/app/components/required-marker/required-marker.directive';
+import { AddUserComponent } from '../../src/app/components/add-user/add-user.component';
+import { ModalSendMailComponent } from './components/modal-send-mail/modal-send-mail.component';
+import { TranslateDropdownPipe } from './shared/pipes/translateDropdown.pipe';
+import { CachingInterceptor } from './core/interceptors/caching.interceptor';
+import { CacheService } from './core/services/cache.service';
+import { MasterDataComponents } from '../../src/app/components/master-data/master-data.component';
+import { ModalMasterdataEditComponent } from './components/modal-masterdata-edit/modal-masterdata-edit.component';
+import { ModalMasterdataAddComponent } from './components/modal-masterdata-add/modal-masterdata-add.component';
+import { SearchFormScoreAnnouncementComponent } from './components/score-announcement/search-form/search-form-search-form-score-announcemen.component';
+import { TableScoreAnnouncementComponent } from './components/score-announcement/table-score-announcemen/table-score-announcemen.component';
+import { SearchMasterDataComponent } from './components/search-master-data/search-master-data.component';
+import { TableScoreSearchComponent } from './components/score-search/table-score-search/table-score-search.component';
+import { SearchFormScoreComponent } from './components/score-search/search-form/search-form-score.component';
+import { BellCurveComponent } from './components/bell-curve/bell-curve.component';
+import { NgChartsModule } from 'ng2-charts';
+import { SearchDashboardComponent } from './components/search-dashboard/search-dashboard.component';
+import { ChangePasswordComponent } from './route/change-password/change-password.component';
+import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
+import { Page404Component } from './components/page-404/page-404.component';
+import { ErrorLayoutComponent } from './layout/error-layout/error-layout.component';
+import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
+import { NgHttpLoaderComponent } from 'ng-http-loader';
+import { pendingRequestsInterceptor$ } from 'ng-http-loader';
+import { DashboardAdminComponent } from './components/dashboard-admin/dashboard-admin.component';
+import { AdminSearchComponent } from './components/admin-search/admin-search.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +91,34 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
     ScoreAnnouncementComponent,
     DashboardComponent,
     TranslatePipe,
+    UploadScoreHeaderComponent,
+    UploadExcelContainerComponent,
+    ModalEditComponent,
+    LoginPageComponent,
+    MainLayoutComponent,
+    AuthLayoutComponent,
+    AutocompleteComponent,
+    AddUserComponent,
+    AddUserRoute,
+    ModalSendMailComponent,
+    TranslateDropdownPipe,
+    MasterDataComponents,
+    ModalMasterdataEditComponent,
+    ModalMasterdataAddComponent,
+    SearchScoreComponent,
+    SearchFormScoreAnnouncementComponent,
+    TableScoreAnnouncementComponent,
+    SearchMasterDataComponent,
+    SearchFormScoreComponent,
+    TableScoreSearchComponent,
+    BellCurveComponent,
+    SearchDashboardComponent,
+    ChangePasswordComponent,
+    Page404Component,
+    ErrorLayoutComponent,
+    LoadingSpinnerComponent,
+    DashboardAdminComponent,
+    AdminSearchComponent,
   ],
   imports: [
     BrowserModule,
@@ -67,10 +135,23 @@ import { TranslatePipe } from './shared/pipes/translate.pipe';
     NgOptionTemplateDirective,
     NgSelectComponent,
     MatSelectModule,
+    RequiredMarkerDirective,
+    NgChartsModule,
+    NgHttpLoaderComponent,
   ],
   providers: [
-    provideHttpClient(),
-    // provideClientHydration(withEventReplay()),
+    { provide: JWT_OPTIONS, useValue: {} },
+    JwtHelperService,
+    CacheService,
+    provideHttpClient(
+      withInterceptorsFromDi(),
+      withInterceptors([pendingRequestsInterceptor$])
+    ),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CachingInterceptor,
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent],
 })

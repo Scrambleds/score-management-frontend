@@ -1,0 +1,238 @@
+<div class="custom-card">
+  <div class="card-body">
+    <div class="fw-bold">{{ "uploadscore_header_title" | translate }}</div>
+    <div *ngIf="isUploaded" class="text-danger">
+      {{ "uploadscore_header_remark" | translate }}
+    </div>
+    <!-- parent will submit this form instead -->
+    <form
+      #formSubject="ngForm"
+      (ngSubmit)="onSubmit($event)"
+      [formGroup]="form"
+      class="w-100"
+    >
+      <div class="row">
+        <!-- Subject Code -->
+        <div class="col-6 col-sm-5 col-md-4 col-xxl-2">
+          <label
+            for="subjectNo"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('subjectCode')"
+            >{{ "subject_code" | translate }}
+          </label>
+          <!-- <div class="input-group-autocomplete mb-2"> -->
+          <div class="autocomplete-container">
+            <input
+              type="text"
+              class="form-control"
+              id="subjectCode"
+              formControlName="subjectCode"
+              [placeholder]="'placeholder_text' | translate"
+              autocomplete="off"
+              (input)="searchCode()"
+              (keydown)="onKeyDown($event)"
+              (focus)="onFocus()"
+              (blur)="hideSuggestions()"
+              maxlength="11"
+            />
+            <!-- (blur)="hideSuggestions()" -->
+            <ul
+              *ngIf="filteredSubjects.length > 0 && showSuggestions"
+              class="autocomplete-list"
+            >
+              <li
+                *ngFor="let item of filteredSubjects"
+                (click)="selectCode(item)"
+              >
+                {{ item.subjectCode }} - {{ item.subjectName }}
+              </li>
+            </ul>
+          </div>
+
+          <div
+            *ngIf="
+              form.get('subjectCode')?.touched &&
+              form.get('subjectCode')?.hasError('required')
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+          <div
+            *ngIf="
+              (form.get('subjectCode')?.touched &&
+                form.get('subjectCode')?.hasError('pattern')) ||
+              (form.get('subjectCode')?.touched &&
+                form.get('subjectCode')?.hasError('minlength'))
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterSubjectCodePattern" | translate }}
+          </div>
+        </div>
+
+        <!-- Subject Name -->
+        <div class="col-6 col-sm-7 col-md-8 col-xxl-3">
+          <label
+            for="subjectName"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('subjectName')"
+            >{{ "subject_name" | translate }}
+          </label>
+          <input
+            #subjectName
+            type="text"
+            class="form-control"
+            formControlName="subjectName"
+            [placeholder]="'placeholder_text' | translate"
+            autocomplete="off"
+            [readonly]="isSubjectNameReadonly"
+          />
+          <div
+            *ngIf="
+              form.get('subjectName')?.touched &&
+              form.get('subjectName')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+
+        <!-- Academic Year -->
+        <div class="col-6 col-sm-6 col-md-3 col-xxl-2">
+          <label
+            for="academic_year"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('academicYearCode')"
+            >{{ "academic_year" | translate }}
+          </label>
+          <ng-select
+            name="academicYearCode"
+            formControlName="academicYearCode"
+            [items]="academicYearList"
+            bindValue="byte_code"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            (change)="onSelectChange($event, 'academicYearCode')"
+            [searchFn]="customSearchFn.bind(this)"
+            selectOnTab="true"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('academicYearCode')?.touched &&
+              form.get('academicYearCode')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+
+        <!-- Semester -->
+        <div class="col-6 col-sm-6 col-md-3 col-xxl-2">
+          <label
+            for="semester"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('semesterCode')"
+            >{{ "semester" | translate }}
+          </label>
+          <ng-select
+            name="semesterCode"
+            formControlName="semesterCode"
+            [items]="semesterList"
+            bindValue="byte_code"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            (change)="onSelectChange($event, 'semesterCode')"
+            [searchFn]="customSearchFn.bind(this)"
+            selectOnTab="true"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('semesterCode')?.touched &&
+              form.get('semesterCode')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+
+        <!-- Section -->
+        <div class="col-6 col-sm-6 col-md-3 col-xxl-1">
+          <label
+            for="sectionCode"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('sectionCode')"
+            >{{ "section" | translate }}
+          </label>
+          <ng-select
+            name="sectionCode"
+            formControlName="sectionCode"
+            [items]="sectionList"
+            bindValue="byte_code"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            (change)="onSelectChange($event, 'sectionCode')"
+            [searchFn]="customSearchFn.bind(this)"
+            selectOnTab="true"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('sectionCode')?.touched &&
+              form.get('sectionCode')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+
+        <!-- Teacher -->
+        <div class="col-6 col-sm-6 col-md-3 col-xxl-2">
+          <label
+            for="sectionCode"
+            class="fw-bold mb-2 label-truncate"
+            [appRequiredMarker]="form.get('teacher')"
+            >{{ "uploadScore_searchTeacher" | translate }}
+          </label>
+          <ng-select
+            name="teacher"
+            formControlName="teacher"
+            [items]="teacherList"
+            bindValue="teacherCode"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [multiple]="true"
+            (change)="onSelectChange($event, 'teacher')"
+            [searchFn]="customSearchTeacherFn.bind(this)"
+            selectOnTab="true"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item.teacherName }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="form.get('teacher')?.touched && form.get('teacher')?.invalid"
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

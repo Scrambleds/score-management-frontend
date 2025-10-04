@@ -1,0 +1,107 @@
+<div class="card p-3 mb-3">
+  <div class="form-container">
+    <form [formGroup]="form" class="mb-0">
+
+      <div class="form-row">
+        <!-- <div class="row"> -->
+        <div class="subject-group">
+          <label class="fw-bold mb-0 ps-2"
+            [appRequiredMarker]="form.get('subject_id')">{{ "subject_code" | translate }}/{{
+            "add_dashboard_label_subject" | translate }} </label>
+          <div class="select-group">
+            <ng-select class="w-100" id="subject_id" formControlName="subject_id" [items]="SubjectList"
+              bindValue="subjectCode" bindLabel="subjectName" [placeholder]="'placeholder_select' | translate"
+              [clearable]="true" [searchFn]="customSearchFn">
+              <ng-template ng-option-tmp let-item="item">
+                {{ item.subjectCode }} - {{ item.subjectName }}
+              </ng-template>
+            </ng-select>
+            <div *ngIf="form.get('subject_id')?.touched && form.get('subject_id')?.invalid" class="text-danger ps-2">
+              <!-- กรุณากรอกข้อมูล -->
+              {{ "alert_enterData" | translate }}
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="fw-bold mb-0 ps-2"
+            [appRequiredMarker]="form.get('academic_year')">{{ "academic_year" | translate }} </label>
+          <div class="select-group">
+            <ng-select class="w-100" name="academic_year" formControlName="academic_year" [items]="academicYearList" [searchFn]="customSearchFn_SearchLan.bind(this)"
+              bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate"
+              [searchable]="true" [clearable]="true">
+              <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                {{ item | translateDropdown }}
+              </ng-template>
+            </ng-select>
+            <div *ngIf="form.get('academic_year')?.touched && form.get('academic_year')?.invalid"
+              class="text-danger ps-1">
+              <!-- กรุณากรอกข้อมูล -->
+              {{ "alert_enterData" | translate }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="fw-bold mb-0 ps-2" [appRequiredMarker]="form.get('semester')">
+            {{ "semester" | translate}} </label>
+          <div class="select-group">
+            <ng-select class="w-100" name="semester" formControlName="semester" [items]="semesterList" [searchFn]="customSearchFn_SearchLan.bind(this)"
+              bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate" [searchable]="true"
+              [clearable]="true">
+              <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                {{ item | translateDropdown }}
+              </ng-template>
+            </ng-select>
+            <div *ngIf="form.get('semester')?.touched && form.get('semester')?.invalid" class="text-danger ps-1">
+              <!-- กรุณากรอกข้อมูล -->
+              {{ "alert_enterData" | translate }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="fw-bold mb-0 ps-2" [appRequiredMarker]="form.get('section')">
+            {{ "section" | translate }} </label>
+          <div class="select-group">
+            <ng-select class="w-100" name="section" formControlName="section" [items]="sectionList"
+              bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate"
+              [searchable]="true" [clearable]="true">
+              <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                {{ item | translateDropdown }}
+              </ng-template>
+            </ng-select>
+            <div *ngIf="form.get('section')?.touched && form.get('section')?.invalid" class="text-danger ps-1">
+              <!-- กรุณากรอกข้อมูล -->
+              {{ "alert_enterData" | translate }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="fw-bold mb-0 ps-2"[appRequiredMarker]="form.get('score_type')">{{ "dashboard_scoretype" | translate}} </label>
+          <div class="select-group">
+            <ng-select class="w-100" name="score_type" formControlName="score_type" [items]="scoreTypeList" [searchFn]="customSearchFn_SearchLan.bind(this)"
+              bindValue="byte_desc_th" bindLabel="byte_desc_th" [placeholder]="'placeholder_select' | translate" [searchable]="true"
+              [clearable]="true">
+              <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                {{ item | translateDropdown }}
+              </ng-template>
+            </ng-select>
+            <div *ngIf="form.get('score_type')?.dirty && form.get('score_type')?.invalid" class="text-danger ps-1">
+              <!-- กรุณากรอกข้อมูล -->
+              {{ "alert_enterData" | translate }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ส่งออกไฟล์ Excel -->
+<!-- <div class="col-12 d-flex justify-content-end">
+  <button type="submit" class="btn btn-primary" (click)="exportExcel()" [disabled]="!form.valid">
+    <i class="bi bi-download"></i>
+    {{ 'dashboard_excel_export' | translate }}
+  </button>
+</div> -->

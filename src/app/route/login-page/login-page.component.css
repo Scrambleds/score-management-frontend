@@ -1,0 +1,182 @@
+/* Login Page Styles */
+body.login-page {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  margin: 0;
+}
+
+body.login-page .custom-card {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Text Overlay */
+.text-overlay {
+  color: #fff;
+  text-align: center;
+}
+
+/* Buttons */
+.btn-success {
+  background-color: #006664;
+  border: none;
+}
+
+.btn-success:hover {
+  background-color: #005946;
+}
+
+.btn-success:disabled {
+  background-color: #00755e33;
+}
+
+/* Form Styles */
+.form-control {
+  border: 1px solid #006c68;
+  color: #005946;
+  font-size: 16px;
+}
+
+.form-control:focus {
+  border-color: #006c68;
+  box-shadow: 0 0 0 0.2rem rgba(0, 108, 104, 0.25);
+  outline: none;
+}
+
+/* Typography */
+.title-head {
+  color: #006c68;
+  font-size: 30px;
+}
+
+.title {
+  color: #006c68;
+  font-size: 18px;
+}
+
+.title-form,
+.form-label {
+  font-size: 18px;
+  color: #505050;
+}
+
+.title-form {
+  margin: 2.5rem 0 0;
+}
+
+.error-message {
+  margin: 0.5rem 0 0;
+  color: red;
+}
+
+.custom-card {
+  /* height: 781px;
+  width: 1246px; */
+
+  border-radius: 20px;
+  border: 0;
+  background-image: none;
+  background-position: left;
+  background-repeat: no-repeat;
+}
+
+/* Extra-large desktop screens (min-width: 1366px) */
+
+/* Large desktop screens (max-width: 1600px) */
+/* @media (max-width: 1600px) {
+  .custom-card {
+    width: 80%;
+    height: auto;
+  }
+} */
+
+/* iPad Pro and medium desktop screens (min-width: 1024px and max-width: 1439px) */
+/* @media (min-width: 992px) and (max-width: 1199px) {
+  .custom-card {
+    background-image: url("../../../assets/other/scenery/md-screen.png");
+    background-size: 50% 100%;
+    max-width: 940px;
+  }
+} */
+@media (min-width: 992px) {
+  .custom-card {
+    background-image: url("../../../assets/other/scenery/lg-screen.png");
+    background-size: 50% 100%;
+    max-width: 940px;
+    /* max-height: 90%; */
+    min-width: 940px;
+    /* min-height: 90%; */
+  }
+}
+
+/* Medium screens (max-width: 1024px) */
+@media (max-width: 991px) {
+  .custom-card {
+    max-width: 90%;
+    /* max-height: 90%; */
+    /* height: auto;
+    width: 90%; */
+    margin: 0 auto;
+    padding: 1rem;
+    border-radius: 15px;
+    box-shadow: none;
+  }
+}
+
+/* Small screens (max-width: 768px) */
+@media (max-width: 768px) {
+  .custom-card {
+    height: auto;
+    width: 95%;
+    margin: 0 auto;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: none;
+  }
+
+  .title-form {
+    margin: 1rem;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+}
+
+/* Input Group */
+.input-group .form-control {
+  border-right: none;
+  border-color: #006c68;
+}
+
+.input-group .btn {
+  border-left: none;
+}
+
+.custom-input {
+  border-radius: 10px 0 0 10px;
+  padding: 10px;
+}
+
+.custom-input:focus {
+  border-color: #006c68;
+}
+
+.input-group-text {
+  border-radius: 0 10px 10px 0;
+  cursor: pointer;
+  border-color: #006c68;
+}
+
+.input-group .form-control,
+.input-group .input-group-text {
+  height: 39px;
+  line-height: 1.5;
+  padding: 6px 12px;
+}
+
+/* Dropdown */
+.dropdown-item:not(.disabled).active,
+.dropdown-item:not(.disabled):active {
+  background-color: #005946;
+  color: black;
+}

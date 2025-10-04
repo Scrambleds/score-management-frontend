@@ -1,0 +1,208 @@
+<div class="custom-card">
+  <div class="card-body">
+    <div class="fw-bold">{{ "uploadscore_details" | translate }}</div>
+    <div class="text-danger">
+      {{ "title_score_ann_form" | translate }}
+    </div>
+    <!-- parent will submit this form instead -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-100">
+      <div class="d-flex justify-content-center gap-3">
+        <!-- Subject Code -->
+        <div class="col-12 col-sm-12 col-md-4 col-lg-3">
+          <label for="subjectSearch" class="fw-bold d-flex flex-wrap m-1"
+            >{{ "subject_code" | translate }} / {{ "subject_name" | translate }}
+            <p class="text-danger mb-0 ms-1">*</p></label
+          >
+          <div class="input-group-autocomplete mb-2">
+            <div class="input-group-autocomplete mb-2">
+              <!-- <input
+                #subjectCode
+                id="subjectSearch"
+                class="form-control"
+                formControlName="subjectSearch"
+                [placeholder]="'placeholder_text' | translate"
+                (focus)="showSuggestions = true"
+                (blur)="hideSuggestions()"
+                (input)="showAutocomplete()"
+              />
+              <ul *ngIf="showSuggestions && filteredSuggestions.length > 0">
+                <li
+                  *ngFor="let suggestion of filteredSuggestions"
+                  (mousedown)="selectSubject(suggestion)"
+                >
+                  {{ suggestion.subject_id }} {{ suggestion.subject_name }}
+                </li>
+              </ul> -->
+              <ng-select
+                name="subjectSearch"
+                formControlName="subjectSearch"
+                [clearable]="true"
+                id="subjectSearch"
+                [items]="subjectList"
+                [placeholder]="'placeholder_select' | translate"
+                bindLabel="subjectSearch"
+                [searchable]="true"
+              >
+              </ng-select>
+            </div>
+          </div>
+          <div
+            *ngIf="
+              form.get('subjectSearch')?.touched &&
+              form.get('subjectSearch')?.invalid
+            "
+            class="text-danger ps-2 mt-1"
+          >
+            {{ "alert_enterData" | translate }}
+            {{ "subject_code" | translate }} / {{ "subject_name" | translate }}
+          </div>
+        </div>
+
+        <!-- academic_year -->
+        <div class="col-12 col-sm-4 col-md-3 col-lg-2">
+          <label for="academic_year" class="fw-bold mb-2 d-flex flex-wrap"
+            >{{ "academic_year" | translate }}
+            <p class="text-danger mb-0 ms-1">*</p>
+          </label>
+          <ng-select
+            name="academic_year"
+            formControlName="academic_year"
+            bindValue="placeholder_key"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [items]="academic_yearLovItem"
+            [searchFn]="customSearchFn.bind(this)"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('academic_year')?.touched &&
+              form.get('academic_year')?.invalid
+            "
+            class="text-danger ps-2 mt-1"
+          >
+            {{ "alert_enterData" | translate }}
+            {{ "academic_year" | translate }}
+          </div>
+        </div>
+        <div class="col-12 col-sm-4 col-md-3 col-lg-2">
+          <label for="semester" class="fw-bold mb-2 d-flex flex-wrap"
+            >{{ "semester" | translate }}
+            <p class="text-danger mb-0 ms-1">*</p></label
+          >
+          <ng-select
+            name="semester"
+            formControlName="semester"
+            bindValue="placeholder_key"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [items]="semesterLovItem"
+            [searchFn]="customSearchFn.bind(this)"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('semester')?.touched && form.get('semester')?.invalid
+            "
+            class="text-danger ps-2 mt-1"
+          >
+            {{ "alert_enterData" | translate }} {{ "semester" | translate }}
+          </div>
+        </div>
+        <div class="col-12 col-sm-4 col-md-3 col-lg-2">
+          <label for="section" class="fw-bold mb-2 d-flex flex-warp"
+            >{{ "section" | translate }}
+            <p class="text-danger mb-0 ms-1">*</p>
+          </label>
+          <ng-select
+            name="section"
+            formControlName="section"
+            bindValue="placeholder_key"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [items]="sectionLovItem"
+            [searchFn]="customSearchFn.bind(this)"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item">
+              {{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="form.get('section')?.touched && form.get('section')?.invalid"
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }} {{ "section" | translate }}
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center gap-3 mt-3">
+        <div class="col-12 col-sm-4 col-md-4 col-lg-3">
+          <label for="studentSearch" class="fw-bold mb-2"
+            >{{ "student_name" | translate }} / {{ "student_id" | translate }}
+          </label>
+          <input
+            id="studentSearch"
+            class="form-control"
+            formControlName="studentSearch"
+            [placeholder]="'placeholder_text' | translate"
+          />
+          <div
+            *ngIf="
+              form.get('academicYearCode')?.touched &&
+              form.get('academicYearCode')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-4 col-md-3 col-lg-2">
+          <label for="sendStatus" class="fw-bold mb-2">{{
+            "send_status" | translate
+          }}</label>
+          <ng-select
+            name="sendStatus"
+            formControlName="sendStatus"
+            bindValue="placeholder_key"
+            [placeholder]="'placeholder_select' | translate"
+            [clearable]="true"
+            [items]="statuses"
+            [searchFn]="customSearchFn.bind(this)"
+          >
+            <ng-template ng-option-tmp ng-label-tmp let-item="item"
+              >{{ item | translateDropdown : { en: "desc_en", th: "desc_th" } }}
+            </ng-template>
+          </ng-select>
+          <div
+            *ngIf="
+              form.get('sendStatus')?.touched && form.get('sendStatus')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center gap-2 mb-0 mt-2">
+        <button type="submit" class="btn btn-primary custom-btn">
+          <i class="bi bi-search"></i> {{ "user_manage_search" | translate }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary custom-btn"
+          (click)="onReset()"
+        >
+          <i class="bi bi-arrow-repeat"></i
+          >{{ "user_manage_reset" | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

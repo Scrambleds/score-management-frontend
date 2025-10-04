@@ -1,0 +1,390 @@
+<!-- Modal -->
+<div
+  #modal
+  class="modal fade modal-custom"
+  id="announceScoreModal"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  data-bs-focus="false"
+  tabindex="-1"
+  aria-labelledby="announceScoreLabel"
+>
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="announceScoreLabel">
+          {{ "modalSendMail_title" | translate }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeModal()"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body pt-2">
+        <!-- Recipient Email Input -->
+        <div class="mb-2" *ngIf="isSendPerPerson">
+          <label for="recipientEmail" class="form-label">{{
+            "modalSendMail_destinationMail" | translate
+          }}</label>
+          <input
+            type="email"
+            class="form-control"
+            id="recipientEmail"
+            [(ngModel)]="currentEmail"
+            readonly
+            disabled
+          />
+        </div>
+
+        <!-- Subject Input -->
+        <div class="mb-2">
+          <label for="emailSubject" class="form-label">{{
+            "modalSendMail_subjectMail" | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            id="emailSubject"
+            name="emailSubject"
+            [(ngModel)]="emailSubject"
+            (focus)="onSubjectFocus()"
+            (blur)="onBlur()"
+            autocomplete="off"
+          />
+        </div>
+        <!-- Variable Selection -->
+        <div class="mb-2">
+          <label for="variableSelect" class="form-label me-2">{{
+            "modalSendMail_labelAddVar" | translate
+          }}</label>
+          <div class="d-flex align-items-center">
+            <ng-select
+              [items]="placeholderList"
+              [(ngModel)]="selectedVariable"
+              [placeholder]="'placeholder_select' | translate"
+              [searchable]="true"
+              [clearable]="true"
+              [dropdownPosition]="'auto'"
+              class="custom-ng-select"
+              style="width: 35%"
+              bindValue="placeholder_key"
+            >
+              <!-- ใช้ ng-label-tmp เพื่อแสดง label เมื่อมีการเลือก item -->
+              <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                {{
+                  item | translateDropdown : { th: "desc_th", en: "desc_en" }
+                }}
+              </ng-template>
+            </ng-select>
+
+            <button
+              type="button"
+              class="btn btn-primary ms-2"
+              (click)="addVariable()"
+              [disabled]="!canAddVariable || !selectedVariable"
+            >
+              <i class="bi bi-plus-square"></i>
+              {{ "modalSendMail_btnAddVar" | translate }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Message Textarea -->
+        <div class="mb-1">
+          <label for="emailMessage" class="form-label">
+            {{ "modalSendMail_bodyMail" | translate }}
+          </label>
+          <textarea
+            class="form-control"
+            id="emailMessage"
+            rows="10"
+            cols="50"
+            (focus)="onTextareaFocus()"
+            (keydown)="insertTab($event)"
+            (blur)="onBlur()"
+            [(ngModel)]="messageText"
+            autocomplete="off"
+            style="
+              tab-size: 8;
+              font-family: monospace;
+              font-size: 13px;
+              white-space: pre;
+            "
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer justify-content-between">
+        <div class="dropdown">
+          <button
+            type="button"
+            class="btn btn-secondary dropdown-toggle"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i
+              class="bi bi-file-earmark-text-fill"
+              style="font-size: 1rem; color: var(--white-color)"
+            ></i>
+            {{ "modalSendMail_btnTemplate" | translate }}
+          </button>
+          <ul class="dropdown-menu">
+            <li class="dropdown-item-container">
+              <button
+                class="dropdown-item"
+                type="button"
+                (click)="$event.stopPropagation()"
+              >
+                {{ "modalSendMail_menuTemplate_basicTemplate" | translate }}
+              </button>
+              <ul class="dropdown-submenu">
+                <li>
+                  <h6 class="dropdown-header">
+                    {{ "modalSendMail_menuTemplate_basicTemplate" | translate }}
+                  </h6>
+                </li>
+                <div class="template-list-container">
+                  <li *ngFor="let template of basicTemplateList">
+                    <button
+                      class="dropdown-item"
+                      type="button"
+                      (click)="loadBasicTemplate(template.templateId)"
+                    >
+                      {{ template.templateName }}
+                    </button>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <li class="dropdown-item-container">
+              <button
+                class="dropdown-item"
+                type="button"
+                (click)="$event.stopPropagation()"
+              >
+                {{ "modalSendMail_menuTemplate_privateTemplate" | translate }}
+              </button>
+              <ul class="dropdown-submenu">
+                <li>
+                  <h6 class="dropdown-header">
+                    {{
+                      "modalSendMail_menuTemplate_privateTemplate" | translate
+                    }}
+                  </h6>
+                </li>
+                <div class="template-list-container">
+                  <li *ngFor="let template of privateTemplateList">
+                    <button
+                      class="dropdown-item"
+                      type="button"
+                      (click)="loadPrivateTemplate(template.templateId)"
+                    >
+                      {{ template.templateName }}
+                    </button>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <li class="dropdown-item-container">
+              <button
+                class="dropdown-item"
+                type="button"
+                (click)="$event.stopPropagation()"
+              >
+                {{ "modalSendMail_menuTemplate_defaultTemplate" | translate }}
+              </button>
+              <ul class="dropdown-submenu">
+                <li>
+                  <h6 class="dropdown-header">
+                    {{
+                      "modalSendMail_menuTemplate_defaultTemplate" | translate
+                    }}
+                  </h6>
+                </li>
+                <div class="template-list-container">
+                  <li *ngFor="let template of allTemplateList">
+                    <button
+                      class="dropdown-item"
+                      type="button"
+                      (click)="setDefaultTemplate(template.templateId)"
+                    >
+                      {{ template.templateName }}
+                    </button>
+                  </li>
+                </div>
+              </ul>
+            </li>
+            <li class="dropdown-item-container">
+              <button class="dropdown-item" type="button">
+                <i
+                  class="bi bi-file-earmark-plus-fill"
+                  style="font-size: 1rem; color: var(--grey-color)"
+                ></i>
+                {{ "modalSendMail_menuTemplate_updateTemplate" | translate }}
+              </button>
+              <ul class="dropdown-submenu">
+                <li>
+                  <h6 class="dropdown-header">
+                    {{
+                      "modalSendMail_menuTemplate_updateTemplate_title"
+                        | translate
+                    }}
+                  </h6>
+                </li>
+                <div class="template-list-container">
+                  <li *ngFor="let template of privateTemplateList">
+                    <button
+                      class="dropdown-item"
+                      type="button"
+                      (click)="updateTemplate(template.templateId)"
+                    >
+                      {{ template.templateName }}
+                    </button>
+                  </li>
+                </div>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <button
+                    class="dropdown-item"
+                    type="button"
+                    (click)="toggleTemplateDialog(true)"
+                  >
+                    {{
+                      "modalSendMail_menuTemplate_updateTemplate_add"
+                        | translate
+                    }}
+                  </button>
+                </li>
+              </ul>
+            </li>
+            <li class="dropdown-item-container">
+              <button class="dropdown-item" type="button">
+                <i
+                  class="bi bi-file-earmark-x-fill"
+                  style="font-size: 1rem; color: var(--grey-color)"
+                ></i>
+                {{ "modalSendMail_menuTemplate_deleteTemplate" | translate }}
+              </button>
+              <ul class="dropdown-submenu">
+                <li>
+                  <h6 class="dropdown-header">
+                    {{
+                      "modalSendMail_menuTemplate_deleteTemplate" | translate
+                    }}
+                  </h6>
+                </li>
+                <div class="template-list-container">
+                  <li *ngFor="let template of privateTemplateList">
+                    <button
+                      class="dropdown-item"
+                      type="button"
+                      (click)="deleteTemplate(template.templateId)"
+                    >
+                      {{ template.templateName }}
+                    </button>
+                  </li>
+                </div>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeModal()"
+          >
+            {{ "btn_close" | translate }}
+          </button>
+          <button type="button" class="btn btn-primary" (click)="sendEmail()">
+            <i
+              class="bi bi-send-fill"
+              style="font-size: 1rem; color: var(--white-color)"
+            ></i>
+            {{ "modalSendMail_btnSendMail" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- dialog create template -->
+<div
+  class="custom-overlay"
+  *ngIf="isTemplateDialogVisible"
+  id="createTemplateDialog"
+  tabindex="0"
+  (keydown)="trapFocus($event)"
+>
+  <div class="backdrop"></div>
+  <div
+    class="overlay-content"
+    [ngClass]="{
+      'fade-in': isTemplateDialogVisible,
+      'fade-out': !isTemplateDialogVisible
+    }"
+  >
+    <div class="mb-3">
+      <label for="templateName" class="form-label">
+        {{ "modalCreateTemplate_label" | translate }}
+      </label>
+      <form
+        [formGroup]="createTemplateForm"
+        class="gap-1 d-flex flex-wrap mb-0"
+        style="width: auto"
+      >
+        <!-- Input Container -->
+        <div class="flex-grow-1" style="min-width: 200px">
+          <input
+            formControlName="nameTemplate"
+            name="nameTemplate"
+            type="text"
+            id="templateName"
+            [placeholder]="'modalCreateTemplate_placeholder' | translate"
+            class="form-control me-2 w-100"
+            autocomplete="off"
+          />
+          <div
+            *ngIf="
+              createTemplateForm.get('nameTemplate')?.touched &&
+              createTemplateForm.get('nameTemplate')?.invalid
+            "
+            class="text-danger ps-2"
+          >
+            {{ "alert_enterData" | translate }}
+          </div>
+        </div>
+        <!-- Button Container -->
+        <div
+          class="d-flex ms-auto h-auto"
+          style="
+            flex-wrap: wrap;
+            gap: 8px;
+            text-align: right;
+            max-height: 37.6px;
+          "
+        >
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="createTemplateForm.invalid"
+            (click)="onSaveCreateTemplate()"
+          >
+            {{ "btn_save" | translate }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            {{ "btn_cancel" | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

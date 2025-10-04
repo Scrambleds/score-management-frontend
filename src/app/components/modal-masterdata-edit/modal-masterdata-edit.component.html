@@ -1,0 +1,110 @@
+<!-- <div class="modal-overlay"></div> -->
+
+<form [formGroup]="form">
+  <!-- <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" #modalElement> -->
+  <div class="modal fade" tabindex="-1" role="dialog" #modalElement (click)="onBackdropClick($event)">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header bg-dark-blue text-white">
+          <h5 class="modal-title fw-bold" id="modalLabel">
+            {{ "master_modal_header1" | translate }}
+          </h5>
+          <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body overflow-auto p-0">
+          <div class="bg-light-green">
+            <p class="fw-bold mb-3 ps-3">
+              {{ "master_modal_title1" | translate }}
+            </p>
+          </div>
+
+          <div class="container">
+            <div class="row g-3 mb-4">
+              <!-- รหัสอ้างอิง -->
+              <div class="col-12 col-md-6 col-lg-4">
+                <label for="byte_code" class="form-label ps-2" [appRequiredMarker]="form.get('byte_code')">{{ "master_modal_bytecode" | translate }} </label>
+                <input type="text" id="byte_code" class="form-control" formControlName="byte_code"
+                  [placeholder]="'placeholder_text' | translate" />
+                  <div *ngIf="form.get('byte_code')?.invalid && form.get('byte_code')?.touched" class="text-danger ps-2">
+                    {{ "alert_enterData" | translate }}
+                  </div>
+              </div>
+
+              <!-- ประเภทอ้างอิง -->
+              <div class="col-12 col-md-6 col-lg-4">
+                <label for="byte_reference" class="form-label ps-2" [appRequiredMarker]="form.get('byte_reference')">{{ "master_modal_byteref" | translate }} </label>
+                <input type="text" id="byte_reference" class="form-control" formControlName="byte_reference"
+                  [placeholder]="'placeholder_text' | translate" />
+                  <div *ngIf="form.get('byte_reference')?.invalid && form.get('byte_reference')?.touched" class="text-danger ps-2">
+                    {{ "alert_enterData" | translate }}
+                  </div>
+              </div>
+
+              <!-- Active Status -->
+              <div class="col-12 col-md-6 col-lg-4">
+                <label for="active_status" class="form-label ps-2" [appRequiredMarker]="form.get('active_status')">{{"user_manage_status" | translate}} </label>
+                <ng-select [items]="statusData" bindLabel="byte_desc_th" bindValue="byte_desc_th"
+                  [placeholder]="'placeholder_select' | translate" formControlName="active_status" [searchFn]="customSearchFn_SearchLan.bind(this)"
+                  [searchable]="true">
+                  <ng-template ng-option-tmp ng-label-tmp let-item="item">
+                    {{ item | translateDropdown }}
+                  </ng-template>
+                </ng-select>
+                  <div *ngIf="form.get('active_status')?.invalid && form.get('active_status')?.touched" class="text-danger ps-2">
+                    {{ "alert_enterData" | translate }}
+                  </div>
+              </div>
+
+
+            </div>
+          </div>
+
+          <div class="bg-light-green">
+            <p class="fw-bold mb-0 ps-3">
+              {{ "master_modal_title2" | translate }}
+            </p>
+          </div>
+
+          <div class="mb-3"></div>
+
+          <div class="container">
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-md-6 col-lg-4">
+                <label for="byte_desc_en" class="form-label ps-2" [appRequiredMarker]="form.get('byte_desc_en')"> {{ "master_modal_engdesc" | translate}} </label>
+                <input type="text" id="byte_desc_en" class="form-control" formControlName="byte_desc_en"
+                  [placeholder]="'placeholder_text' | translate" />
+                  <div *ngIf="form.get('byte_desc_en')?.invalid && form.get('byte_desc_en')?.touched" class="text-danger ps-2">
+                    {{ "alert_enterData" | translate }}
+                  </div>                  
+              </div>
+
+              <!-- ชื่ออ้างอิงภาษาไทย -->
+              <div class="col-12 col-md-6 col-lg-4">
+                <label for="byte_desc_th" class="form-label ps-2" [appRequiredMarker]="form.get('byte_desc_th')"> {{ "master_modal_thaidesc" | translate}} </label>
+                <input type="text" id="byte_desc_th" class="form-control" formControlName="byte_desc_th"
+                [placeholder]="'placeholder_text' | translate" />
+                  <div *ngIf="form.get('byte_desc_th')?.invalid && form.get('byte_desc_th')?.touched" class="text-danger ps-2">
+                    {{ "alert_enterData" | translate }}
+                  </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Submit Button -->
+        <div class="d-flex justify-content-center pt-3 mb-4">
+          <button type="button" class="btn btn-primary" (click)="OnSaveData()">
+            <i class="bi bi-floppy-fill me-2"></i>
+            {{ "uploadscore_saveData" | translate }}
+          </button>          
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
